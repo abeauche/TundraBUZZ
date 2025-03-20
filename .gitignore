@@ -47,13 +47,10 @@ vignettes/*.pdf
 
 # Word temporary
 ~$*.doc*
-
 # Excel temporary
 ~$*.xls*
-
 # Excel Backup File
 *.xlk
-
 # PowerPoint temporary
 ~$*.ppt*
 
@@ -80,11 +77,23 @@ index.lock
 Rplots.pdf
 packrat/lib*/
 
-# Ignore all data files
-data/*
+# Ignore various obsolete raw data files
+**/data/raw/obsolete/
 
 # It is important that we are ignoring Shape Files, Audio Files
 
 # Ignore All Files on HardDrive
 D:/*
-/Volumes/TundraBUZZ
+/Volumes/TundraBUZZ/
+
+# Ignore the scrap outputs
+**/scrap/
+
+# Ignore Spectrogram Outputs
+outputs/spectrograms/*
+
+# Ignore scrapwork outputs
+outputs/scrap/*
+
+# Ignore hypothesis outputs
+outputs/hypothesis/*
