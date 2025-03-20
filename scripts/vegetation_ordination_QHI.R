@@ -17,7 +17,7 @@ library(vegan)
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
-vegetation_raw <- read.csv("/data_raw/QHI_vegetation_2024.csv", stringsAsFactors = TRUE)
+vegetation_raw <- read.csv("/data_raw/QHI_vegetation_2024_raw.csv", stringsAsFactors = TRUE)
 
 # Define functions (if applicable)
 
