@@ -1,0 +1,1022 @@
+"","aru_id","plot","date","distance","class","percent.cover","all.flower.count","canopy_height_top","observer","notes"
+"1","ARUQ1","Core",2024-08-04,0,"Salix Arctica",34,27,1,"AB",NA
+"2","ARUQ1","Core",2024-08-04,0,"xxxmoss",22,2,1,"AB",NA
+"3","ARUQ1","Core",2024-08-04,0,"Oxytropis",19,10,1,"AB",NA
+"4","ARUQ1","Core",2024-08-04,0,"Pedicularis spp",3,3,1,"AB",NA
+"5","ARUQ1","Core",2024-08-04,0,"Graminoid/horsetails",10,2,82,"AB",NA
+"6","ARUQ1","Core",2024-08-04,0,"Stellaria",2,25,1,"AB",NA
+"7","ARUQ1","Core",2024-08-04,0,"xxxlitter",10,2,1,"AB",NA
+"8","ARUQ1","S",2024-08-04,5,"Salix Arctica",45,25,1,"AB",NA
+"9","ARUQ1","S",2024-08-04,5,"xxxmoss",24,2,1,"AB",NA
+"10","ARUQ1","S",2024-08-04,5,"Oxytropis",6,14,1,"AB",NA
+"11","ARUQ1","S",2024-08-04,5,"Graminoid/horsetails",2,2,1,"AB",NA
+"12","ARUQ1","S",2024-08-04,5,"Pedicularis Capitata",4,2,1,"AB",NA
+"13","ARUQ1","S",2024-08-04,5,"Stellaria",1,21,1,"AB",NA
+"14","ARUQ1","S",2024-08-04,5,"Castilleja",5,3,15,"AB",NA
+"15","ARUQ1","S",2024-08-04,5,"Yarrow",3,2,1,"AB",NA
+"16","ARUQ1","S",2024-08-04,5,"otherforb",2,2,1,"AB",NA
+"17","ARUQ1","S",2024-08-04,5,"xxxlitter",9,2,1,"AB",NA
+"18","ARUQ1","E",2024-08-04,5,"Salix Arctica",57,30,1,"AB",NA
+"19","ARUQ1","E",2024-08-04,5,"Oxytropis",11,2,1,"AB",NA
+"20","ARUQ1","E",2024-08-04,5,"Graminoid/horsetails",6,2,74,"AB",NA
+"21","ARUQ1","E",2024-08-04,5,"Stellaria",1,3,1,"AB",NA
+"22","ARUQ1","E",2024-08-04,5,"Yarrow",1,2,1,"AB",NA
+"23","ARUQ1","E",2024-08-04,5,"Lichen",1,2,1,"AB",NA
+"24","ARUQ1","E",2024-08-04,5,"xxxmoss",6,2,1,"AB",NA
+"25","ARUQ1","E",2024-08-04,5,"xxxlitter",17,2,1,"AB",NA
+"26","ARUQ1","N",2024-08-04,5,"Salix Arctica",15,2,1,"AB",NA
+"27","ARUQ1","N",2024-08-04,5,"Pedicularis Vertisilata",7,25,1,"AB",NA
+"28","ARUQ1","N",2024-08-04,5,"Pedicularis spp",3,2,1,"AB",NA
+"29","ARUQ1","N",2024-08-04,5,"Graminoid/horsetails",15,2,80,"AB",NA
+"30","ARUQ1","N",2024-08-04,5,"Yarrow",8,2,1,"AB",NA
+"31","ARUQ1","N",2024-08-04,5,"xxxmoss",4,2,1,"AB",NA
+"32","ARUQ1","N",2024-08-04,5,"Stellaria",1,2,1,"AB",NA
+"33","ARUQ1","N",2024-08-04,5,"otherforb",2,2,1,"AB","Artemisia"
+"34","ARUQ1","N",2024-08-04,5,"otherforb",1,32,1,"AB","White lily"
+"35","ARUQ1","N",2024-08-04,5,"xxxlitter",42,2,1,"AB",NA
+"36","ARUQ1","W",2024-08-04,5,"Graminoid/horsetails",4.2,2,62,"AB",NA
+"37","ARUQ1","W",2024-08-04,5,"Monkshood",3.5,3,1,"AB",NA
+"38","ARUQ1","W",2024-08-04,5,"Salix Arctica",45.2,2,1,"AB",NA
+"39","ARUQ1","W",2024-08-04,5,"Oxytropis",11.8,22,1,"AB",NA
+"40","ARUQ1","W",2024-08-04,5,"Yarrow",5.2,2,1,"AB",NA
+"41","ARUQ1","W",2024-08-04,5,"xxxmoss",4.3,2,1,"AB",NA
+"42","ARUQ1","W",2024-08-04,5,"otherforb",1,2,1,"AB","Artemisia"
+"43","ARUQ1","W",2024-08-04,5,"xxxlitter",23.4,2,1,"AB",NA
+"44","ARUQ1","W",2024-08-04,5,"Stellaria",1.4,22,1,"AB",NA
+"45","ARUQ3","Core",2024-08-04,0,"Salix Arctica",34,14,1,"AB","15:39"
+"46","ARUQ3","Core",2024-08-04,0,"Lupine",27,27,1,"AB",NA
+"47","ARUQ3","Core",2024-08-04,0,"Pedicularis Capitata",15,6,1,"AB",NA
+"48","ARUQ3","Core",2024-08-04,0,"Lichen",1,2,1,"AB","Cet cuc"
+"49","ARUQ3","Core",2024-08-04,0,"xxxlitter",3,2,1,"AB",NA
+"50","ARUQ3","Core",2024-08-04,0,"Senecio",2,3,1,"AB","Other aster"
+"51","ARUQ3","Core",2024-08-04,0,"Dryas",27,25,1,"AB",NA
+"52","ARUQ3","Core",2024-08-04,0,"Stellaria",3,6,1,"AB",NA
+"53","ARUQ3","Core",2024-08-04,0,"xxxmoss",7,2,1,"AB",NA
+"54","ARUQ3","Core",2024-08-04,0,"Graminoid/horsetails",1,2,22,"AB",NA
+"55","ARUQ3","Core",2024-08-04,0,"Astragalus",8,21,1,"AB",NA
+"56","ARUQ3","S",2024-08-04,5,"Salix Arctica",31,3,1,"AB",NA
+"57","ARUQ3","S",2024-08-04,5,"Lupine",22,2,1,"AB",NA
+"58","ARUQ3","S",2024-08-04,5,"Pedicularis Vertisilata",7,27,98,"AB",NA
+"59","ARUQ3","S",2024-08-04,5,"Dryas",65,29,1,"AB",NA
+"60","ARUQ3","S",2024-08-04,5,"otherforb",4,14,1,"AB","Pol viv"
+"61","ARUQ3","S",2024-08-04,5,"Astragalus",6,2,1,"AB",NA
+"62","ARUQ3","S",2024-08-04,5,"Graminoid/horsetails",2,2,1,"AB",NA
+"63","ARUQ3","S",2024-08-04,5,"Oxytropis",6,14,1,"AB",NA
+"64","ARUQ3","S",2024-08-04,5,"xxxmoss",3,2,1,"AB",NA
+"65","ARUQ3","S",2024-08-04,5,"Stellaria",2,3,1,"AB",NA
+"66","ARUQ3","S",2024-08-04,5,"Lichen",1,2,1,"AB",NA
+"67","ARUQ3","E",2024-08-04,5,"Salix Arctica",5,2,1,"AB",NA
+"68","ARUQ3","E",2024-08-04,5,"Salix Reticulata",36,6,1,"AB",NA
+"69","ARUQ3","E",2024-08-04,5,"Salix Richardsonii ",58,30,1,"AB",NA
+"70","ARUQ3","E",2024-08-04,5,"Pedicularis Capitata",9,3,1,"AB",NA
+"71","ARUQ3","E",2024-08-04,5,"Astragalus",6,21,1,"AB",NA
+"72","ARUQ3","E",2024-08-04,5,"Dryas",12,25,1,"AB",NA
+"73","ARUQ3","E",2024-08-04,5,"Lupine",7,3,1,"AB",NA
+"74","ARUQ3","E",2024-08-04,5,"Graminoid/horsetails",1,2,72,"AB",NA
+"75","ARUQ3","E",2024-08-04,5,"Stellaria",1,2,1,"AB",NA
+"76","ARUQ3","E",2024-08-04,5,"Oxytropis",1,2,1,"AB",NA
+"77","ARUQ3","E",2024-08-04,5,"xxxlitter",3,2,1,"AB",NA
+"78","ARUQ3","N",2024-08-04,5,"Petasites frigidus",11,2,1,"AB","Narrowly making petasites frig, saxifraga"
+"79","ARUQ3","N",2024-08-04,5,"Salix Arctica",47,22,1,"AB",NA
+"80","ARUQ3","N",2024-08-04,5,"Lupine",16,14,1,"AB",NA
+"81","ARUQ3","N",2024-08-04,5,"Astragalus",14,14,1,"AB",NA
+"82","ARUQ3","N",2024-08-04,5,"Polygonum viviparum",7,29,1,"AB",NA
+"83","ARUQ3","N",2024-08-04,5,"Pedicularis Capitata",8,25,1,"AB",NA
+"84","ARUQ3","N",2024-08-04,5,"Stellaria",2,14,1,"AB",NA
+"85","ARUQ3","N",2024-08-04,5,"otherforb",1,2,1,"AB","Not myosotis"
+"86","ARUQ3","N",2024-08-04,5,"xxxfungus",2,2,1,"AB",NA
+"87","ARUQ3","N",2024-08-04,5,"xxxlitter",28,2,1,"AB",NA
+"88","ARUQ3","N",2024-08-04,5,"xxxmoss",7,2,1,"AB",NA
+"89","ARUQ3","N",2024-08-04,5,"Dryas",1,2,1,"AB",NA
+"90","ARUQ3","N",2024-08-04,5,"Graminoid/horsetails",2,2,33,"AB",NA
+"91","ARUQ3","N",2024-08-04,5,"otherforb",1,2,1,"AB","Cardamome digitata"
+"92","ARUQ3","W",2024-08-04,5,"Salix Reticulata",61,19,1,"AB",NA
+"93","ARUQ3","W",2024-08-04,5,"Lupine",6,2,1,"AB",NA
+"94","ARUQ3","W",2024-08-04,5,"Dryas",30,21,1,"AB",NA
+"95","ARUQ3","W",2024-08-04,5,"Oxytropis",2,2,1,"AB",NA
+"96","ARUQ3","W",2024-08-04,5,"Astragalus",8,22,1,"AB",NA
+"97","ARUQ3","W",2024-08-04,5,"Salix Arctica",3,2,1,"AB",NA
+"98","ARUQ3","W",2024-08-04,5,"Graminoid/horsetails",1,2,15,"AB",NA
+"99","ARUQ3","W",2024-08-04,5,"xxxlitter",2,2,1,"AB",NA
+"100","ARUQ3","W",2024-08-04,5,"xxxmoss",2,2,1,"AB",NA
+"101","ARUQ3","W",2024-08-04,5,"Polygonum viviparum",1,2,1,"AB","Viv"
+"102","ARUQ3","W",2024-08-04,5,"Pedicularis Capitata",1,2,1,"AB",NA
+"103","ARUQ3","W",2024-08-04,5,"Lichen",2,2,1,"AB",NA
+"104","ARUQ9","N",2024-08-04,5,"Dryas",39,2,1,"AB",NA
+"105","ARUQ9","N",2024-08-04,5,"Petasites frigidus",18,2,1,"AB",NA
+"106","ARUQ9","N",2024-08-04,5,"Lupine",11,2,1,"AB",NA
+"107","ARUQ9","N",2024-08-04,5,"Salix Arctica",8,2,1,"AB",NA
+"108","ARUQ9","N",2024-08-04,5,"Astragalus",2,2,1,"AB",NA
+"109","ARUQ9","N",2024-08-04,5,"Stellaria",1,14,1,"AB",NA
+"110","ARUQ9","N",2024-08-04,5,"Graminoid/horsetails",32,2,1,"AB","Horsetails"
+"111","ARUQ9","N",2024-08-04,5,"Senecio",1,2,1,"AB",NA
+"112","ARUQ9","N",2024-08-04,5,"xxxlitter",4,2,1,"AB",NA
+"113","ARUQ9","N",2024-08-04,5,"Graminoid/horsetails",4,2,43,"AB",NA
+"114","ARUQ9","N",2024-08-04,5,"Castilleja",2,3,1,"AB",NA
+"115","ARUQ9","N",2024-08-04,5,"Polygonum viviparum",3,3,1,"AB",NA
+"116","ARUQ9","N",2024-08-04,5,"Pedicularis spp",2,2,1,"AB",NA
+"117","ARUQ9","N",2024-08-04,5,"Lichen",2,2,1,"AB",NA
+"118","ARUQ9","N",2024-08-04,5,"Saxifrage",4,2,1,"AB",NA
+"119","ARUQ9","W",2024-08-04,5,"Salix Arctica",18,14,1,"AB",NA
+"120","ARUQ9","W",2024-08-04,5,"Lupine",12,3,1,"AB",NA
+"121","ARUQ9","W",2024-08-04,5,"Petasites frigidus",14,2,1,"AB",NA
+"122","ARUQ9","W",2024-08-04,5,"Graminoid/horsetails",13,2,22,"AB",NA
+"123","ARUQ9","W",2024-08-04,5,"Dryas",42,29,1,"AB",NA
+"124","ARUQ9","W",2024-08-04,5,"xxxmoss",12,2,1,"AB",NA
+"125","ARUQ9","W",2024-08-04,5,"Astragalus",2,2,1,"AB",NA
+"126","ARUQ9","W",2024-08-04,5,"Oxytropis",2,2,1,"AB",NA
+"127","ARUQ9","W",2024-08-04,5,"xxxlitter",3,2,1,"AB",NA
+"128","ARUQ9","W",2024-08-04,5,"Stellaria",1,2,1,"AB",NA
+"129","ARUQ9","S",2024-08-04,5,"Petasites frigidus",7,2,1,"AB",NA
+"130","ARUQ9","S",2024-08-04,5,"Salix Arctica",26,2,1,"AB",NA
+"131","ARUQ9","S",2024-08-04,5,"Lupine",11,2,1,"AB",NA
+"132","ARUQ9","S",2024-08-04,5,"Dryas",10,2,1,"AB",NA
+"133","ARUQ9","S",2024-08-04,5,"Monkshood",3,2,1,"AB",NA
+"134","ARUQ9","S",2024-08-04,5,"xxxmoss",9,2,1,"AB",NA
+"135","ARUQ9","S",2024-08-04,5,"Polygonum viviparum",4,27,1,"AB","Viv"
+"136","ARUQ9","S",2024-08-04,5,"Senecio",1,2,1,"AB",NA
+"137","ARUQ9","S",2024-08-04,5,"otherforb",6,2,1,"AB",NA
+"138","ARUQ9","S",2024-08-04,5,"otherforb",2,3,1,"AB","Lag gla"
+"139","ARUQ9","S",2024-08-04,5,"Graminoid/horsetails",10,2,1,"AB","Horsetail "
+"140","ARUQ9","S",2024-08-04,5,"Stellaria",2,22,1,"AB",NA
+"141","ARUQ9","S",2024-08-04,5,"Saxifrage",1,3,1,"AB","Narrow leaf"
+"142","ARUQ9","S",2024-08-04,5,"Astragalus",1,3,1,"AB",NA
+"143","ARUQ9","S",2024-08-04,5,"Oxytropis",1,2,1,"AB",NA
+"144","ARUQ9","S",2024-08-04,5,"Graminoid/horsetails",5,2,1,"AB",NA
+"145","ARUQ9","S",2024-08-04,5,"Saxifrage",2.5,3,47,"AB","Stiff stem "
+"146","ARUQ9","E",2024-08-04,5,"Graminoid/horsetails",41,2,1,"AB","Horsetail"
+"147","ARUQ9","E",2024-08-04,5,"Lupine",29,2,1,"AB",NA
+"148","ARUQ9","E",2024-08-04,5,"Salix Arctica",6,2,1,"AB",NA
+"149","ARUQ9","E",2024-08-04,5,"Dryas",22,27,1,"AB",NA
+"150","ARUQ9","E",2024-08-04,5,"Astragalus",7,2,1,"AB",NA
+"151","ARUQ9","E",2024-08-04,5,"Salix Reticulata",17,32,1,"AB",NA
+"152","ARUQ9","E",2024-08-04,5,"Stellaria",2,3,1,"AB",NA
+"153","ARUQ9","E",2024-08-04,5,"Polygonum viviparum",2,21,1,"AB","Viv"
+"154","ARUQ9","E",2024-08-04,5,"Graminoid/horsetails",1,2,63,"AB",NA
+"155","ARUQ9","E",2024-08-04,5,"Petasites frigidus",6,2,1,"AB",NA
+"156","ARUQ9","E",2024-08-04,5,"Saxifrage",3,2,1,"AB",NA
+"157","ARUQ9","E",2024-08-04,5,"Pedicularis spp",1,2,1,"AB",NA
+"158","ARUQ9","E",2024-08-04,5,"otherforb",1,2,1,"AB",NA
+"159","ARUQ9","E",2024-08-04,5,"xxxlitter",2,2,1,"AB",NA
+"160","ARUQ9","Core",2024-08-04,0,"Lupine",21,3,1,"AB",NA
+"161","ARUQ9","Core",2024-08-04,0,"Salix Arctica",32,25,1,"AB",NA
+"162","ARUQ9","Core",2024-08-04,0,"Petasites frigidus",15,2,1,"AB",NA
+"163","ARUQ9","Core",2024-08-04,0,"xxxlitter",12,2,1,"AB",NA
+"164","ARUQ9","Core",2024-08-04,0,"Graminoid/horsetails",5,2,1,"AB","Horsetail "
+"165","ARUQ9","Core",2024-08-04,0,"Astragalus",4,14,1,"AB",NA
+"166","ARUQ9","Core",2024-08-04,0,"otherforb",3,2,1,"AB","Blue bell"
+"167","ARUQ9","Core",2024-08-04,0,"Pedicularis Vertisilata",3,21,1,"AB",NA
+"168","ARUQ9","Core",2024-08-04,0,"Polygonum viviparum",1,3,1,"AB","Viv"
+"169","ARUQ9","Core",2024-08-04,0,"Dryas",2,3,1,"AB",NA
+"170","ARUQ9","Core",2024-08-04,0,"Pedicularis spp",3,3,1,"AB",NA
+"171","ARUQ9","Core",2024-08-04,0,"Graminoid/horsetails",3,2,60,"AB",NA
+"172","ARUQ9","Core",2024-08-04,0,"Pedicularis Capitata",1,3,1,"AB",NA
+"173","ARUQ10","Core",2024-08-04,0,"Cassiope tetragona",47,26,1,"AB",NA
+"174","ARUQ10","Core",2024-08-04,0,"Salix Pulchra",12,21,1,"AB",NA
+"175","ARUQ10","Core",2024-08-04,0,"Salix Reticulata",31,4,1,"AB",NA
+"176","ARUQ10","Core",2024-08-04,0,"Polygonum viviparum",4,29,1,"AB",NA
+"177","ARUQ10","Core",2024-08-04,0,"Polygonum bistorta",1,2,1,"AB",NA
+"178","ARUQ10","Core",2024-08-04,0,"otherforb",1,2,1,"AB",NA
+"179","ARUQ10","Core",2024-08-04,0,"Graminoid/horsetails",3,2,1,"AB","30.4"
+"180","ARUQ10","Core",2024-08-04,0,"Lupine",6,14,1,"AB",NA
+"181","ARUQ10","Core",2024-08-04,0,"Pedicularis Capitata",3,27,1,"AB",NA
+"182","ARUQ10","Core",2024-08-04,0,"Dryas",13,2,1,"AB",NA
+"183","ARUQ10","Core",2024-08-04,0,"Lichen",2,2,1,"AB",NA
+"184","ARUQ10","Core",2024-08-04,0,"otherforb",3,3,1,"AB","Pyrolla grandiflora"
+"185","ARUQ10","Core",2024-08-04,0,"Oxytropis",1,2,1,"AB",NA
+"186","ARUQ10","Core",2024-08-04,0,"Salix Polaris",1,3,1,"AB",NA
+"187","ARUQ10","N",2024-08-04,5,"xxxbareground",46,2,1,"AB",NA
+"188","ARUQ10","N",2024-08-04,5,"Polygonum viviparum",2,14,1,"AB",NA
+"189","ARUQ10","N",2024-08-04,5,"Polygonum bistorta",5,25,1,"AB",NA
+"190","ARUQ10","N",2024-08-04,5,"Dryas",18,14,1,"AB",NA
+"191","ARUQ10","N",2024-08-04,5,"Lichen",2,2,1,"AB",NA
+"192","ARUQ10","N",2024-08-04,5,"Graminoid/horsetails",15,2,87,"AB",NA
+"193","ARUQ10","N",2024-08-04,5,"Salix Pulchra",14,14,1,"AB",NA
+"194","ARUQ10","N",2024-08-04,5,"Pedicularis spp",1,14,1,"AB",NA
+"195","ARUQ10","N",2024-08-04,5,"Stellaria",1,25,1,"AB",NA
+"196","ARUQ10","N",2024-08-04,5,"Salix Reticulata",3,3,1,"AB",NA
+"197","ARUQ10","N",2024-08-04,5,"Salix Other",3,2,1,"AB",NA
+"198","ARUQ10","N",2024-08-04,5,"otherforb",2,2,1,"AB","Pyrolla"
+"199","ARUQ10","E",2024-08-04,5,"Salix Reticulata",14,2,1,"AB",NA
+"200","ARUQ10","E",2024-08-04,5,"Graminoid/horsetails",5,2,81,"AB",NA
+"201","ARUQ10","E",2024-08-04,5,"otherforb",2,2,1,"AB",NA
+"202","ARUQ10","E",2024-08-04,5,"Polygonum bistorta",3,14,1,"AB",NA
+"203","ARUQ10","E",2024-08-04,5,"Polygonum viviparum",1,14,1,"AB",NA
+"204","ARUQ10","E",2024-08-04,5,"Pedicularis Capitata",1,21,1,"AB",NA
+"205","ARUQ10","E",2024-08-04,5,"Lupine",4,2,1,"AB",NA
+"206","ARUQ10","E",2024-08-04,5,"xxxmoss",10,2,1,"AB",NA
+"207","ARUQ10","E",2024-08-04,5,"Lichen",2,2,1,"AB",NA
+"208","ARUQ10","E",2024-08-04,5,"Saxifrage",7,14,1,"AB","Nelsonii"
+"209","ARUQ10","E",2024-08-04,5,"Salix Other",12,3,1,"AB","Phlebophylla"
+"210","ARUQ10","E",2024-08-04,5,"Dryas",10,14,1,"AB",NA
+"211","ARUQ10","E",2024-08-04,5,"otherforb",7,3,49,"AB","Artemisia"
+"212","ARUQ10","E",2024-08-04,5,"xxxlitter",30,2,1,"AB",NA
+"213","ARUQ10","E",2024-08-04,5,"otherforb",3,2,1,"AB","Saussurea?"
+"214","ARUQ10","E",2024-08-04,5,"otherforb",3,2,1,"AB","Pyrolla"
+"215","ARUQ10","E",2024-08-04,5,"Salix Pulchra",5,2,1,"AB",NA
+"216","ARUQ10","E",2024-08-04,5,"Stellaria",1,21,1,"AB",NA
+"217","ARUQ10","S",2024-08-04,5,"Cassiope tetragona",21,26,1,"AB",NA
+"218","ARUQ10","S",2024-08-04,5,"Salix Reticulata",15,30,1,"AB",NA
+"219","ARUQ10","S",2024-08-04,5,"Salix Pulchra",18,2,1,"AB",NA
+"220","ARUQ10","S",2024-08-04,5,"Pedicularis Capitata",2,3,1,"AB",NA
+"221","ARUQ10","S",2024-08-04,5,"Polygonum viviparum",2,3,1,"AB",NA
+"222","ARUQ10","S",2024-08-04,5,"otherforb",6,3,1,"AB","Artemisia "
+"223","ARUQ10","S",2024-08-04,5,"Stellaria",1,14,1,"AB",NA
+"224","ARUQ10","S",2024-08-04,5,"otherforb",2,2,1,"AB","Cardamome digitata"
+"225","ARUQ10","S",2024-08-04,5,"Dryas",9,27,1,"AB",NA
+"226","ARUQ10","S",2024-08-04,5,"otherforb",1,2,1,"AB","Pyrolla "
+"227","ARUQ10","S",2024-08-04,5,"Salix Other",1,2,1,"AB","Phlebophylla"
+"228","ARUQ10","S",2024-08-04,5,"Lichen",5,2,1,"AB",NA
+"229","ARUQ10","S",2024-08-04,5,"Graminoid/horsetails",3,2,69,"AB",NA
+"230","ARUQ10","S",2024-08-04,5,"xxxlitter",20,2,1,"AB",NA
+"231","ARUQ10","S",2024-08-04,5,"xxxmoss",3,2,1,"AB",NA
+"232","ARUQ10","W",2024-08-04,5,"Salix Pulchra",74,14,1,"AB",NA
+"233","ARUQ10","W",2024-08-04,5,"Polygonum bistorta",4,25,45,"AB",NA
+"234","ARUQ10","W",2024-08-04,5,"Lichen",3,2,1,"AB",NA
+"235","ARUQ10","W",2024-08-04,5,"otherforb",1,14,1,"AB","Valerian"
+"236","ARUQ10","W",2024-08-04,5,"Salix Reticulata",14,3,1,"AB",NA
+"237","ARUQ10","W",2024-08-04,5,"xxxmoss",7,2,1,"AB",NA
+"238","ARUQ10","W",2024-08-04,5,"Pedicularis Capitata",1,2,1,"AB",NA
+"239","ARUQ10","W",2024-08-04,5,"Dryas",3,3,1,"AB",NA
+"240","ARUQ10","W",2024-08-04,5,"Lupine",2,3,1,"AB",NA
+"241","ARUQ10","W",2024-08-04,5,"Stellaria",1,3,1,"AB",NA
+"242","ARUQ10","W",2024-08-04,5,"Graminoid/horsetails",1,2,1,"AB",NA
+"243","ARUQ10","W",2024-08-04,5,"otherforb",2,2,1,"AB",NA
+"244","ARUQ10","W",2024-08-04,5,"Astragalus",1,2,1,"AB",NA
+"245","ARUQ7","Core",2024-08-05,0,"Salix Arctica",34,3,1,"AB","12:57"
+"246","ARUQ7","Core",2024-08-05,0,"Lupine",26,3,1,"AB",NA
+"247","ARUQ7","Core",2024-08-05,0,"Dryas",29,12,1,"AB",NA
+"248","ARUQ7","Core",2024-08-05,0,"Pedicularis Capitata",6,3,1,"AB",NA
+"249","ARUQ7","Core",2024-08-05,0,"Pedicularis spp",2,21,1,"AB",NA
+"250","ARUQ7","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"AB",NA
+"251","ARUQ7","Core",2024-08-05,0,"Oxytropis",6,2,1,"AB",NA
+"252","ARUQ7","Core",2024-08-05,0,"Stellaria",1,22,1,"AB",NA
+"253","ARUQ7","Core",2024-08-05,0,"xxxmoss",2,2,1,"AB",NA
+"254","ARUQ7","Core",2024-08-05,0,"Astragalus",3,14,1,"AB",NA
+"255","ARUQ7","Core",2024-08-05,0,"Graminoid/horsetails",2,2,75,"AB",NA
+"256","ARUQ7","Core",2024-08-05,0,"xxxlitter",4,2,1,"AB",NA
+"257","ARUQ7","N",2024-08-05,5,"Dryas",63,22,1,"AB",NA
+"258","ARUQ7","N",2024-08-05,5,"Salix Arctica",14,3,1,"AB",NA
+"259","ARUQ7","N",2024-08-05,5,"xxxlitter",23,2,1,"AB",NA
+"260","ARUQ7","N",2024-08-05,5,"Graminoid/horsetails",1,2,14,"AB",NA
+"261","ARUQ7","N",2024-08-05,5,"Astragalus",2,2,1,"AB",NA
+"262","ARUQ7","N",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"263","ARUQ7","N",2024-08-05,5,"Lupine",1,2,1,"AB",NA
+"264","ARUQ7","N",2024-08-05,5,"Oxytropis",4,2,1,"AB",NA
+"265","ARUQ7","E",2024-08-05,5,"Lupine",38,14,1,"AB",NA
+"266","ARUQ7","E",2024-08-05,5,"Pedicularis Capitata",2,14,1,"AB",NA
+"267","ARUQ7","E",2024-08-05,5,"Salix Arctica",20,21,1,"AB",NA
+"268","ARUQ7","E",2024-08-05,5,"Oxytropis",2,2,1,"AB",NA
+"269","ARUQ7","E",2024-08-05,5,"Dryas",18,21,1,"AB",NA
+"270","ARUQ7","E",2024-08-05,5,"Lichen",5,2,1,"AB",NA
+"271","ARUQ7","E",2024-08-05,5,"Polygonum viviparum",2,21,1,"AB",NA
+"272","ARUQ7","E",2024-08-05,5,"Astragalus",2,2,1,"AB",NA
+"273","ARUQ7","E",2024-08-05,5,"xxxmoss",7,2,1,"AB",NA
+"274","ARUQ7","E",2024-08-05,5,"xxxlitter",15,2,1,"AB",NA
+"275","ARUQ7","E",2024-08-05,5,"Saxifrage",2,2,1,"AB",NA
+"276","ARUQ7","E",2024-08-05,5,"otherforb",2,2,1,"AB","Cardamome digitata"
+"277","ARUQ7","E",2024-08-05,5,"Graminoid/horsetails",2,2,50,"AB",NA
+"278","ARUQ7","S",2024-08-05,5,"Lupine",29,3,1,"AB",NA
+"279","ARUQ7","S",2024-08-05,5,"Salix Reticulata",26,12,1,"AB",NA
+"280","ARUQ7","S",2024-08-05,5,"Astragalus",2,2,1,"AB",NA
+"281","ARUQ7","S",2024-08-05,5,"Salix Arctica",14,14,1,"AB",NA
+"282","ARUQ7","S",2024-08-05,5,"Dryas",25,7,1,"AB",NA
+"283","ARUQ7","S",2024-08-05,5,"Graminoid/horsetails",4,2,64,"AB",NA
+"284","ARUQ7","S",2024-08-05,5,"Senecio",1,3,1,"AB",NA
+"285","ARUQ7","S",2024-08-05,5,"Pedicularis Capitata",1,2,1,"AB",NA
+"286","ARUQ7","S",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"287","ARUQ7","S",2024-08-05,5,"Oxytropis",1,2,1,"AB",NA
+"288","ARUQ7","S",2024-08-05,5,"xxxlitter",3,2,1,"AB",NA
+"289","ARUQ7","S",2024-08-05,5,"Stellaria",1,3,1,"AB",NA
+"290","ARUQ7","W",2024-08-05,5,"Dryas",78,23,1,"AB",NA
+"291","ARUQ7","W",2024-08-05,5,"Astragalus",9,3,1,"AB",NA
+"292","ARUQ7","W",2024-08-05,5,"Pedicularis spp",2,2,1,"AB",NA
+"293","ARUQ7","W",2024-08-05,5,"Pedicularis Capitata",1,3,1,"AB",NA
+"294","ARUQ7","W",2024-08-05,5,"Lupine",5,2,1,"AB",NA
+"295","ARUQ7","W",2024-08-05,5,"Salix Arctica",7,14,1,"AB",NA
+"296","ARUQ7","W",2024-08-05,5,"Graminoid/horsetails",5,2,29,"AB",NA
+"297","ARUQ7","W",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"298","ARUQ7","W",2024-08-05,5,"Oxytropis",1,2,1,"AB",NA
+"299","ARUQ7","W",2024-08-05,5,"xxxlitter",12,2,1,"AB",NA
+"300","ARUQ8","Core",2024-08-05,0,"Pedicularis spp",1,3,30,"AB",NA
+"301","ARUQ8","Core",2024-08-05,0,"Oxytropis",13,27,1,"AB",NA
+"302","ARUQ8","Core",2024-08-05,0,"Astragalus",12,14,1,"AB",NA
+"303","ARUQ8","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"AB",NA
+"304","ARUQ8","Core",2024-08-05,0,"Dryas",67,6,1,"AB",NA
+"305","ARUQ8","Core",2024-08-05,0,"Lichen",3,2,1,"AB",NA
+"306","ARUQ8","Core",2024-08-05,0,"Salix Arctica",17,2,1,"AB",NA
+"307","ARUQ8","Core",2024-08-05,0,"Stellaria",1,27,1,"AB",NA
+"308","ARUQ8","Core",2024-08-05,0,"xxxmoss",1,2,1,"AB",NA
+"309","ARUQ8","Core",2024-08-05,0,"xxxlitter",6,2,1,"AB",NA
+"310","ARUQ8","Core",2024-08-05,0,"Graminoid/horsetails",4,2,1,"AB",NA
+"311","ARUQ8","Core",2024-08-05,0,"Pedicularis Capitata",2,2,1,"AB",NA
+"312","ARUQ8","Core",2024-08-05,0,"otherforb",2,2,1,"AB",NA
+"313","ARUQ8","N",2024-08-05,5,"Salix Arctica",8,2,1,"AB",NA
+"314","ARUQ8","N",2024-08-05,5,"Petasites frigidus",4,2,1,"AB",NA
+"315","ARUQ8","N",2024-08-05,5,"xxxfungus",2,2,1,"AB",NA
+"316","ARUQ8","N",2024-08-05,5,"Dryas",78,22,1,"AB",NA
+"317","ARUQ8","N",2024-08-05,5,"Oxytropis",3,2,1,"AB",NA
+"318","ARUQ8","N",2024-08-05,5,"Castilleja",1,3,7,"AB",NA
+"319","ARUQ8","N",2024-08-05,5,"Polygonum viviparum",1,21,1,"AB",NA
+"320","ARUQ8","N",2024-08-05,5,"Pedicularis Capitata",1,3,1,"AB",NA
+"321","ARUQ8","N",2024-08-05,5,"Graminoid/horsetails",3,2,1,"AB",NA
+"322","ARUQ8","N",2024-08-05,5,"Astragalus",1,2,1,"AB",NA
+"323","ARUQ8","N",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"324","ARUQ8","E",2024-08-05,5,"Dryas",36,9,1,"AB",NA
+"325","ARUQ8","E",2024-08-05,5,"Graminoid/horsetails",7,2,73,"AB",NA
+"326","ARUQ8","E",2024-08-05,5,"xxxmoss",22,2,1,"AB",NA
+"327","ARUQ8","E",2024-08-05,5,"Polygonum viviparum",1,25,1,"AB",NA
+"328","ARUQ8","E",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"329","ARUQ8","E",2024-08-05,5,"Castilleja",1,2,1,"AB",NA
+"330","ARUQ8","E",2024-08-05,5,"Salix Arctica",13,2,1,"AB",NA
+"331","ARUQ8","E",2024-08-05,5,"Pedicularis Vertisilata",1,2,1,"AB",NA
+"332","ARUQ8","E",2024-08-05,5,"otherforb",1,2,1,"AB",NA
+"333","ARUQ8","E",2024-08-05,5,"Astragalus",1,2,1,"AB",NA
+"334","ARUQ8","E",2024-08-05,5,"xxxlitter",6,2,1,"AB",NA
+"335","ARUQ8","S",2024-08-05,5,"Pedicularis spp",3,21,1,"AB",NA
+"336","ARUQ8","S",2024-08-05,5,"Pedicularis Vertisilata",4,21,1,"AB",NA
+"337","ARUQ8","S",2024-08-05,5,"Castilleja",1,3,1,"AB",NA
+"338","ARUQ8","S",2024-08-05,5,"Oxytropis",2,2,1,"AB",NA
+"339","ARUQ8","S",2024-08-05,5,"Astragalus",6,2,1,"AB",NA
+"340","ARUQ8","S",2024-08-05,5,"Dryas",43,5,1,"AB",NA
+"341","ARUQ8","S",2024-08-05,5,"Graminoid/horsetails",2,2,54,"AB",NA
+"342","ARUQ8","S",2024-08-05,5,"Salix Arctica",29,2,1,"AB",NA
+"343","ARUQ8","S",2024-08-05,5,"xxxmoss",2,2,1,"AB",NA
+"344","ARUQ8","S",2024-08-05,5,"xxxlitter",16,2,1,"AB",NA
+"345","ARUQ8","S",2024-08-05,5,"Stellaria",1,14,1,"AB",NA
+"346","ARUQ8","S",2024-08-05,5,"Lichen",3,2,1,"AB",NA
+"347","ARUQ8","W",2024-08-05,5,"Dryas",43,25,1,"AB",NA
+"348","ARUQ8","W",2024-08-05,5,"Astragalus",2,21,1,"AB",NA
+"349","ARUQ8","W",2024-08-05,5,"Oxytropis",14,2,1,"AB",NA
+"350","ARUQ8","W",2024-08-05,5,"Polygonum viviparum",1,21,1,"AB",NA
+"351","ARUQ8","W",2024-08-05,5,"Salix Arctica",21,2,1,"AB",NA
+"352","ARUQ8","W",2024-08-05,5,"xxxmoss",2,2,1,"AB",NA
+"353","ARUQ8","W",2024-08-05,5,"Pedicularis Capitata",7,2,1,"AB",NA
+"354","ARUQ8","W",2024-08-05,5,"Stellaria",1,3,1,"AB",NA
+"355","ARUQ8","W",2024-08-05,5,"Pedicularis Vertisilata",1,2,1,"AB",NA
+"356","ARUQ8","W",2024-08-05,5,"xxxlitter",3,2,1,"AB",NA
+"357","ARUQ8","W",2024-08-05,5,"Lichen",1,2,1,"AB",NA
+"358","ARUQ6","Core",2024-08-05,0,"Pedicularis Vertisilata",17,20,1,"AB",NA
+"359","ARUQ6","Core",2024-08-05,0,"Castilleja",6,21,27,"AB",NA
+"360","ARUQ6","Core",2024-08-05,0,"Oxytropis",21,16,1,"AB",NA
+"361","ARUQ6","Core",2024-08-05,0,"Salix Arctica",22,2,1,"AB",NA
+"362","ARUQ6","Core",2024-08-05,0,"xxxmoss",3,2,1,"AB",NA
+"363","ARUQ6","Core",2024-08-05,0,"xxxlitter",10,2,1,"AB",NA
+"364","ARUQ6","Core",2024-08-05,0,"otherforb",1,2,1,"AB",NA
+"365","ARUQ6","Core",2024-08-05,0,"Astragalus",12,14,1,"AB",NA
+"366","ARUQ6","Core",2024-08-05,0,"Graminoid/horsetails",3,2,1,"AB",NA
+"367","ARUQ6","Core",2024-08-05,0,"Pedicularis spp",2,21,1,"AB",NA
+"368","ARUQ6","N",2024-08-05,5,"Pedicularis Vertisilata",3,25,1,"AB",NA
+"369","ARUQ6","N",2024-08-05,5,"Saxifrage",5,27,1,"AB",NA
+"370","ARUQ6","N",2024-08-05,5,"Stellaria",1,14,1,"AB",NA
+"371","ARUQ6","N",2024-08-05,5,"otherforb",1,25,1,"AB","Blue flower"
+"372","ARUQ6","N",2024-08-05,5,"otherforb",1,3,1,"AB","White lily"
+"373","ARUQ6","N",2024-08-05,5,"Polygonum viviparum",1,22,1,"AB",NA
+"374","ARUQ6","N",2024-08-05,5,"Astragalus",5,3,1,"AB",NA
+"375","ARUQ6","N",2024-08-05,5,"Yarrow",2,2,1,"AB",NA
+"376","ARUQ6","N",2024-08-05,5,"Senecio",2,2,1,"AB","Other unknown"
+"377","ARUQ6","N",2024-08-05,5,"Graminoid/horsetails",6,2,54,"AB",NA
+"378","ARUQ6","N",2024-08-05,5,"otherforb",1,2,1,"AB","Set of leaves"
+"379","ARUQ6","N",2024-08-05,5,"xxxlitter",45,2,1,"AB",NA
+"380","ARUQ6","N",2024-08-05,5,"xxxmoss",2,2,1,"AB",NA
+"381","ARUQ6","E",2024-08-05,5,"Salix Arctica",14,27,1,"AB",NA
+"382","ARUQ6","E",2024-08-05,5,"Graminoid/horsetails",3,2,33,"AB",NA
+"383","ARUQ6","E",2024-08-05,5,"Pedicularis Capitata",4,3,1,"AB",NA
+"384","ARUQ6","E",2024-08-05,5,"otherforb",1,14,1,"AB","Blue flower"
+"385","ARUQ6","E",2024-08-05,5,"otherforb",6,25,1,"AB","Green white leaves"
+"386","ARUQ6","E",2024-08-05,5,"xxxmoss",16,2,1,"AB",NA
+"387","ARUQ6","E",2024-08-05,5,"Pedicularis Vertisilata",1,2,1,"AB",NA
+"388","ARUQ6","E",2024-08-05,5,"otherforb",1,2,1,"AB","Small leaves"
+"389","ARUQ6","E",2024-08-05,5,"xxxbareground",65,2,1,"AB",NA
+"390","ARUQ6","S",2024-08-05,5,"Pedicularis Capitata",4,21,1,"AB",NA
+"391","ARUQ6","S",2024-08-05,5,"Pedicularis Vertisilata",5,21,13,"AB",NA
+"392","ARUQ6","S",2024-08-05,5,"otherforb",2,13,1,"AB","Blue flower"
+"393","ARUQ6","S",2024-08-05,5,"Salix Arctica",24,5,1,"AB",NA
+"394","ARUQ6","S",2024-08-05,5,"Saxifrage",4,2,1,"AB","Six leaves"
+"395","ARUQ6","S",2024-08-05,5,"Graminoid/horsetails",2,2,1,"AB",NA
+"396","ARUQ6","S",2024-08-05,5,"xxxmoss",7,2,1,"AB",NA
+"397","ARUQ6","S",2024-08-05,5,"xxxbareground",35,2,1,"AB",NA
+"398","ARUQ6","S",2024-08-05,5,"xxxlitter",15,2,1,"AB",NA
+"399","ARUQ6","W",2024-08-05,5,"Astragalus",26,32,97,"AB",NA
+"400","ARUQ6","W",2024-08-05,5,"xxxmoss",28,2,1,"AB",NA
+"401","ARUQ6","W",2024-08-05,5,"xxxlitter",45,2,1,"AB",NA
+"402","ARUQ6","W",2024-08-05,5,"Lichen",3,2,1,"AB",NA
+"403","ARUQ6","W",2024-08-05,5,"Salix Arctica",3,2,1,"AB",NA
+"404","ARUQ6","W",2024-08-05,5,"Oxytropis",6,2,1,"AB",NA
+"405","ARUQ6","W",2024-08-05,5,"Graminoid/horsetails",1,2,1,"AB",NA
+"406","ARUQ5","Core",2024-08-05,0,"Lupine",61,7,1,"AB",NA
+"407","ARUQ5","Core",2024-08-05,0,"Salix Arctica",19,22,1,"AB",NA
+"408","ARUQ5","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"AB",NA
+"409","ARUQ5","Core",2024-08-05,0,"Yarrow",1,3,1,"AB",NA
+"410","ARUQ5","Core",2024-08-05,0,"Stellaria",1,14,1,"AB",NA
+"411","ARUQ5","Core",2024-08-05,0,"Lichen",2,2,1,"AB",NA
+"412","ARUQ5","Core",2024-08-05,0,"Castilleja",3,2,1,"AB",NA
+"413","ARUQ5","Core",2024-08-05,0,"xxxlitter",9,2,1,"AB",NA
+"414","ARUQ5","Core",2024-08-05,0,"Pedicularis Capitata",1,2,1,"AB",NA
+"415","ARUQ5","Core",2024-08-05,0,"Graminoid/horsetails",1,2,51,"AB",NA
+"416","ARUQ5","N",2024-08-05,5,"Salix Arctica",46,22,1,"AB",NA
+"417","ARUQ5","N",2024-08-05,5,"Lupine",17,14,1,"AB",NA
+"418","ARUQ5","N",2024-08-05,5,"Pedicularis Capitata",3,14,96,"AB",NA
+"419","ARUQ5","N",2024-08-05,5,"Dryas",26,6,1,"AB",NA
+"420","ARUQ5","N",2024-08-05,5,"Stellaria",1,3,1,"AB",NA
+"421","ARUQ5","N",2024-08-05,5,"Petasites frigidus",1,2,1,"AB",NA
+"422","ARUQ5","N",2024-08-05,5,"Lichen",1,2,1,"AB",NA
+"423","ARUQ5","N",2024-08-05,5,"Graminoid/horsetails",1,2,1,"AB",NA
+"424","ARUQ5","N",2024-08-05,5,"xxxlitter",8,2,1,"AB",NA
+"425","ARUQ5","N",2024-08-05,5,"otherforb",1,2,1,"AB","Sausserea"
+"426","ARUQ5","E",2024-08-05,5,"Salix Richardsonii ",82,16,78,"AB",NA
+"427","ARUQ5","E",2024-08-05,5,"Dryas",10,2,1,"AB",NA
+"428","ARUQ5","E",2024-08-05,5,"Lupine",6,2,1,"AB",NA
+"429","ARUQ5","E",2024-08-05,5,"Graminoid/horsetails",4,2,1,"AB","Horsetail"
+"430","ARUQ5","E",2024-08-05,5,"Monkshood",2,2,1,"AB",NA
+"431","ARUQ5","E",2024-08-05,5,"Petasites frigidus",3,2,1,"AB",NA
+"432","ARUQ5","E",2024-08-05,5,"otherforb",1,2,1,"AB","Polemonaciae "
+"433","ARUQ5","E",2024-08-05,5,"Stellaria",1,2,1,"AB",NA
+"434","ARUQ5","E",2024-08-05,5,"xxxlitter",15,2,1,"AB",NA
+"435","ARUQ5","S",2024-08-05,5,"Lupine",38,29,1,"AB",NA
+"436","ARUQ5","S",2024-08-05,5,"Senecio",2,14,32,"AB",NA
+"437","ARUQ5","S",2024-08-05,5,"Pedicularis Vertisilata",6,27,1,"AB",NA
+"438","ARUQ5","S",2024-08-05,5,"Petasites frigidus",3,2,1,"AB",NA
+"439","ARUQ5","S",2024-08-05,5,"Monkshood",1,3,1,"AB",NA
+"440","ARUQ5","S",2024-08-05,5,"Castilleja",3,3,1,"AB",NA
+"441","ARUQ5","S",2024-08-05,5,"otherforb",2,2,1,"AB",NA
+"442","ARUQ5","S",2024-08-05,5,"xxxmoss",4,2,1,"AB",NA
+"443","ARUQ5","S",2024-08-05,5,"Pedicularis Capitata",1,2,1,"AB",NA
+"444","ARUQ5","S",2024-08-05,5,"Graminoid/horsetails",1,2,1,"AB","Horsetail"
+"445","ARUQ5","S",2024-08-05,5,"Graminoid/horsetails",6,2,1,"AB",NA
+"446","ARUQ5","S",2024-08-05,5,"xxxfungus",1,2,1,"AB",NA
+"447","ARUQ5","S",2024-08-05,5,"Polygonum viviparum",1,14,1,"AB",NA
+"448","ARUQ5","S",2024-08-05,5,"Salix Arctica",19,14,1,"AB",NA
+"449","ARUQ5","S",2024-08-05,5,"Stellaria",1,14,1,"AB",NA
+"450","ARUQ5","S",2024-08-05,5,"Oxytropis",1,2,1,"AB",NA
+"451","ARUQ5","S",2024-08-05,5,"Yarrow",2,2,1,"AB",NA
+"452","ARUQ5","W",2024-08-05,5,"Dryas",41,2,1,"AB",NA
+"453","ARUQ5","W",2024-08-05,5,"Polygonum viviparum",4,25,1,"AB",NA
+"454","ARUQ5","W",2024-08-05,5,"Salix Arctica",17,2,1,"AB",NA
+"455","ARUQ5","W",2024-08-05,5,"Lupine",14,3,1,"AB",NA
+"456","ARUQ5","W",2024-08-05,5,"xxxmoss",11,2,1,"AB",NA
+"457","ARUQ5","W",2024-08-05,5,"xxxlitter",10,2,1,"AB",NA
+"458","ARUQ5","W",2024-08-05,5,"Saxifrage",3,2,1,"AB",NA
+"459","ARUQ5","W",2024-08-05,5,"Yarrow",1,2,1,"AB",NA
+"460","ARUQ5","W",2024-08-05,5,"Graminoid/horsetails",2,2,8,"AB",NA
+"461","ARUQ5","W",2024-08-05,5,"Senecio",1,2,1,"AB",NA
+"462","ARUQ5","W",2024-08-05,5,"Pedicularis spp",1,2,1,"AB",NA
+"463","ARUQ5","W",2024-08-05,5,"Stellaria",1,3,1,"AB",NA
+"464","ARUQ4","Core",2024-08-05,0,"Salix Richardsonii ",73,15,59,"AB",NA
+"465","ARUQ4","Core",2024-08-05,0,"xxxmoss",15,2,1,"AB",NA
+"466","ARUQ4","Core",2024-08-05,0,"xxxlitter",12,2,1,"AB",NA
+"467","ARUQ4","Core",2024-08-05,0,"Graminoid/horsetails",3,2,1,"AB","Horsetail"
+"468","ARUQ4","N",2024-08-05,5,"Salix Arctica",27,2,1,"AB",NA
+"469","ARUQ4","N",2024-08-05,5,"Graminoid/horsetails",13,2,1,"AB","Horsetail "
+"470","ARUQ4","N",2024-08-05,5,"xxxmoss",15,2,1,"AB",NA
+"471","ARUQ4","N",2024-08-05,5,"xxxlitter",12,2,1,"AB",NA
+"472","ARUQ4","N",2024-08-05,5,"Salix Richardsonii ",5,2,1,"AB",NA
+"473","ARUQ4","N",2024-08-05,5,"Astragalus",3,2,1,"AB",NA
+"474","ARUQ4","N",2024-08-05,5,"Graminoid/horsetails",8,2,40,"AB",NA
+"475","ARUQ4","E",2024-08-05,5,"Salix Richardsonii ",68,17,66,"AB",NA
+"476","ARUQ4","E",2024-08-05,5,"xxxmoss",3,2,1,"AB",NA
+"477","ARUQ4","E",2024-08-05,5,"Graminoid/horsetails",7,2,1,"AB",NA
+"478","ARUQ4","E",2024-08-05,5,"xxxlitter",17,2,1,"AB",NA
+"479","ARUQ4","S",2024-08-05,5,"Graminoid/horsetails",31,2,1,"AB","Horsetail"
+"480","ARUQ4","S",2024-08-05,5,"Astragalus",14,25,1,"AB",NA
+"481","ARUQ4","S",2024-08-05,5,"Salix Richardsonii ",2,2,1,"AB",NA
+"482","ARUQ4","S",2024-08-05,5,"Graminoid/horsetails",12,2,41,"AB",NA
+"483","ARUQ4","S",2024-08-05,5,"Saxifrage",3,2,1,"AB",NA
+"484","ARUQ4","S",2024-08-05,5,"otherforb",2,2,1,"AB",NA
+"485","ARUQ4","S",2024-08-05,5,"Oxytropis",5,3,1,"AB",NA
+"486","ARUQ4","S",2024-08-05,5,"Pedicularis spp",2,2,1,"AB",NA
+"487","ARUQ4","S",2024-08-05,5,"xxxlitter",21,2,1,"AB",NA
+"488","ARUQ4","W",2024-08-05,5,"Salix Richardsonii ",24,21,44,"AB",NA
+"489","ARUQ4","W",2024-08-05,5,"Salix Arctica",32,14,1,"AB",NA
+"490","ARUQ4","W",2024-08-05,5,"Graminoid/horsetails",16,2,1,"AB","Horsetail"
+"491","ARUQ4","W",2024-08-05,5,"Graminoid/horsetails",5,2,1,"AB",NA
+"492","ARUQ4","W",2024-08-05,5,"Pedicularis Capitata",3,2,1,"AB",NA
+"493","ARUQ4","W",2024-08-05,5,"Astragalus",3,2,1,"AB",NA
+"494","ARUQ4","W",2024-08-05,5,"xxxlitter",3,2,1,"AB",NA
+"495","ARUQ4","W",2024-08-05,5,"xxxmoss",8,2,1,"AB",NA
+"496","ARUQ4","W",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"497","ARUQ4","W",2024-08-05,5,"Oxytropis",2,2,1,"AB",NA
+"498","ARUQ2","Core",2024-08-05,0,"Astragalus",38,31,1,"AB",NA
+"499","ARUQ2","Core",2024-08-05,0,"Petasites frigidus",4,2,1,"AB",NA
+"500","ARUQ2","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"AB",NA
+"501","ARUQ2","Core",2024-08-05,0,"Salix Richardsonii ",32,25,1,"AB",NA
+"502","ARUQ2","Core",2024-08-05,0,"Salix Arctica",6,2,1,"AB",NA
+"503","ARUQ2","Core",2024-08-05,0,"xxxmoss",10,2,1,"AB",NA
+"504","ARUQ2","Core",2024-08-05,0,"Lichen",5,2,1,"AB",NA
+"505","ARUQ2","Core",2024-08-05,0,"Graminoid/horsetails",6,2,1,"AB","Horsetail "
+"506","ARUQ2","Core",2024-08-05,0,"Graminoid/horsetails",2,2,50,"AB",NA
+"507","ARUQ2","N",2024-08-05,5,"Petasites frigidus",8,3,38,"AB",NA
+"508","ARUQ2","N",2024-08-05,5,"Salix Richardsonii ",25,2,1,"AB",NA
+"509","ARUQ2","N",2024-08-05,5,"Lichen",15,2,1,"AB",NA
+"510","ARUQ2","N",2024-08-05,5,"xxxmoss",1,2,1,"AB",NA
+"511","ARUQ2","N",2024-08-05,5,"Graminoid/horsetails",3,2,1,"AB","Horsetail"
+"512","ARUQ2","N",2024-08-05,5,"Graminoid/horsetails",13,2,1,"AB",NA
+"513","ARUQ2","N",2024-08-05,5,"Salix Arctica",9,2,1,"AB",NA
+"514","ARUQ2","N",2024-08-05,5,"xxxlitter",25,2,1,"AB",NA
+"515","ARUQ2","E",2024-08-05,5,"Salix Richardsonii ",28,30,1,"AB",NA
+"516","ARUQ2","E",2024-08-05,5,"Polygonum viviparum",1,14,1,"AB",NA
+"517","ARUQ2","E",2024-08-05,5,"Astragalus",26,29,1,"AB",NA
+"518","ARUQ2","E",2024-08-05,5,"Graminoid/horsetails",2,2,67,"AB",NA
+"519","ARUQ2","E",2024-08-05,5,"Graminoid/horsetails",11,2,1,"AB","Horsetail "
+"520","ARUQ2","E",2024-08-05,5,"xxxmoss",15,2,1,"AB",NA
+"521","ARUQ2","E",2024-08-05,5,"Lichen",2,2,1,"AB",NA
+"522","ARUQ2","E",2024-08-05,5,"xxxlitter",9,2,1,"AB",NA
+"523","ARUQ2","E",2024-08-05,5,"Salix Arctica",3,2,1,"AB",NA
+"524","ARUQ2","S",2024-08-05,5,"Salix Richardsonii ",41,3,19,"AB",NA
+"525","ARUQ2","S",2024-08-05,5,"Graminoid/horsetails",8,2,1,"AB","Horsetail "
+"526","ARUQ2","S",2024-08-05,5,"Petasites frigidus",6,2,1,"AB",NA
+"527","ARUQ2","S",2024-08-05,5,"xxxlitter",12,2,2,"AB",NA
+"528","ARUQ2","S",2024-08-05,5,"Salix Arctica",9,2,1,"AB",NA
+"529","ARUQ2","S",2024-08-05,5,"Graminoid/horsetails",4,2,1,"AB",NA
+"530","ARUQ2","S",2024-08-05,5,"Stellaria",1,27,1,"AB",NA
+"531","ARUQ2","S",2024-08-05,5,"xxxmoss",11,2,1,"AB",NA
+"532","ARUQ2","S",2024-08-05,5,"Lichen",4,2,1,"AB",NA
+"533","ARUQ2","W",2024-08-05,5,"Salix Richardsonii ",28,2,1,"AB",NA
+"534","ARUQ2","W",2024-08-05,5,"Petasites frigidus",20,2,22,"AB",NA
+"535","ARUQ2","W",2024-08-05,5,"Salix Arctica",13,22,1,"AB",NA
+"536","ARUQ2","W",2024-08-05,5,"Graminoid/horsetails",4,2,1,"AB","Horsetail "
+"537","ARUQ2","W",2024-08-05,5,"Graminoid/horsetails",2,2,1,"AB",NA
+"538","ARUQ2","W",2024-08-05,5,"Astragalus",6,2,1,"AB",NA
+"539","ARUQ2","W",2024-08-05,5,"Lichen",7,2,1,"AB",NA
+"540","ARUQ2","W",2024-08-05,5,"xxxmoss",21,2,1,"AB",NA
+"541","ARUQ2","W",2024-08-05,5,"Stellaria",1,3,1,"AB",NA
+"542","ARUQ2","W",2024-08-05,5,"xxxlitter",6,2,1,"AB",NA
+"543","ARUQ1","Core",2024-08-04,0,"xxxmoss",10.2,2,1,"EB",NA
+"544","ARUQ1","Core",2024-08-04,0,"Oxytropis",15.4,6,1,"EB",NA
+"545","ARUQ1","Core",2024-08-04,0,"Graminoid/horsetails",4.7,22,83,"EB",NA
+"546","ARUQ1","Core",2024-08-04,0,"Salix Arctica",46.8,27,1,"EB",NA
+"547","ARUQ1","Core",2024-08-04,0,"Graminoid/horsetails",1.9,27,1,"EB",NA
+"548","ARUQ1","Core",2024-08-04,0,"Pedicularis Capitata",2.6,3,1,"EB",NA
+"549","ARUQ1","Core",2024-08-04,0,"Stellaria",2.1,21,1,"EB",NA
+"550","ARUQ1","Core",2024-08-04,0,"Graminoid/horsetails",1.8,2,1,"EB",NA
+"551","ARUQ1","Core",2024-08-04,0,"xxxlitter",14.5,2,1,"EB",NA
+"552","ARUQ1","S",2024-08-04,5,"Salix Arctica",47.3,2,1,"EB",NA
+"553","ARUQ1","S",2024-08-04,5,"Graminoid/horsetails",2.7,25,1,"EB",NA
+"554","ARUQ1","S",2024-08-04,5,"Graminoid/horsetails",2.1,2,1,"EB",NA
+"555","ARUQ1","S",2024-08-04,5,"Oxytropis",4.2,14,1,"EB",NA
+"556","ARUQ1","S",2024-08-04,5,"Pedicularis Capitata",2.6,3,1,"EB",NA
+"557","ARUQ1","S",2024-08-04,5,"Stellaria",0.8,2,1,"EB",NA
+"558","ARUQ1","S",2024-08-04,5,"Castilleja",1.9,3,1,"EB",NA
+"559","ARUQ1","S",2024-08-04,5,"Yarrow",2.6,2,1,"EB",NA
+"560","ARUQ1","S",2024-08-04,5,"xxxmoss",18.2,2,1,"EB",NA
+"561","ARUQ1","S",2024-08-04,5,"xxxlitter",16.2,2,1,"EB",NA
+"562","ARUQ1","S",2024-08-04,5,NA,1.4,2,1,"EB",NA
+"563","ARUQ1","E",2024-08-04,5,"Graminoid/horsetails",2.3,2,1,"EB",NA
+"564","ARUQ1","E",2024-08-04,5,"Salix Arctica",48.3,25,1,"EB",NA
+"565","ARUQ1","E",2024-08-04,5,"Pedicularis Capitata",0.9,2,1,"EB",NA
+"566","ARUQ1","E",2024-08-04,5,"Graminoid/horsetails",15.7,25,75,"EB",NA
+"567","ARUQ1","E",2024-08-04,5,"Yarrow",0.5,2,1,"EB",NA
+"568","ARUQ1","E",2024-08-04,5,"Stellaria",0.6,3,1,"EB",NA
+"569","ARUQ1","E",2024-08-04,5,"Graminoid/horsetails",0.3,32,1,"EB",NA
+"570","ARUQ1","E",2024-08-04,5,"Oxytropis",3.1,2,1,"EB",NA
+"571","ARUQ1","E",2024-08-04,5,"xxxlitter",24.6,2,1,"EB",NA
+"572","ARUQ1","E",2024-08-04,5,"xxxmoss",3.7,2,1,"EB",NA
+"573","ARUQ1","N",2024-08-04,5,"xxxlitter",38.9,2,1,"EB",NA
+"574","ARUQ1","N",2024-08-04,5,"Pedicularis Vertisilata",5.3,25,1,"EB",NA
+"575","ARUQ1","N",2024-08-04,5,"Graminoid/horsetails",8.2,25,79,"EB",NA
+"576","ARUQ1","N",2024-08-04,5,"Graminoid/horsetails",2.3,2,1,"EB",NA
+"577","ARUQ1","N",2024-08-04,5,"Stellaria",1.2,14,1,"EB",NA
+"578","ARUQ1","N",2024-08-04,5,NA,1.2,29,1,"EB",NA
+"579","ARUQ1","N",2024-08-04,5,"Artemisia",1.2,2,1,"EB",NA
+"580","ARUQ1","N",2024-08-04,5,"xxxmoss",4.6,2,1,"EB",NA
+"581","ARUQ1","N",2024-08-04,5,"Salix Arctica",23.5,2,1,"EB",NA
+"582","ARUQ1","N",2024-08-04,5,"Yarrow",13.6,3,1,"EB",NA
+"583","ARUQ1","W",2024-08-04,5,"Salix Arctica",40.2,2,1,"EB",NA
+"584","ARUQ1","W",2024-08-04,5,"Monkshood",2.1,3,1,"EB",NA
+"585","ARUQ1","W",2024-08-04,5,"Graminoid/horsetails",16.3,2,61,"EB",NA
+"586","ARUQ1","W",2024-08-04,5,"xxxmoss",2.5,2,1,"EB",NA
+"587","ARUQ1","W",2024-08-04,5,"xxxlitter",25.3,2,1,"EB",NA
+"588","ARUQ1","W",2024-08-04,5,"Oxytropis",10.3,22,1,"EB",NA
+"589","ARUQ1","W",2024-08-04,5,"Stellaria",1.3,22,1,"EB",NA
+"590","ARUQ1","W",2024-08-04,5,"Artemisia",2.2,2,1,"EB",NA
+"591","ARUQ3","Core",2024-08-04,0,"Salix Arctica",37,2,1,"EB",NA
+"592","ARUQ3","Core",2024-08-04,0,"Lupine",22,27,1,"EB",NA
+"593","ARUQ3","Core",2024-08-04,0,"Pedicularis Capitata",21,32,1,"EB",NA
+"594","ARUQ3","Core",2024-08-04,0,"xxxlitter",11,2,1,"EB",NA
+"595","ARUQ3","Core",2024-08-04,0,"Graminoid/horsetails",2,2,1,"EB",NA
+"596","ARUQ3","Core",2024-08-04,0,"Dryas",9,25,1,"EB",NA
+"597","ARUQ3","Core",2024-08-04,0,"Astragalus",13,14,1,"EB",NA
+"598","ARUQ3","Core",2024-08-04,0,"Senecio",1,3,85,"EB","Other aster"
+"599","ARUQ3","Core",2024-08-04,0,"Stellaria",1,5,1,"EB",NA
+"600","ARUQ3","Core",2024-08-04,0,"xxxmoss",3,2,1,"EB",NA
+"601","ARUQ3","Core",2024-08-04,0,"Lichen",1,2,1,"EB",NA
+"602","ARUQ3","S",2024-08-04,5,"Dryas",62,25,1,"EB",NA
+"603","ARUQ3","S",2024-08-04,5,"Salix Arctica",16,2,1,"EB",NA
+"604","ARUQ3","S",2024-08-04,5,"Astragalus",2,2,1,"EB",NA
+"605","ARUQ3","S",2024-08-04,5,"Lupine",7,2,1,"EB",NA
+"606","ARUQ3","S",2024-08-04,5,"Pedicularis Vertisilata",12,27,97,"EB",NA
+"607","ARUQ3","S",2024-08-04,5,"Polygonum viviparum",1,14,1,"EB",NA
+"608","ARUQ3","S",2024-08-04,5,"Graminoid/horsetails",NA,1,1,"EB",NA
+"609","ARUQ3","S",2024-08-04,5,"Oxytropis",NA,14,1,"EB",NA
+"610","ARUQ3","S",2024-08-04,5,"xxxlitter",3,2,1,"EB",NA
+"611","ARUQ3","S",2024-08-04,5,"xxxmoss",3,2,1,"EB",NA
+"612","ARUQ3","S",2024-08-04,5,"Lichen",2,2,1,"EB",NA
+"613","ARUQ3","S",2024-08-04,5,"Stellaria",4,21,1,"EB",NA
+"614","ARUQ3","E",2024-08-04,5,"Salix Richardsonii ",52,4,1,"EB",NA
+"615","ARUQ3","E",2024-08-04,5,"Salix Reticulata",15,7,1,"EB",NA
+"616","ARUQ3","E",2024-08-04,5,"Lupine",5,14,1,"EB",NA
+"617","ARUQ3","E",2024-08-04,5,"Polygonum viviparum",1,3,1,"EB",NA
+"618","ARUQ3","E",2024-08-04,5,"Graminoid/horsetails",9,2,70,"EB",NA
+"619","ARUQ3","E",2024-08-04,5,"Salix Arctica",5,2,1,"EB",NA
+"620","ARUQ3","E",2024-08-04,5,"Dryas",19,22,1,"EB",NA
+"621","ARUQ3","E",2024-08-04,5,"Astragalus",5,21,1,"EB",NA
+"622","ARUQ3","E",2024-08-04,5,"Castilleja",3,14,1,"EB",NA
+"623","ARUQ3","E",2024-08-04,5,"Pedicularis Capitata",7,3,1,"EB",NA
+"624","ARUQ3","E",2024-08-04,5,"Stellaria",1,21,1,"EB",NA
+"625","ARUQ3","E",2024-08-04,5,"Oxytropis",2,2,1,"EB",NA
+"626","ARUQ3","E",2024-08-04,5,"xxxlitter",6,2,1,"EB",NA
+"627","ARUQ3","N",2024-08-04,5,"xxxmoss",12,2,1,"EB",NA
+"628","ARUQ3","N",2024-08-04,5,"xxxlitter",17,2,1,"EB",NA
+"629","ARUQ3","N",2024-08-04,5,"Petasites frigidus",10,2,1,"EB",NA
+"630","ARUQ3","N",2024-08-04,5,"Lupine",23,3,99,"EB",NA
+"631","ARUQ3","N",2024-08-04,5,"Salix Arctica",19,27,1,"EB",NA
+"632","ARUQ3","N",2024-08-04,5,"Oxytropis",4,2,1,"EB",NA
+"633","ARUQ3","N",2024-08-04,5,"Astragalus",4,3,1,"EB",NA
+"634","ARUQ3","N",2024-08-04,5,"Graminoid/horsetails",7,2,36,"EB",NA
+"635","ARUQ3","N",2024-08-04,5,"Pedicularis Capitata",11,22,1,"EB",NA
+"636","ARUQ3","N",2024-08-04,5,"otherforb",6,2,1,"EB","Img_4806"
+"637","ARUQ3","N",2024-08-04,5,"Polygonum viviparum",5,29,1,"EB",NA
+"638","ARUQ3","N",2024-08-04,5,"Dryas",3,2,1,"EB",NA
+"639","ARUQ3","N",2024-08-04,5,"Stellaria",1,3,1,"EB",NA
+"640","ARUQ3","N",2024-08-04,5,"xxxfungus",1,2,1,"EB",NA
+"641","ARUQ3","N",2024-08-04,5,"otherforb",1,2,1,"EB",NA
+"642","ARUQ3","W",2024-08-04,5,"Salix Reticulata",65,17,1,"EB",NA
+"643","ARUQ3","W",2024-08-04,5,"Lichen",2,2,1,"EB",NA
+"644","ARUQ3","W",2024-08-04,5,"Lupine",5,3,84,"EB",NA
+"645","ARUQ3","W",2024-08-04,5,"xxxlitter",2,2,1,"EB",NA
+"646","ARUQ3","W",2024-08-04,5,"Dryas",32,14,1,"EB",NA
+"647","ARUQ3","W",2024-08-04,5,"Oxytropis",3,3,1,"EB",NA
+"648","ARUQ3","W",2024-08-04,5,"Astragalus",2,22,1,"EB",NA
+"649","ARUQ3","W",2024-08-04,5,"Pedicularis Capitata",1,2,1,"EB",NA
+"650","ARUQ3","W",2024-08-04,5,"Salix Arctica",1,2,1,"EB",NA
+"651","ARUQ3","W",2024-08-04,5,"Graminoid/horsetails",1,2,18,"EB",NA
+"652","ARUQ9","N",2024-08-04,5,"Dryas",17,2,1,"EB","Appears to have stopped recording"
+"653","ARUQ9","N",2024-08-04,5,"Petasites frigidus",21,2,12,"EB",NA
+"654","ARUQ9","N",2024-08-04,5,"Castilleja",3,3,1,"EB",NA
+"655","ARUQ9","N",2024-08-04,5,"Lupine",4,3,1,"EB",NA
+"656","ARUQ9","N",2024-08-04,5,"Salix Arctica",8,2,1,"EB",NA
+"657","ARUQ9","N",2024-08-04,5,"xxxlitter",9,2,1,"EB",NA
+"658","ARUQ9","N",2024-08-04,5,"Graminoid/horsetails",46,2,1,"EB",NA
+"659","ARUQ9","N",2024-08-04,5,"Astragalus",2,2,1,"EB",NA
+"660","ARUQ9","N",2024-08-04,5,"Polygonum bistorta",1,2,1,"EB",NA
+"661","ARUQ9","N",2024-08-04,5,"Oxytropis",1,3,1,"EB",NA
+"662","ARUQ9","N",2024-08-04,5,"Stellaria",1,14,1,"EB",NA
+"663","ARUQ9","N",2024-08-04,5,"Senecio",1,2,1,"EB",NA
+"664","ARUQ9","N",2024-08-04,5,"Saxifrage",2,2,1,"EB",NA
+"665","ARUQ9","W",2024-08-04,5,"Dryas",43,27,1,"EB",NA
+"666","ARUQ9","W",2024-08-04,5,"Salix Arctica",13,2,1,"EB",NA
+"667","ARUQ9","W",2024-08-04,5,"Petasites frigidus",10,2,90,"EB",NA
+"668","ARUQ9","W",2024-08-04,5,"Graminoid/horsetails",3,2,23,"EB",NA
+"669","ARUQ9","W",2024-08-04,5,"Lupine",14,14,1,"EB",NA
+"670","ARUQ9","W",2024-08-04,5,"xxxmoss",8,2,1,"EB",NA
+"671","ARUQ9","W",2024-08-04,5,"xxxlitter",15,2,1,"EB",NA
+"672","ARUQ9","W",2024-08-04,5,"Stellaria",1,3,1,"EB",NA
+"673","ARUQ9","S",2024-08-04,5,"Salix Arctica",17,2,1,"EB",NA
+"674","ARUQ9","S",2024-08-04,5,"Polygonum viviparum",5,25,1,"EB",NA
+"675","ARUQ9","S",2024-08-04,5,"Lupine",14,2,1,"EB",NA
+"676","ARUQ9","S",2024-08-04,5,"Graminoid/horsetails",21,2,1,"EB",NA
+"677","ARUQ9","S",2024-08-04,5,"L. Glauca",2,3,1,"EB",NA
+"678","ARUQ9","S",2024-08-04,5,"Saxifrage",4,14,46,"EB","One large stif stemmed"
+"679","ARUQ9","S",2024-08-04,5,"Stellaria",1,22,1,"EB",NA
+"680","ARUQ9","S",2024-08-04,5,"Astragalus",3,3,1,"EB",NA
+"681","ARUQ9","S",2024-08-04,5,"Oxytropis",1,2,1,"EB",NA
+"682","ARUQ9","S",2024-08-04,5,"otherforb",3,2,1,"EB",NA
+"683","ARUQ9","S",2024-08-04,5,"Monkshood",2,2,1,"EB",NA
+"684","ARUQ9","S",2024-08-04,5,"xxxmoss",14,2,1,"EB",NA
+"685","ARUQ9","S",2024-08-04,5,"xxxlitter",14,2,1,"EB",NA
+"686","ARUQ9","S",2024-08-04,5,"Dryas",7,2,1,"EB",NA
+"687","ARUQ9","S",2024-08-04,5,"Senecio",1,2,1,"EB",NA
+"688","ARUQ9","E",2024-08-04,5,"Dryas",29,6,1,"EB",NA
+"689","ARUQ9","E",2024-08-04,5,"Lupine",30,2,95,"EB",NA
+"690","ARUQ9","E",2024-08-04,5,"Graminoid/horsetails",38,2,71,"EB",NA
+"691","ARUQ9","E",2024-08-04,5,"Petasites frigidus",8,2,1,"EB",NA
+"692","ARUQ9","E",2024-08-04,5,"Salix Reticulata",10,30,1,"EB",NA
+"693","ARUQ9","E",2024-08-04,5,"Salix Arctica",5,2,1,"EB",NA
+"694","ARUQ9","E",2024-08-04,5,"Astragalus",3,2,1,"EB",NA
+"695","ARUQ9","E",2024-08-04,5,"Polygonum viviparum",2,14,1,"EB",NA
+"696","ARUQ9","E",2024-08-04,5,"Pedicularis Capitata",1,3,1,"EB",NA
+"697","ARUQ9","E",2024-08-04,5,"Saxifrage",1,2,1,"EB",NA
+"698","ARUQ9","E",2024-08-04,5,"Stellaria",2,3,1,"EB",NA
+"699","ARUQ9","E",2024-08-04,5,"xxxlitter",3,2,1,"EB",NA
+"700","ARUQ9","Core",2024-08-04,0,"Lupine",31,14,1,"EB",NA
+"701","ARUQ9","Core",2024-08-04,0,"Petasites frigidus",18,2,3,"EB",NA
+"702","ARUQ9","Core",2024-08-04,0,"Salix Arctica",41,21,1,"EB",NA
+"703","ARUQ9","Core",2024-08-04,0,"Graminoid/horsetails",5,2,56,"EB",NA
+"704","ARUQ9","Core",2024-08-04,0,"Pedicularis Vertisilata",3,21,1,"EB",NA
+"705","ARUQ9","Core",2024-08-04,0,"Pedicularis spp",1,2,1,"EB",NA
+"706","ARUQ9","Core",2024-08-04,0,"Astragalus",8,14,1,"EB",NA
+"707","ARUQ9","Core",2024-08-04,0,"Oxytropis",9,21,1,"EB",NA
+"708","ARUQ9","Core",2024-08-04,0,"Dryas",2,3,1,"EB",NA
+"709","ARUQ9","Core",2024-08-04,0,"xxxlitter",9,2,1,"EB",NA
+"710","ARUQ10","Core",2024-08-04,0,"Cassiope tetragona",38,26,1,"EB",NA
+"711","ARUQ10","Core",2024-08-04,0,"Lupine",4,21,1,"EB",NA
+"712","ARUQ10","Core",2024-08-04,0,"Pedicularis Capitata",11,30,1,"EB",NA
+"713","ARUQ10","Core",2024-08-04,0,"Salix Pulchra",13,5,1,"EB",NA
+"714","ARUQ10","Core",2024-08-04,0,"Pyrola grandiflora",5,3,1,"EB",NA
+"715","ARUQ10","Core",2024-08-04,0,"Graminoid/horsetails",14,2,88,"EB",NA
+"716","ARUQ10","Core",2024-08-04,0,"Salix Reticulata",42,14,1,"EB",NA
+"717","ARUQ10","Core",2024-08-04,0,"Polygonum viviparum",5,29,20,"EB",NA
+"718","ARUQ10","Core",2024-08-04,0,"Polygonum bistorta",2,2,1,"EB",NA
+"719","ARUQ10","Core",2024-08-04,0,"Oxytropis",1,2,1,"EB",NA
+"720","ARUQ10","N",2024-08-04,5,"Polygonum bistorta",12,22,34,"EB",NA
+"721","ARUQ10","N",2024-08-04,5,"xxxlitter",22,2,1,"EB",NA
+"722","ARUQ10","N",2024-08-04,5,"Graminoid/horsetails",17,2,86,"EB",NA
+"723","ARUQ10","N",2024-08-04,5,"Lupine",3,2,1,"EB",NA
+"724","ARUQ10","N",2024-08-04,5,"Salix Pulchra",9,2,1,"EB",NA
+"725","ARUQ10","N",2024-08-04,5,"Salix Reticulata",11,2,1,"EB",NA
+"726","ARUQ10","N",2024-08-04,5,"Pyrola grandiflora",NA,1,1,"EB",NA
+"727","ARUQ10","N",2024-08-04,5,"Pedicularis Capitata",1,2,1,"EB",NA
+"728","ARUQ10","N",2024-08-04,5,"Dryas",4,21,1,"EB",NA
+"729","ARUQ10","N",2024-08-04,5,"Pedicularis spp",1,3,1,"EB",NA
+"730","ARUQ10","N",2024-08-04,5,"Saxifrage",1,2,1,"EB",NA
+"731","ARUQ10","N",2024-08-04,5,"Stellaria",NA,25,1,"EB",NA
+"732","ARUQ10","N",2024-08-04,5,"Polygonum viviparum",1,14,1,"EB",NA
+"733","ARUQ10","N",2024-08-04,5,"xxxmoss",7,2,1,"EB",NA
+"734","ARUQ10","N",2024-08-04,5,"xxxbareground",34,2,1,"EB",NA
+"735","ARUQ10","N",2024-08-04,5,"Salix Other",1,2,1,"EB",NA
+"736","ARUQ10","E",2024-08-04,5,"Salix Reticulata",17,2,1,"EB",NA
+"737","ARUQ10","E",2024-08-04,5,"xxxlitter",9,2,1,"EB",NA
+"738","ARUQ10","E",2024-08-04,5,"xxxmoss",9,2,1,"EB",NA
+"739","ARUQ10","E",2024-08-04,5,"Graminoid/horsetails",8,2,1,"EB",NA
+"740","ARUQ10","E",2024-08-04,5,"Salix Pulchra",2,2,1,"EB",NA
+"741","ARUQ10","E",2024-08-04,5,"Salix Other",4,3,1,"EB",NA
+"742","ARUQ10","E",2024-08-04,5,"Dryas",9,14,1,"EB",NA
+"743","ARUQ10","E",2024-08-04,5,"Saxifrage",8,14,1,"EB","Nelsonii"
+"744","ARUQ10","E",2024-08-04,5,"Senecio",1,3,1,"EB","Maybe saxifrage"
+"745","ARUQ10","E",2024-08-04,5,"Artemisia",2,21,1,"EB",NA
+"746","ARUQ10","E",2024-08-04,5,"Pyrola grandiflora",1,2,1,"EB",NA
+"747","ARUQ10","E",2024-08-04,5,"otherforb",6,2,1,"EB","Sauceria "
+"748","ARUQ10","E",2024-08-04,5,"Pedicularis Capitata",3,21,1,"EB",NA
+"749","ARUQ10","E",2024-08-04,5,"Lupine",1,2,1,"EB",NA
+"750","ARUQ10","E",2024-08-04,5,"Polygonum bistorta",2,14,1,"EB",NA
+"751","ARUQ10","E",2024-08-04,5,"Stellaria",1,27,1,"EB",NA
+"752","ARUQ10","S",2024-08-04,5,"Cassiope tetragona",20,26,1,"EB",NA
+"753","ARUQ10","S",2024-08-04,5,"Artemisia",5,3,53,"EB",NA
+"754","ARUQ10","S",2024-08-04,5,"Pedicularis Capitata",12,3,1,"EB",NA
+"755","ARUQ10","S",2024-08-04,5,"Salix Reticulata",18,25,1,"EB",NA
+"756","ARUQ10","S",2024-08-04,5,"xxxmoss",7,2,1,"EB",NA
+"757","ARUQ10","S",2024-08-04,5,"xxxlitter",21,2,1,"EB",NA
+"758","ARUQ10","S",2024-08-04,5,"Graminoid/horsetails",12,2,69,"EB",NA
+"759","ARUQ10","S",2024-08-04,5,"Salix Pulchra",10,21,1,"EB",NA
+"760","ARUQ10","S",2024-08-04,5,"Pyrola grandiflora",1,2,1,"EB",NA
+"761","ARUQ10","S",2024-08-04,5,"Dryas",8,14,1,"EB",NA
+"762","ARUQ10","W",2024-08-04,5,"Salix Pulchra",77,14,1,"EB",NA
+"763","ARUQ10","W",2024-08-04,5,"Salix Reticulata",15,14,1,"EB",NA
+"764","ARUQ10","W",2024-08-04,5,"xxxmoss",7,2,1,"EB",NA
+"765","ARUQ10","W",2024-08-04,5,"Polygonum bistorta",2,22,45,"EB",NA
+"766","ARUQ10","W",2024-08-04,5,"Polygonum viviparum",1,3,1,"EB",NA
+"767","ARUQ10","W",2024-08-04,5,"Lupine",4,3,1,"EB",NA
+"768","ARUQ10","W",2024-08-04,5,"Dryas",1,3,1,"EB",NA
+"769","ARUQ10","W",2024-08-04,5,"Astragalus",1,2,1,"EB",NA
+"770","ARUQ10","W",2024-08-04,5,"Stellaria",1,3,1,"EB",NA
+"771","ARUQ10","W",2024-08-04,5,"otherforb",3,2,1,"EB","Img_4881"
+"772","ARUQ10","W",2024-08-04,5,"Pyrola grandiflora",2,2,1,"EB",NA
+"773","ARUQ10","W",2024-08-04,5,"otherforb",1,3,1,"EB","Valeria"
+"774","ARUQ7","Core",2024-08-05,0,"Salix Arctica",29,3,1,"EB",NA
+"775","ARUQ7","Core",2024-08-05,0,"Oxytropis",19,2,1,"EB",NA
+"776","ARUQ7","Core",2024-08-05,0,"Lupine",21,14,1,"EB",NA
+"777","ARUQ7","Core",2024-08-05,0,"Dryas",21,13,1,"EB",NA
+"778","ARUQ7","Core",2024-08-05,0,"Pedicularis Capitata",6,14,1,"EB",NA
+"779","ARUQ7","Core",2024-08-05,0,"Pedicularis spp",2,14,1,"EB",NA
+"780","ARUQ7","Core",2024-08-05,0,"Graminoid/horsetails",9,2,1,"EB",NA
+"781","ARUQ7","Core",2024-08-05,0,"xxxlitter",4,2,1,"EB",NA
+"782","ARUQ7","Core",2024-08-05,0,"Astragalus",4,3,1,"EB",NA
+"783","ARUQ7","Core",2024-08-05,0,"Stellaria",1,14,1,"EB",NA
+"784","ARUQ7","N",2024-08-05,5,"xxxlitter",28,2,1,"EB",NA
+"785","ARUQ7","N",2024-08-05,5,"xxxmoss",1,2,1,"EB",NA
+"786","ARUQ7","N",2024-08-05,5,"Salix Arctica",12,3,89,"EB",NA
+"787","ARUQ7","N",2024-08-05,5,"Oxytropis",5,2,1,"EB","Nigresence"
+"788","ARUQ7","N",2024-08-05,5,"Graminoid/horsetails",3,2,14,"EB",NA
+"789","ARUQ7","N",2024-08-05,5,"Dryas",65,22,1,"EB",NA
+"790","ARUQ7","N",2024-08-05,5,"Lupine",1,2,1,"EB",NA
+"791","ARUQ7","N",2024-08-05,5,"Astragalus",1,2,1,"EB",NA
+"792","ARUQ7","E",2024-08-05,5,"xxxmoss",12,2,1,"EB",NA
+"793","ARUQ7","E",2024-08-05,5,"xxxlitter",14,2,1,"EB",NA
+"794","ARUQ7","E",2024-08-05,5,"Salix Arctica",13,14,1,"EB",NA
+"795","ARUQ7","E",2024-08-05,5,"Lupine",20,14,5,"EB",NA
+"796","ARUQ7","E",2024-08-05,5,"Polygonum viviparum",1,21,1,"EB",NA
+"797","ARUQ7","E",2024-08-05,5,"Dryas",9,21,1,"EB",NA
+"798","ARUQ7","E",2024-08-05,5,"Pedicularis Capitata",8,21,1,"EB",NA
+"799","ARUQ7","E",2024-08-05,5,"Oxytropis",1,14,1,"EB",NA
+"800","ARUQ7","E",2024-08-05,5,"otherforb",1,2,102,"EB",NA
+"801","ARUQ7","E",2024-08-05,5,"Astragalus",2,2,1,"EB",NA
+"802","ARUQ7","E",2024-08-05,5,"Graminoid/horsetails",7,2,48,"EB",NA
+"803","ARUQ7","E",2024-08-05,5,"Stellaria",1,14,1,"EB",NA
+"804","ARUQ7","S",2024-08-05,5,"Salix Reticulata",27,12,1,"EB",NA
+"805","ARUQ7","S",2024-08-05,5,"Lupine",32,21,17,"EB",NA
+"806","ARUQ7","S",2024-08-05,5,"Dryas",23,32,1,"EB",NA
+"807","ARUQ7","S",2024-08-05,5,"Graminoid/horsetails",6,2,65,"EB",NA
+"808","ARUQ7","S",2024-08-05,5,"Salix Arctica",13,14,1,"EB",NA
+"809","ARUQ7","S",2024-08-05,5,"Pedicularis Capitata",2,2,1,"EB",NA
+"810","ARUQ7","S",2024-08-05,5,"Senecio",1,3,1,"EB",NA
+"811","ARUQ7","S",2024-08-05,5,"Astragalus",3,2,1,"EB",NA
+"812","ARUQ7","W",2024-08-05,5,"xxxlitter",18,2,1,"EB",NA
+"813","ARUQ7","W",2024-08-05,5,"Salix Arctica",14,21,1,"EB",NA
+"814","ARUQ7","W",2024-08-05,5,"Astragalus",10,14,1,"EB",NA
+"815","ARUQ7","W",2024-08-05,5,"Pedicularis spp",3,2,1,"EB",NA
+"816","ARUQ7","W",2024-08-05,5,"Pedicularis Capitata",2,3,1,"EB",NA
+"817","ARUQ7","W",2024-08-05,5,"Graminoid/horsetails",3,2,28,"EB",NA
+"818","ARUQ7","W",2024-08-05,5,"Dryas",79,24,1,"EB",NA
+"819","ARUQ7","W",2024-08-05,5,"Lupine",3,2,91,"EB",NA
+"820","ARUQ8","Core",2024-08-05,0,"Dryas",58,4,1,"EB",NA
+"821","ARUQ8","Core",2024-08-05,0,"xxxmoss",2,2,1,"EB",NA
+"822","ARUQ8","Core",2024-08-05,0,"Astragalus",8,21,1,"EB",NA
+"823","ARUQ8","Core",2024-08-05,0,"Oxytropis",15,14,1,"EB",NA
+"824","ARUQ8","Core",2024-08-05,0,"Salix Arctica",14,2,1,"EB",NA
+"825","ARUQ8","Core",2024-08-05,0,"Stellaria",1,14,1,"EB",NA
+"826","ARUQ8","Core",2024-08-05,0,"Pedicularis spp",2,3,25,"EB",NA
+"827","ARUQ8","Core",2024-08-05,0,"Graminoid/horsetails",3,2,1,"EB",NA
+"828","ARUQ8","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"EB",NA
+"829","ARUQ8","N",2024-08-05,5,"Castilleja",1,3,6,"EB",NA
+"830","ARUQ8","N",2024-08-05,5,"Dryas",82,30,1,"EB",NA
+"831","ARUQ8","N",2024-08-05,5,"Oxytropis",7,2,1,"EB",NA
+"832","ARUQ8","N",2024-08-05,5,"Graminoid/horsetails",4,2,1,"EB",NA
+"833","ARUQ8","N",2024-08-05,5,"Petasites frigidus",4,2,1,"EB",NA
+"834","ARUQ8","N",2024-08-05,5,"Polygonum viviparum",1,14,1,"EB",NA
+"835","ARUQ8","N",2024-08-05,5,"Oxytropis",1,2,1,"EB",NA
+"836","ARUQ8","N",2024-08-05,5,"Pedicularis spp",2,3,1,"EB",NA
+"837","ARUQ8","N",2024-08-05,5,"Salix Arctica",12,2,1,"EB",NA
+"838","ARUQ8","E",2024-08-05,5,"Salix Arctica",19,2,1,"EB",NA
+"839","ARUQ8","E",2024-08-05,5,"xxxlitter",10,2,1,"EB",NA
+"840","ARUQ8","E",2024-08-05,5,"Dryas",18,6,1,"EB",NA
+"841","ARUQ8","E",2024-08-05,5,"Graminoid/horsetails",17,2,76,"EB",NA
+"842","ARUQ8","E",2024-08-05,5,"xxxmoss",24,2,1,"EB",NA
+"843","ARUQ8","E",2024-08-05,5,"Castilleja",2,2,1,"EB",NA
+"844","ARUQ8","E",2024-08-05,5,"Polygonum viviparum",1,3,100,"EB",NA
+"845","ARUQ8","E",2024-08-05,5,"Astragalus",1,2,1,"EB",NA
+"846","ARUQ8","E",2024-08-05,5,"Pedicularis spp",1,2,1,"EB",NA
+"847","ARUQ8","S",2024-08-05,5,"Graminoid/horsetails",17,2,57,"EB",NA
+"848","ARUQ8","S",2024-08-05,5,"Castilleja",2,14,1,"EB",NA
+"849","ARUQ8","S",2024-08-05,5,"xxxlitter",10,2,1,"EB",NA
+"850","ARUQ8","S",2024-08-05,5,"Salix Arctica",13,2,1,"EB",NA
+"851","ARUQ8","S",2024-08-05,5,"Pedicularis spp",4,21,16,"EB",NA
+"852","ARUQ8","S",2024-08-05,5,"Oxytropis",6,2,1,"EB",NA
+"853","ARUQ8","S",2024-08-05,5,"Pedicularis Vertisilata",5,14,1,"EB",NA
+"854","ARUQ8","S",2024-08-05,5,"Astragalus",3,2,1,"EB",NA
+"855","ARUQ8","S",2024-08-05,5,"Dryas",35,29,1,"EB",NA
+"856","ARUQ8","S",2024-08-05,5,"Stellaria",1,14,1,"EB",NA
+"857","ARUQ8","S",2024-08-05,5,"xxxmoss",5,2,1,"EB",NA
+"858","ARUQ8","W",2024-08-05,5,"Salix Arctica",24,2,1,"EB",NA
+"859","ARUQ8","W",2024-08-05,5,"Dryas",32,25,1,"EB",NA
+"860","ARUQ8","W",2024-08-05,5,"Oxytropis",12,2,1,"EB",NA
+"861","ARUQ8","W",2024-08-05,5,"Astragalus",2,14,1,"EB",NA
+"862","ARUQ8","W",2024-08-05,5,"Stellaria",1,3,1,"EB",NA
+"863","ARUQ8","W",2024-08-05,5,"Pedicularis Capitata",3,2,1,"EB",NA
+"864","ARUQ8","W",2024-08-05,5,"Graminoid/horsetails",5,2,1,"EB",NA
+"865","ARUQ8","W",2024-08-05,5,"Polygonum bistorta",3,2,1,"EB",NA
+"866","ARUQ8","W",2024-08-05,5,"Polygonum viviparum",1,14,1,"EB",NA
+"867","ARUQ8","W",2024-08-05,5,"xxxlitter",3,2,1,"EB",NA
+"868","ARUQ6","Core",2024-08-05,0,"Oxytropis",21,7,1,"EB",NA
+"869","ARUQ6","Core",2024-08-05,0,"Astragalus",3,21,1,"EB",NA
+"870","ARUQ6","Core",2024-08-05,0,"Pedicularis Vertisilata",9,14,1,"EB",NA
+"871","ARUQ6","Core",2024-08-05,0,"Pedicularis spp",3,21,1,"EB",NA
+"872","ARUQ6","Core",2024-08-05,0,"Castilleja",4,3,21,"EB",NA
+"873","ARUQ6","Core",2024-08-05,0,"Salix Arctica",37,21,1,"EB",NA
+"874","ARUQ6","Core",2024-08-05,0,"xxxlitter",15,2,1,"EB",NA
+"875","ARUQ6","Core",2024-08-05,0,"xxxmoss",5,2,1,"EB",NA
+"876","ARUQ6","N",2024-08-05,5,"Astragalus",7,2,1,"EB",NA
+"877","ARUQ6","N",2024-08-05,5,"Graminoid/horsetails",5,2,55,"EB",NA
+"878","ARUQ6","N",2024-08-05,5,"Pedicularis Vertisilata",3,22,1,"EB",NA
+"879","ARUQ6","N",2024-08-05,5,"Saxifrage",8,21,1,"EB",NA
+"880","ARUQ6","N",2024-08-05,5,"Polygonum viviparum",3,27,11,"EB",NA
+"881","ARUQ6","N",2024-08-05,5,"otherforb",1,14,1,"EB","Purple flower pointy leaves"
+"882","ARUQ6","N",2024-08-05,5,"Yarrow",4,2,1,"EB",NA
+"883","ARUQ6","N",2024-08-05,5,"xxxmoss",8,2,1,"EB",NA
+"884","ARUQ6","N",2024-08-05,5,"xxxlitter",73,2,1,"EB",NA
+"885","ARUQ6","N",2024-08-05,5,"Senecio",2,2,1,"EB",NA
+"886","ARUQ6","N",2024-08-05,5,"Stellaria",2,21,1,"EB",NA
+"887","ARUQ6","N",2024-08-05,5,"Artemisia",1,2,1,"EB",NA
+"888","ARUQ6","E",2024-08-05,5,"xxxbareground",76,2,1,"EB",NA
+"889","ARUQ6","E",2024-08-05,5,"xxxmoss",15,2,1,"EB",NA
+"890","ARUQ6","E",2024-08-05,5,"Salix Arctica",9,29,1,"EB",NA
+"891","ARUQ6","E",2024-08-05,5,"Graminoid/horsetails",2,2,31,"EB",NA
+"892","ARUQ6","E",2024-08-05,5,"otherforb",7,30,1,"EB",NA
+"893","ARUQ6","E",2024-08-05,5,"Pedicularis Vertisilata",2,3,94,"EB",NA
+"894","ARUQ6","E",2024-08-05,5,"Pedicularis Capitata",2,2,1,"EB",NA
+"895","ARUQ6","E",2024-08-05,5,"Saxifrage",1,2,1,"EB",NA
+"896","ARUQ6","E",2024-08-05,5,"xxxlitter",3,2,1,"EB",NA
+"897","ARUQ6","S",2024-08-05,5,"xxxbareground",51,2,1,"EB",NA
+"898","ARUQ6","S",2024-08-05,5,"xxxlitter",17,2,1,"EB",NA
+"899","ARUQ6","S",2024-08-05,5,"Salix Arctica",20,8,1,"EB",NA
+"900","ARUQ6","S",2024-08-05,5,"otherforb",9,12,1,"EB",NA
+"901","ARUQ6","S",2024-08-05,5,"Pedicularis Vertisilata",5,27,16,"EB",NA
+"902","ARUQ6","S",2024-08-05,5,"Graminoid/horsetails",29,2,1,"EB",NA
+"903","ARUQ6","S",2024-08-05,5,"Artemisia",3,2,1,"EB",NA
+"904","ARUQ6","S",2024-08-05,5,"xxxmoss",10,2,1,"EB",NA
+"905","ARUQ6","W",2024-08-05,5,"Astragalus",26,32,92,"EB",NA
+"906","ARUQ6","W",2024-08-05,5,"Oxytropis",6,14,1,"EB",NA
+"907","ARUQ6","W",2024-08-05,5,"xxxmoss",45,2,1,"EB",NA
+"908","ARUQ6","W",2024-08-05,5,"xxxlitter",45,2,1,"EB",NA
+"909","ARUQ6","W",2024-08-05,5,"Graminoid/horsetails",2,2,14,"EB",NA
+"910","ARUQ5","Core",2024-08-05,0,"Lupine",66,11,1,"EB",NA
+"911","ARUQ5","Core",2024-08-05,0,"Salix Arctica",24,25,1,"EB",NA
+"912","ARUQ5","Core",2024-08-05,0,"Yarrow",9,2,1,"EB",NA
+"913","ARUQ5","Core",2024-08-05,0,"Graminoid/horsetails",3,2,51,"EB",NA
+"914","ARUQ5","Core",2024-08-05,0,"Castilleja",5,2,1,"EB",NA
+"915","ARUQ5","Core",2024-08-05,0,"Oxytropis",2,2,1,"EB",NA
+"916","ARUQ5","Core",2024-08-05,0,"Polygonum viviparum",1,3,26,"EB",NA
+"917","ARUQ5","Core",2024-08-05,0,"xxxlitter",8,2,1,"EB",NA
+"918","ARUQ5","Core",2024-08-05,0,"xxxmoss",2,2,1,"EB",NA
+"919","ARUQ5","N",2024-08-05,5,"Dryas",29,5,1,"EB",NA
+"920","ARUQ5","N",2024-08-05,5,"Lupine",16,21,1,"EB",NA
+"921","ARUQ5","N",2024-08-05,5,"Salix Arctica",52,21,1,"EB",NA
+"922","ARUQ5","N",2024-08-05,5,"xxxmoss",7,2,1,"EB",NA
+"923","ARUQ5","N",2024-08-05,5,"Pedicularis Capitata",4,14,101,"EB",NA
+"924","ARUQ5","N",2024-08-05,5,"Petasites frigidus",3,2,1,"EB",NA
+"925","ARUQ5","N",2024-08-05,5,"Graminoid/horsetails",1,2,1,"EB",NA
+"926","ARUQ5","N",2024-08-05,5,"otherforb",1,3,1,"EB","Sauceria "
+"927","ARUQ5","E",2024-08-05,5,"Dryas",10,2,1,"EB",NA
+"928","ARUQ5","E",2024-08-05,5,"Petasites frigidus",3,2,1,"EB",NA
+"929","ARUQ5","E",2024-08-05,5,"Lupine",4,2,1,"EB",NA
+"930","ARUQ5","E",2024-08-05,5,"Salix Richardsonii ",72,8,77,"EB",NA
+"931","ARUQ5","E",2024-08-05,5,"Monkshood",3,3,1,"EB",NA
+"932","ARUQ5","E",2024-08-05,5,"xxxlitter",16,2,1,"EB",NA
+"933","ARUQ5","E",2024-08-05,5,"otherforb",1,2,1,"EB","Polimonacea"
+"934","ARUQ5","E",2024-08-05,5,"Stellaria",1,2,1,"EB",NA
+"935","ARUQ5","S",2024-08-05,5,"Lupine",47,25,1,"EB",NA
+"936","ARUQ5","S",2024-08-05,5,"Senecio",3,14,24,"EB",NA
+"937","ARUQ5","S",2024-08-05,5,"Pedicularis Vertisilata",8,22,1,"EB",NA
+"938","ARUQ5","S",2024-08-05,5,"Polygonum viviparum",1,14,1,"EB",NA
+"939","ARUQ5","S",2024-08-05,5,"Graminoid/horsetails",8,2,1,"EB",NA
+"940","ARUQ5","S",2024-08-05,5,"Castilleja",2,3,1,"EB",NA
+"941","ARUQ5","S",2024-08-05,5,"Petasites frigidus",2,2,1,"EB",NA
+"942","ARUQ5","S",2024-08-05,5,"xxxmoss",9,2,1,"EB",NA
+"943","ARUQ5","S",2024-08-05,5,"xxxlitter",11,2,1,"EB",NA
+"944","ARUQ5","S",2024-08-05,5,"Salix Arctica",20,14,1,"EB",NA
+"945","ARUQ5","S",2024-08-05,5,"Oxytropis",3,2,1,"EB",NA
+"946","ARUQ5","S",2024-08-05,5,"Saxifrage",2,2,1,"EB",NA
+"947","ARUQ5","S",2024-08-05,5,"Monkshood",1,3,1,"EB",NA
+"948","ARUQ5","S",2024-08-05,5,"Saxifrage",1,2,1,"EB",NA
+"949","ARUQ5","S",2024-08-05,5,"Stellaria",2,14,1,"EB",NA
+"950","ARUQ5","W",2024-08-05,5,"Dryas",33,2,1,"EB",NA
+"951","ARUQ5","W",2024-08-05,5,"Salix Arctica",18,2,1,"EB",NA
+"952","ARUQ5","W",2024-08-05,5,"xxxlitter",13,2,1,"EB",NA
+"953","ARUQ5","W",2024-08-05,5,"Graminoid/horsetails",2,2,9,"EB",NA
+"954","ARUQ5","W",2024-08-05,5,"Polygonum viviparum",2,22,1,"EB",NA
+"955","ARUQ5","W",2024-08-05,5,"Lupine",19,3,93,"EB",NA
+"956","ARUQ5","W",2024-08-05,5,"xxxmoss",8,2,1,"EB",NA
+"957","ARUQ5","W",2024-08-05,5,"Pedicularis spp",1,2,1,"EB",NA
+"958","ARUQ5","W",2024-08-05,5,"Saxifrage",1,2,1,"EB",NA
+"959","ARUQ4","Core",2024-08-05,0,"xxxmoss",15,2,1,"EB",NA
+"960","ARUQ4","Core",2024-08-05,0,"xxxlitter",22,2,1,"EB",NA
+"961","ARUQ4","Core",2024-08-05,0,"Salix Richardsonii ",62,2,58,"EB",NA
+"962","ARUQ4","Core",2024-08-05,0,"Graminoid/horsetails",5,18,1,"EB",NA
+"963","ARUQ4","N",2024-08-05,5,"Graminoid/horsetails",13,2,42,"EB",NA
+"964","ARUQ4","N",2024-08-05,5,"xxxmoss",19,2,1,"EB",NA
+"965","ARUQ4","N",2024-08-05,5,"Salix Arctica",14,2,1,"EB",NA
+"966","ARUQ4","N",2024-08-05,5,"xxxlitter",30,2,1,"EB",NA
+"967","ARUQ4","N",2024-08-05,5,"Salix Richardsonii ",6,2,4,"EB",NA
+"968","ARUQ4","N",2024-08-05,5,"Astragalus",1,2,1,"EB",NA
+"969","ARUQ4","E",2024-08-05,5,"Salix Richardsonii ",78,10,67,"EB",NA
+"970","ARUQ4","E",2024-08-05,5,"Graminoid/horsetails",9,2,1,"EB",NA
+"971","ARUQ4","E",2024-08-05,5,"xxxmoss",5,2,1,"EB",NA
+"972","ARUQ4","E",2024-08-05,5,"xxxlitter",20,2,1,"EB",NA
+"973","ARUQ4","S",2024-08-05,5,"Graminoid/horsetails",58,2,35,"EB",NA
+"974","ARUQ4","S",2024-08-05,5,"xxxlitter",26,2,1,"EB",NA
+"975","ARUQ4","S",2024-08-05,5,"Salix Richardsonii ",5,2,1,"EB",NA
+"976","ARUQ4","S",2024-08-05,5,"Astragalus",9,25,23,"EB",NA
+"977","ARUQ4","S",2024-08-05,5,"Oxytropis",3,3,1,"EB",NA
+"978","ARUQ4","S",2024-08-05,5,"Saxifrage",1,2,1,"EB",NA
+"979","ARUQ4","S",2024-08-05,5,"xxxmoss",5,2,1,"EB",NA
+"980","ARUQ4","S",2024-08-05,5,"Pedicularis spp",1,2,1,"EB",NA
+"981","ARUQ4","S",2024-08-05,5,"otherforb",2,2,1,"EB","Maybe small arctic dock"
+"982","ARUQ4","W",2024-08-05,5,"Salix Richardsonii ",23,2,44,"EB",NA
+"983","ARUQ4","W",2024-08-05,5,"Salix Arctica",13,14,1,"EB",NA
+"984","ARUQ4","W",2024-08-05,5,"xxxmoss",16,2,1,"EB",NA
+"985","ARUQ4","W",2024-08-05,5,"Graminoid/horsetails",24,2,1,"EB",NA
+"986","ARUQ4","W",2024-08-05,5,"xxxlitter",18,2,1,"EB",NA
+"987","ARUQ4","W",2024-08-05,5,"Astragalus",4,2,1,"EB",NA
+"988","ARUQ4","W",2024-08-05,5,"Oxytropis",2,2,1,"EB",NA
+"989","ARUQ2","Core",2024-08-05,0,"Astragalus",35,28,39,"EB",NA
+"990","ARUQ2","Core",2024-08-05,0,"Salix Richardsonii ",25,29,1,"EB",NA
+"991","ARUQ2","Core",2024-08-05,0,"Salix Arctica",3,2,1,"EB",NA
+"992","ARUQ2","Core",2024-08-05,0,"Polygonum viviparum",1,3,1,"EB",NA
+"993","ARUQ2","Core",2024-08-05,0,"xxxlitter",15,2,1,"EB",NA
+"994","ARUQ2","Core",2024-08-05,0,"xxxmoss",19,2,1,"EB",NA
+"995","ARUQ2","Core",2024-08-05,0,"Graminoid/horsetails",2,2,52,"EB",NA
+"996","ARUQ2","N",2024-08-05,5,"Salix Richardsonii ",25,2,1,"EB",NA
+"997","ARUQ2","N",2024-08-05,5,"Petasites frigidus",13,3,37,"EB",NA
+"998","ARUQ2","N",2024-08-05,5,"Salix Arctica",7,2,1,"EB",NA
+"999","ARUQ2","N",2024-08-05,5,"Stellaria",1,14,1,"EB",NA
+"1000","ARUQ2","N",2024-08-05,5,"xxxlitter",38,2,1,"EB",NA
+"1001","ARUQ2","N",2024-08-05,5,"xxxmoss",5,2,1,"EB",NA
+"1002","ARUQ2","N",2024-08-05,5,"Graminoid/horsetails",15,2,1,"EB",NA
+"1003","ARUQ2","E",2024-08-05,5,"Astragalus",21,5,1,"EB",NA
+"1004","ARUQ2","E",2024-08-05,5,"Salix Richardsonii ",26,22,39,"EB",NA
+"1005","ARUQ2","E",2024-08-05,5,"Polygonum viviparum",1,14,1,"EB",NA
+"1006","ARUQ2","E",2024-08-05,5,"Salix Arctica",7,2,1,"EB",NA
+"1007","ARUQ2","E",2024-08-05,5,"Graminoid/horsetails",18,2,68,"EB",NA
+"1008","ARUQ2","E",2024-08-05,5,"xxxmoss",12,2,1,"EB",NA
+"1009","ARUQ2","S",2024-08-05,5,"Salix Richardsonii ",32,2,10,"EB",NA
+"1010","ARUQ2","S",2024-08-05,5,"Salix Arctica",16,21,1,"EB",NA
+"1011","ARUQ2","S",2024-08-05,5,"Petasites frigidus",8,2,1,"EB",NA
+"1012","ARUQ2","S",2024-08-05,5,"xxxmoss",29,2,1,"EB",NA
+"1013","ARUQ2","S",2024-08-05,5,"Stellaria",1,14,1,"EB",NA
+"1014","ARUQ2","S",2024-08-05,5,"xxxlitter",18,2,1,"EB",NA
+"1015","ARUQ2","W",2024-08-05,5,"Petasites frigidus",23,2,17,"EB",NA
+"1016","ARUQ2","W",2024-08-05,5,"Salix Richardsonii ",19,2,1,"EB",NA
+"1017","ARUQ2","W",2024-08-05,5,"Salix Arctica",10,22,1,"EB",NA
+"1018","ARUQ2","W",2024-08-05,5,"xxxmoss",25,2,1,"EB",NA
+"1019","ARUQ2","W",2024-08-05,5,"xxxlitter",12,2,1,"EB",NA
+"1020","ARUQ2","W",2024-08-05,5,"Astragalus",9,2,1,"EB",NA
+"1021","ARUQ2","W",2024-08-05,5,"Graminoid/horsetails",8,2,1,"EB",NA
