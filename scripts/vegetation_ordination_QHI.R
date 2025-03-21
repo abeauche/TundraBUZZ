@@ -230,7 +230,77 @@ dev.off()
 
 
 
+### SCALING ANALYSIS --> COMBINING CORE PLOTS AND AVG PLOTS
 
+# Filtered matrix for core sites
+core_data <- veg_matrix_plot %>% 
+  filter(plot == "Core") %>%
+  mutate(site_id =paste(aru_id, plot, sep = "_")) %>%
+  ungroup() 
+veg_matrix_core <- core_data %>%
+  select(-c(aru_id, plot, aru_plot))
 
+# Matrix for average sites
+averaged_data <- veg_matrix %>% 
+  mutate(site_id =paste(aru_id)) %>%
+  ungroup() 
+veg_matrix_averaged <- averaged_data %>%
+  select(-c(aru_id))
 
+# Tidy veg_matrix_core
+veg_matrix_core <- veg_matrix_core[, !is.na(colnames(veg_matrix_core))]
+veg_matrix_core <- veg_matrix_core[, colnames(veg_matrix_averaged)]
 
+# Combine the two matrices by stacking them
+veg_matrix_combined <- bind_rows(veg_matrix_core, veg_matrix_averaged)  
+veg_comm_matrix_combined <- veg_matrix_combined %>%
+  select(-site_id) %>%
+  as.data.frame() %>% 
+  na.omit()
+rownames(veg_comm_matrix_combined) <- veg_matrix_combined$site_id 
+
+# Match core and averaged points by 'aru_id' (split 'site_id' to get 'aru_id')
+core_data$aru_id <- gsub("_Core", "", core_data$site_id)
+averaged_data$aru_id <- averaged_data$site_id
+
+# Run NMDS ordination
+nmds_result_combined <- metaMDS(veg_comm_matrix_combined, distance = "bray", k = 2, trymax = 200)
+
+# Check stress and plot results
+print(nmds_result_combined$stress)
+pdf("./outputs/figures/NMDS_stress_combined_k2.pdf", width = 7, height = 6)
+stressplot(nmds_result_combined)
+dev.off()
+
+# Extract the MDS coordinates from the NMDS result
+nmds_coords_combined <- as.data.frame(nmds_result_combined$points)
+nmds_coords_combined$aru_id <- rownames(nmds_coords_combined)  # Make sure aru_id is in the same order
+nmds_coords_combined <- nmds_coords_combined %>% mutate(site_id = aru_id) %>%
+  select(-c(aru_id))
+
+# Merge the MDS coordinates with the core and averaged data based on 'aru_id'
+core_data <- left_join(core_data, nmds_coords_combined, by = "site_id")
+averaged_data <- left_join(averaged_data, nmds_coords_combined, by = "site_id")
+
+# Ensure both data sets are ordered the same way
+core_data <- core_data %>%
+  select(site_id, aru_id, MDS1, MDS2)
+averaged_data <- averaged_data %>%
+  select(site_id, aru_id, MDS1, MDS2)
+
+# Create the plot with adjusted xlim and ylim
+pdf("./outputs/figures/NMDS_combined_scaling.pdf", width = 7, height = 6)
+plot(nmds_coords_combined[, 1], nmds_coords_combined[, 2], type = "n", xlim = c(min(nmds_coords_combined[, 1]) - 0.25, max(nmds_coords_combined[, 1]) + 0.25), 
+     ylim = c(min(nmds_coords_combined[, 2]) - 0.25, max(nmds_coords_combined[, 2]) + 0.25))
+# Plot core and averaged sites
+points(core_data$MDS1, core_data$MDS2, col = "red", pch = 19)  # Core points in red
+points(averaged_data$MDS1, averaged_data$MDS2, col = "blue", pch = 19)  # Averaged points in blue
+# Add arrows between corresponding core and averaged points
+for(i in 1:nrow(core_data)) {
+  arrows(averaged_data$MDS1[i], averaged_data$MDS2[i], core_data$MDS1[i], core_data$MDS2[i], length = 0.1, angle = 15, col = "black", lwd = 1)
+}
+# Add a legend
+legend("topright", legend = c("Core", "Averaged"), col = c("red", "blue"), pch = 19, cex = 0.8)
+# Add labels for each site based on aru_id 
+text(nmds_coords_combined[, 1], nmds_coords_combined[, 2], labels = rownames(nmds_coords_combined), pos = 3, cex = 0.8, col = "black")
+dev.off()
