@@ -9,6 +9,7 @@
 # ====================================================
 
 # Load required packages
+install.packages("rgl")
 library(tidyverse)
 library(vegan)
 library(RColorBrewer)
@@ -46,7 +47,7 @@ veg_matrix <- vegetation_aru_summary %>%
 veg_matrix <- veg_matrix %>% select(-any_of("NA"))
 
 # Convert to matrix
-veg_comm_matrix <- as.matrix(veg_matrix[, -c(1,2)])
+veg_comm_matrix <- as.matrix(veg_matrix[, -1])
 rownames(veg_comm_matrix) <- veg_matrix$aru_id
 
 
@@ -75,18 +76,39 @@ nmds_result <- metaMDS(veg_comm_matrix, k = 3, trymax = 200, distance = "bray")
 print(nmds_result$stress)
 stressplot(nmds_result)
 
-# Visualize in a scatter plot for three NMDS dimensions
-plot3d(nmds_result$points[,1], nmds_result$points[,2], nmds_result$points[,3], 
-       col = "blue", size = 3, xlab = "NMDS1", ylab = "NMDS2", zlab = "NMDS3")
+# Merge the 'microclimate' classification with the NMDS data
+nmds_data <- data.frame(aru_id = rownames(nmds_result$points), points = nmds_result$points) %>%
+  left_join(veg_matrix %>% filter(aru_id %in% rownames(nmds_result$points)), by = "aru_id")
 
+nmds_data <- nmds_data %>%
+  mutate(microclimate = case_when(
+    aru_id %in% c("ARUQ5", "ARUQ9", "ARUQ7") ~ "Warm",
+    aru_id %in% c("ARUQ3", "ARUQ8", "ARUQ10") ~ "Intermediate",
+    aru_id %in% c("ARUQ6", "ARUQ1", "ARUQ2", "ARUQ4") ~ "Cool"
+  ))
+
+# Export microclimate factor
+microclimate_factor <- factor(nmds_data$microclimate)
+
+# Create a color palette for the microclimate categories
+colors <- c("cool" = "purple4",   # Blue for cool
+            "intermediate" = "forestgreen", # Greenish-blue for intermediate
+            "warm" = "gold")  # Red for warm
+
+# Create 3D NMDS plot with color coding by microclimate
+plot3d(nmds_result$points[,1], nmds_result$points[,2], nmds_result$points[,3], 
+       col = colors[microclimate_factor], size = 3, xlab = "NMDS1", ylab = "NMDS2", zlab = "NMDS3")
+
+# Add labels at the points (you can modify the labels as needed)
+text3d(nmds_result$points[,1], nmds_result$points[,2], nmds_result$points[,3] + 0.02, 
+       texts = rownames(nmds_result$points), cex = 0.7, col = "black")
+text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3], 
+       texts = rownames(nmds_result$species), cex = 0.7, col = "grey")
 
 
 
 
 ### IN PROGRESS
-
-
-
 
 
 # Run NMDS ordination
