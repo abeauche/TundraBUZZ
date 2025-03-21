@@ -29,11 +29,13 @@ vegetation_raw <- read.csv("./data/raw/QHI_vegetation_2024_raw.csv", stringsAsFa
 # Group by ARU, plot, and species, summarize mean percent cover for both observers
 vegetation_plot_summary <- vegetation_raw %>%
   group_by(aru_id, plot, class) %>%
-  summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE))
+  summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE)) %>%
+  mutate(mean_percent_cover = ifelse(is.nan(mean_percent_cover), 0, mean_percent_cover))
 
 vegetation_aru_summary <- vegetation_raw %>%
   group_by(aru_id, class) %>%
-  summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE))
+  summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE)) %>%
+  mutate(mean_percent_cover = ifelse(is.nan(mean_percent_cover), 0, mean_percent_cover))
 
 write.csv(vegetation_plot_summary, file = "./data/clean/QHI_vegetation_plot_2024.csv")
 write.csv(vegetation_aru_summary, file = "./data/clean/QHI_vegetation_aru_2024.csv")
@@ -66,7 +68,7 @@ NMDS.scree <- function(x) { #where x is the name of the data frame variable
 }
 
 # Choose the optimal nr of dimensions
-pdf("./outputs/figures/NMDS_scree_plot.pdf", width = 7, height = 6)
+pdf("./outputs/figures/NMDS_scree.pdf", width = 7, height = 6)
 NMDS.scree(dist)
 dev.off()
 # k = 3 is a good inflexion point
@@ -77,7 +79,7 @@ nmds_result <- metaMDS(veg_comm_matrix, k = 3, trymax = 200, distance = "bray")
 
 # Check stress and plot results
 print(nmds_result$stress)
-pdf("./outputs/figures/NMDS_stressplot_k3.pdf", width = 7, height = 6)
+pdf("./outputs/figures/NMDS_stress_k3.pdf", width = 7, height = 6)
 stressplot(nmds_result)
 dev.off()
 
@@ -114,11 +116,17 @@ text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3]
 
 
 ### NMDS ORDINATION IN 2D FOR EASIER VISUALIZATION
-# k = 2 is still below stress threshold of 0.2
+# k = 2 is still below stress threshold of 0.2, still acceptable
 
 # Run NMDS ordination
 set.seed(123)
 nmds_result_k2 <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
+
+# Check stress and plot results
+print(nmds_result_k2$stress)
+pdf("./outputs/figures/NMDS_stress_k2.pdf", width = 7, height = 6)
+stressplot(nmds_result_k2)
+dev.off()
 
 # Basic NMDS plot
 pdf("./outputs/figures/NMDS_result_k2.pdf", width = 7, height = 6)
@@ -153,8 +161,9 @@ dev.off()
 
 
 ### NMDS ORDINATION AT PLOT LEVEL
-# NMDS at Plot Level
+# Prepare data for NMDS
 veg_matrix_plot <- vegetation_plot_summary %>%
+  ungroup() %>%
   pivot_wider(names_from = class, values_from = mean_percent_cover, values_fill = 0) %>%
   mutate(aru_plot = paste(aru_id, plot, sep = "_"))
 
@@ -163,12 +172,22 @@ veg_comm_matrix_plot <- veg_matrix_plot %>%
   as.matrix()
 rownames(veg_comm_matrix_plot) <- veg_matrix_plot$aru_plot
 
+# Calculate a dissimilarity matrix using bray-curtis distance
+dist_plot <- vegdist(veg_comm_matrix_plot,  method = "bray")
+
+# Choose the optimal nr of dimensions
+pdf("./outputs/figures/NMDS_scree_plot.pdf", width = 7, height = 6)
+NMDS.scree(dist_plot)
+dev.off()
+# k = 3-4 could be okay
+
 # Run NMDS ordination
 set.seed(123)
-nmds_result_plot <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 2, trymax = 100)
+nmds_result_plot <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 3, trymax = 200)
 
 # NMDS plot by aru_id
 aru_colors <- rainbow(length(unique(nmds_data$aru_id)))[as.factor(nmds_data$aru_id)]
+plot(nmds_result_plot, type = "t")
 ordiplot(nmds_result_plot, display = "sites", type = "n")
 points(nmds_result_plot$points, col = aru_colors, pch = 19)
 legend("topright", legend = unique(nmds_data$aru_id), col = unique(aru_colors), pch = 19, cex = 0.8)
