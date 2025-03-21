@@ -9,7 +9,7 @@
 # ====================================================
 
 # Load required packages
-install.packages("rgl")
+# install.packages("rgl")
 library(tidyverse)
 library(vegan)
 library(RColorBrewer)
@@ -49,6 +49,7 @@ veg_matrix <- veg_matrix %>% select(-any_of("NA"))
 # Convert to matrix
 veg_comm_matrix <- as.matrix(veg_matrix[, -1])
 rownames(veg_comm_matrix) <- veg_matrix$aru_id
+
 
 
 ### NMDS ORDINATION - From https://ourcodingclub.github.io/tutorials/ordination/
@@ -108,48 +109,43 @@ text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3]
 
 
 
-### IN PROGRESS
+### NMDS ORDINATION IN 2D FOR EASIER VISUALIZATION
+# k = 2 is still below stress threshold of 0.2
 
 # Run NMDS ordination
 set.seed(123)
-nmds_result <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
+nmds_result_k2 <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
 
 # Basic NMDS plot
-plot(nmds_result, type = "t")
-ordiplot(nmds_result, display = "sites", type = "n")
-points(nmds_result$points, col = "blue", pch = 19)
-text(nmds_result$points, labels = rownames(nmds_result$points), pos = 3, cex = 0.8)
+plot(nmds_result_k2, type = "t")
+ordiplot(nmds_result_k2, display = "sites", type = "n")
+points(nmds_result_k2$points, col = "blue", pch = 19)
+text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
 
-# NMDS Scree Plot Function
-NMDS.scree <- function(x) {
-  plot(1:10, sapply(1:10, function(i) metaMDS(x, k = i, autotransform = FALSE)$stress),
-       xlab = "# of Dimensions", ylab = "Stress", main = "NMDS Stress Plot", type = "b")
-}
-
-# Scree plot for NMDS
-NMDS.scree(veg_comm_matrix)
+# Merge NMDS results with microclimate classifications
+nmds_data_k2 <- data.frame(aru_id = rownames(nmds_result_k2$points), points = nmds_result_k2$points) %>%
+  left_join(veg_matrix %>% filter(aru_id %in% rownames(nmds_result_k2$points)), by = "aru_id")
 
 # Define microclimate classification
-vegetation_aru_summary <- vegetation_aru_summary %>%
+nmds_data_k2 <- nmds_data_k2 %>%
   mutate(microclimate = case_when(
     aru_id %in% c("ARUQ5", "ARUQ9", "ARUQ7") ~ "Warm",
     aru_id %in% c("ARUQ3", "ARUQ8", "ARUQ10") ~ "Intermediate",
     aru_id %in% c("ARUQ6", "ARUQ1", "ARUQ2", "ARUQ4") ~ "Cool"
   ))
 
-# Merge NMDS results with microclimate classifications
-nmds_data <- data.frame(aru_id = rownames(nmds_result$points), nmds_result$points) %>%
-  left_join(vegetation_aru_summary, by = "aru_id")
-
-# Assign colors based on microclimate
-color_palette <- brewer.pal(length(unique(nmds_data$microclimate)), "Set1")
-nmds_data$color <- color_palette[as.factor(nmds_data$microclimate)]
-
 # NMDS plot with microclimate classification
-ordiplot(nmds_result, display = "sites", type = "n")
-points(nmds_result$points, col = nmds_data$color, pch = 19)
-text(nmds_result$points, labels = rownames(nmds_result$points), pos = 3, cex = 0.8)
+pdf("./outputs/figures/NMDS_microclim_k2.pdf", width = 8.2, height = 6)
+ordiplot(nmds_result_k2, display = "sites", type = "n")
+points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
+text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
+legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
+dev.off()
 
+
+
+
+### NMDS ORDINATION AT PLOT LEVEL
 # NMDS at Plot Level
 veg_matrix_plot <- vegetation_plot_summary %>%
   pivot_wider(names_from = class, values_from = mean_percent_cover, values_fill = 0) %>%
