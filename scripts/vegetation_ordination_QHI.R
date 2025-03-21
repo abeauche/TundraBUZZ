@@ -66,7 +66,9 @@ NMDS.scree <- function(x) { #where x is the name of the data frame variable
 }
 
 # Choose the optimal nr of dimensions
+pdf("./outputs/figures/NMDS_scree_plot.pdf", width = 7, height = 6)
 NMDS.scree(dist)
+dev.off()
 # k = 3 is a good inflexion point
 
 # Increase trymax to 200 for more iterations
@@ -75,7 +77,9 @@ nmds_result <- metaMDS(veg_comm_matrix, k = 3, trymax = 200, distance = "bray")
 
 # Check stress and plot results
 print(nmds_result$stress)
+pdf("./outputs/figures/NMDS_stressplot_k3.pdf", width = 7, height = 6)
 stressplot(nmds_result)
+dev.off()
 
 # Merge the 'microclimate' classification with the NMDS data
 nmds_data <- data.frame(aru_id = rownames(nmds_result$points), points = nmds_result$points) %>%
@@ -117,7 +121,10 @@ set.seed(123)
 nmds_result_k2 <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
 
 # Basic NMDS plot
+pdf("./outputs/figures/NMDS_result_k2.pdf", width = 7, height = 6)
 plot(nmds_result_k2, type = "t")
+dev.off()
+
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 points(nmds_result_k2$points, col = "blue", pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
