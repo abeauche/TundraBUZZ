@@ -183,12 +183,51 @@ dev.off()
 
 # Run NMDS ordination
 set.seed(123)
-nmds_result_plot <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 3, trymax = 200)
+nmds_result_plot_k3 <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 3, trymax = 200)
 
-# NMDS plot by aru_id
-aru_colors <- rainbow(length(unique(nmds_data$aru_id)))[as.factor(nmds_data$aru_id)]
-plot(nmds_result_plot, type = "t")
-ordiplot(nmds_result_plot, display = "sites", type = "n")
-points(nmds_result_plot$points, col = aru_colors, pch = 19)
-legend("topright", legend = unique(nmds_data$aru_id), col = unique(aru_colors), pch = 19, cex = 0.8)
+# Check stress and plot results
+print(nmds_result_plot_k3$stress)
+pdf("./outputs/figures/NMDS_stress_plot_k3.pdf", width = 7, height = 6)
+stressplot(nmds_result_plot_k3)
+dev.off()
+
+# Create colour vector
+plot_colors <- rainbow(length(unique(veg_matrix_plot$aru_id)))[as.factor(veg_matrix_plot$aru_id)]
+
+# Create 3D NMDS plot with color coding by site
+plot3d(nmds_result_plot$points[,1], nmds_result_plot$points[,2], nmds_result_plot$points[,3], col = plot_colors, size = 3, xlab = "NMDS1", ylab = "NMDS2", zlab = "NMDS3")
+
+# Add labels at the points (you can modify the labels as needed)
+text3d(nmds_result_plot$points[,1], nmds_result_plot$points[,2], nmds_result_plot$points[,3] + 0.05, 
+       texts = rownames(nmds_result_plot$points), cex = 0.7, col = "black")
+text3d(nmds_result_plot$species[,1], nmds_result_plot$species[,2], nmds_result_plot$species[,3], 
+       texts = rownames(nmds_result_plot$species), cex = 0.7, col = "grey")
+
+
+
+
+### NMDS ORDINATION AT PLOT LEVEL IN 2D FOR EASIER VISUALIZATION
+# stress at k = 2 still around 0.2, not great
+
+# Run NMDS ordination
+nmds_result_plot_k2 <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 2, trymax = 200)
+
+# Check stress and plot results
+print(nmds_result_plot_k2$stress)
+pdf("./outputs/figures/NMDS_stress_plot_k2.pdf", width = 7, height = 6)
+stressplot(nmds_result_plot_k2)
+dev.off()
+
+# Create 3D NMDS plot with color coding by site
+plot(nmds_result_plot_k2, type = "t")
+
+pdf("./outputs/figures/NMDS_plot_k2.pdf", width = 7, height = 6)
+ordiplot(nmds_result_plot_k2, display = "sites", type = "n")
+points(nmds_result_plot_k2$points, col = plot_colors, pch = 19)
+text(nmds_result_plot_k2$points, labels = rownames(nmds_result_plot_k2$points), pos = 3, cex = 0.8)
+dev.off()
+
+
+
+
 
