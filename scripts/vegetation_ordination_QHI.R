@@ -5,7 +5,7 @@
 # Date Created: 2025-03-20
 # Last Modified: 2025-03-20
 # Description: This script creates an ordination for vegetation plots based on vegetation composition data for 10 POLCAM sites on Qikiqtaruk-Herschel Island measured in the summer of 2024 by A. Beauchemin and E. Bowman.
-# Dependencies: XQuartz, ARU_veg_survey_compiled.csv.
+# Dependencies: XQuartz, QHI_vegetation_2024_raw.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
 
 # Load required packages
@@ -21,7 +21,7 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
 vegetation_raw <- read.csv("./data/raw/QHI_vegetation_2024_raw.csv", stringsAsFactors = TRUE)
-
+location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
 
 ### Prepare datasets for ordination
