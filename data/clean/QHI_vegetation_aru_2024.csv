@@ -1,182 +1,182 @@
-"","aru_id","class","mean_percent_cover"
-"1","ARUQ1","Artemisia",1.7
-"2","ARUQ1","Castilleja",3.45
-"3","ARUQ1","Graminoid/horsetails",5.96875
-"4","ARUQ1","Lichen",1
-"5","ARUQ1","Monkshood",2.8
-"6","ARUQ1","otherforb",1.5
-"7","ARUQ1","Oxytropis",10.1
-"8","ARUQ1","Pedicularis Capitata",2.525
-"9","ARUQ1","Pedicularis spp",3
-"10","ARUQ1","Pedicularis Vertisilata",6.15
-"11","ARUQ1","Salix Arctica",40.23
-"12","ARUQ1","Stellaria",1.24
-"13","ARUQ1","xxxlitter",22.09
-"14","ARUQ1","xxxmoss",9.95
-"15","ARUQ1","Yarrow",4.84285714285714
-"16","ARUQ1",NA,1.3
-"17","ARUQ10","Artemisia",3.5
-"18","ARUQ10","Astragalus",1
-"19","ARUQ10","Cassiope tetragona",31.5
-"20","ARUQ10","Dryas",8.33333333333333
-"21","ARUQ10","Graminoid/horsetails",8.66666666666667
-"22","ARUQ10","Lichen",2.8
-"23","ARUQ10","Lupine",3.42857142857143
-"24","ARUQ10","otherforb",2.86666666666667
-"25","ARUQ10","Oxytropis",1
-"26","ARUQ10","Pedicularis Capitata",4.25
-"27","ARUQ10","Pedicularis spp",1
-"28","ARUQ10","Polygonum bistorta",3.875
-"29","ARUQ10","Polygonum viviparum",2.28571428571429
-"30","ARUQ10","Pyrola grandiflora",2.25
-"31","ARUQ10","Salix Other",4.2
-"32","ARUQ10","Salix Polaris",1
-"33","ARUQ10","Salix Pulchra",23.4
-"34","ARUQ10","Salix Reticulata",18
-"35","ARUQ10","Saxifrage",5.33333333333333
-"36","ARUQ10","Senecio",1
-"37","ARUQ10","Stellaria",1
-"38","ARUQ10","xxxbareground",40
-"39","ARUQ10","xxxlitter",20.4
-"40","ARUQ10","xxxmoss",7.14285714285714
-"41","ARUQ2","Astragalus",22.5
-"42","ARUQ2","Graminoid/horsetails",7
-"43","ARUQ2","Lichen",6.6
-"44","ARUQ2","Petasites frigidus",11.7142857142857
-"45","ARUQ2","Polygonum viviparum",1
-"46","ARUQ2","Salix Arctica",8.3
-"47","ARUQ2","Salix Richardsonii ",28.1
-"48","ARUQ2","Stellaria",1
-"49","ARUQ2","xxxlitter",16.875
-"50","ARUQ2","xxxmoss",14.8
-"51","ARUQ3","Astragalus",6.8
-"52","ARUQ3","Castilleja",3
-"53","ARUQ3","Dryas",26
-"54","ARUQ3","Graminoid/horsetails",2.88888888888889
-"55","ARUQ3","Lichen",1.5
-"56","ARUQ3","Lupine",14
-"57","ARUQ3","otherforb",2.6
-"58","ARUQ3","Oxytropis",3
-"59","ARUQ3","Pedicularis Capitata",9.125
-"60","ARUQ3","Pedicularis Vertisilata",9.5
-"61","ARUQ3","Petasites frigidus",10.5
-"62","ARUQ3","Polygonum viviparum",3
-"63","ARUQ3","Salix Arctica",19.8
-"64","ARUQ3","Salix Reticulata",44.25
-"65","ARUQ3","Salix Richardsonii ",55
-"66","ARUQ3","Senecio",1.5
-"67","ARUQ3","Stellaria",1.875
-"68","ARUQ3","xxxfungus",1.5
-"69","ARUQ3","xxxlitter",8.33333333333333
-"70","ARUQ3","xxxmoss",5.28571428571429
-"71","ARUQ4","Astragalus",5.66666666666667
-"72","ARUQ4","Graminoid/horsetails",15.6923076923077
-"73","ARUQ4","Lichen",2
-"74","ARUQ4","otherforb",2
-"75","ARUQ4","Oxytropis",3
-"76","ARUQ4","Pedicularis Capitata",3
-"77","ARUQ4","Pedicularis spp",1.5
-"78","ARUQ4","Salix Arctica",21.5
-"79","ARUQ4","Salix Richardsonii ",34.6
-"80","ARUQ4","Saxifrage",2
-"81","ARUQ4","xxxlitter",18.1
-"82","ARUQ4","xxxmoss",11.2222222222222
-"83","ARUQ5","Castilleja",3.25
-"84","ARUQ5","Dryas",24.8333333333333
-"85","ARUQ5","Graminoid/horsetails",2.9
-"86","ARUQ5","Lichen",1.5
-"87","ARUQ5","Lupine",28.8
-"88","ARUQ5","Monkshood",1.75
-"89","ARUQ5","otherforb",1.2
-"90","ARUQ5","Oxytropis",2
-"91","ARUQ5","Pedicularis Capitata",2.25
-"92","ARUQ5","Pedicularis spp",1
-"93","ARUQ5","Pedicularis Vertisilata",7
-"94","ARUQ5","Petasites frigidus",2.5
-"95","ARUQ5","Polygonum viviparum",1.66666666666667
-"96","ARUQ5","Salix Arctica",26.875
-"97","ARUQ5","Salix Richardsonii ",77
-"98","ARUQ5","Saxifrage",1.75
-"99","ARUQ5","Senecio",2
-"100","ARUQ5","Stellaria",1.14285714285714
-"101","ARUQ5","xxxfungus",1
-"102","ARUQ5","xxxlitter",11.25
-"103","ARUQ5","xxxmoss",6.83333333333333
-"104","ARUQ5","Yarrow",3.25
-"105","ARUQ6","Artemisia",2
-"106","ARUQ6","Astragalus",13.1666666666667
-"107","ARUQ6","Castilleja",5
-"108","ARUQ6","Graminoid/horsetails",5.88888888888889
-"109","ARUQ6","Lichen",3
-"110","ARUQ6","otherforb",2.81818181818182
-"111","ARUQ6","Oxytropis",13.5
-"112","ARUQ6","Pedicularis Capitata",3.33333333333333
-"113","ARUQ6","Pedicularis spp",2.5
-"114","ARUQ6","Pedicularis Vertisilata",5.625
-"115","ARUQ6","Polygonum viviparum",2
-"116","ARUQ6","Salix Arctica",18.4285714285714
-"117","ARUQ6","Saxifrage",4.5
-"118","ARUQ6","Senecio",2
-"119","ARUQ6","Stellaria",1.5
-"120","ARUQ6","xxxbareground",56.75
-"121","ARUQ6","xxxlitter",29.7777777777778
-"122","ARUQ6","xxxmoss",13.9
-"123","ARUQ6","Yarrow",3
-"124","ARUQ7","Astragalus",3.8
-"125","ARUQ7","Dryas",41
-"126","ARUQ7","Graminoid/horsetails",4.2
-"127","ARUQ7","Lichen",2.75
-"128","ARUQ7","Lupine",17.6
-"129","ARUQ7","otherforb",1.5
-"130","ARUQ7","Oxytropis",4.875
-"131","ARUQ7","Pedicularis Capitata",3.5
-"132","ARUQ7","Pedicularis spp",2.25
-"133","ARUQ7","Polygonum viviparum",1.33333333333333
-"134","ARUQ7","Salix Arctica",17
-"135","ARUQ7","Salix Reticulata",26.5
-"136","ARUQ7","Saxifrage",2
-"137","ARUQ7","Senecio",1
-"138","ARUQ7","Stellaria",1
-"139","ARUQ7","xxxlitter",13.4444444444444
-"140","ARUQ7","xxxmoss",5.5
-"141","ARUQ8","Astragalus",4
-"142","ARUQ8","Castilleja",1.33333333333333
-"143","ARUQ8","Dryas",49.2
-"144","ARUQ8","Graminoid/horsetails",6.88888888888889
-"145","ARUQ8","Lichen",2.2
-"146","ARUQ8","otherforb",1.5
-"147","ARUQ8","Oxytropis",8.11111111111111
-"148","ARUQ8","Pedicularis Capitata",3.25
-"149","ARUQ8","Pedicularis spp",2.16666666666667
-"150","ARUQ8","Pedicularis Vertisilata",2.75
-"151","ARUQ8","Petasites frigidus",4
-"152","ARUQ8","Polygonum bistorta",3
-"153","ARUQ8","Polygonum viviparum",1
-"154","ARUQ8","Salix Arctica",17
-"155","ARUQ8","Stellaria",1
-"156","ARUQ8","xxxfungus",2
-"157","ARUQ8","xxxlitter",7.71428571428571
-"158","ARUQ8","xxxmoss",8.28571428571429
-"159","ARUQ9","Astragalus",3.55555555555556
-"160","ARUQ9","Castilleja",2.5
-"161","ARUQ9","Dryas",21.3
-"162","ARUQ9","Graminoid/horsetails",16.2142857142857
-"163","ARUQ9","L. Glauca",2
-"164","ARUQ9","Lichen",2
-"165","ARUQ9","Lupine",17.7
-"166","ARUQ9","Monkshood",2.5
-"167","ARUQ9","otherforb",3
-"168","ARUQ9","Oxytropis",2.8
-"169","ARUQ9","Pedicularis Capitata",1
-"170","ARUQ9","Pedicularis spp",1.75
-"171","ARUQ9","Pedicularis Vertisilata",3
-"172","ARUQ9","Petasites frigidus",13
-"173","ARUQ9","Polygonum bistorta",1
-"174","ARUQ9","Polygonum viviparum",2.83333333333333
-"175","ARUQ9","Salix Arctica",17.4
-"176","ARUQ9","Salix Reticulata",13.5
-"177","ARUQ9","Saxifrage",2.5
-"178","ARUQ9","Senecio",1
-"179","ARUQ9","Stellaria",1.375
-"180","ARUQ9","xxxlitter",7.88888888888889
-"181","ARUQ9","xxxmoss",10.75
+"","location_id","class","mean_percent_cover"
+"1","COOL1","Artemisia",2
+"2","COOL1","Astragalus",13.1666666666667
+"3","COOL1","Castilleja",5
+"4","COOL1","Graminoid/horsetails",5.88888888888889
+"5","COOL1","Lichen",3
+"6","COOL1","otherforb",2.81818181818182
+"7","COOL1","Oxytropis",13.5
+"8","COOL1","Pedicularis Capitata",3.33333333333333
+"9","COOL1","Pedicularis spp",2.5
+"10","COOL1","Pedicularis Vertisilata",5.625
+"11","COOL1","Polygonum viviparum",2
+"12","COOL1","Salix Arctica",18.4285714285714
+"13","COOL1","Saxifrage",4.5
+"14","COOL1","Senecio",2
+"15","COOL1","Stellaria",1.5
+"16","COOL1","xxxbareground",56.75
+"17","COOL1","xxxlitter",29.7777777777778
+"18","COOL1","xxxmoss",13.9
+"19","COOL1","Yarrow",3
+"20","COOL2","Artemisia",1.7
+"21","COOL2","Castilleja",3.45
+"22","COOL2","Graminoid/horsetails",5.96875
+"23","COOL2","Lichen",1
+"24","COOL2","Monkshood",2.8
+"25","COOL2","otherforb",1.5
+"26","COOL2","Oxytropis",10.1
+"27","COOL2","Pedicularis Capitata",2.525
+"28","COOL2","Pedicularis spp",3
+"29","COOL2","Pedicularis Vertisilata",6.15
+"30","COOL2","Salix Arctica",40.23
+"31","COOL2","Stellaria",1.24
+"32","COOL2","xxxlitter",22.09
+"33","COOL2","xxxmoss",9.95
+"34","COOL2","Yarrow",4.84285714285714
+"35","COOL2",NA,1.3
+"36","COOL3","Astragalus",22.5
+"37","COOL3","Graminoid/horsetails",7
+"38","COOL3","Lichen",6.6
+"39","COOL3","Petasites frigidus",11.7142857142857
+"40","COOL3","Polygonum viviparum",1
+"41","COOL3","Salix Arctica",8.3
+"42","COOL3","Salix Richardsonii ",28.1
+"43","COOL3","Stellaria",1
+"44","COOL3","xxxlitter",16.875
+"45","COOL3","xxxmoss",14.8
+"46","COOL4","Astragalus",5.66666666666667
+"47","COOL4","Graminoid/horsetails",15.6923076923077
+"48","COOL4","Lichen",2
+"49","COOL4","otherforb",2
+"50","COOL4","Oxytropis",3
+"51","COOL4","Pedicularis Capitata",3
+"52","COOL4","Pedicularis spp",1.5
+"53","COOL4","Salix Arctica",21.5
+"54","COOL4","Salix Richardsonii ",34.6
+"55","COOL4","Saxifrage",2
+"56","COOL4","xxxlitter",18.1
+"57","COOL4","xxxmoss",11.2222222222222
+"58","MOD1","Astragalus",6.8
+"59","MOD1","Castilleja",3
+"60","MOD1","Dryas",26
+"61","MOD1","Graminoid/horsetails",2.88888888888889
+"62","MOD1","Lichen",1.5
+"63","MOD1","Lupine",14
+"64","MOD1","otherforb",2.6
+"65","MOD1","Oxytropis",3
+"66","MOD1","Pedicularis Capitata",9.125
+"67","MOD1","Pedicularis Vertisilata",9.5
+"68","MOD1","Petasites frigidus",10.5
+"69","MOD1","Polygonum viviparum",3
+"70","MOD1","Salix Arctica",19.8
+"71","MOD1","Salix Reticulata",44.25
+"72","MOD1","Salix Richardsonii ",55
+"73","MOD1","Senecio",1.5
+"74","MOD1","Stellaria",1.875
+"75","MOD1","xxxfungus",1.5
+"76","MOD1","xxxlitter",8.33333333333333
+"77","MOD1","xxxmoss",5.28571428571429
+"78","MOD2","Astragalus",4
+"79","MOD2","Castilleja",1.33333333333333
+"80","MOD2","Dryas",49.2
+"81","MOD2","Graminoid/horsetails",6.88888888888889
+"82","MOD2","Lichen",2.2
+"83","MOD2","otherforb",1.5
+"84","MOD2","Oxytropis",8.11111111111111
+"85","MOD2","Pedicularis Capitata",3.25
+"86","MOD2","Pedicularis spp",2.16666666666667
+"87","MOD2","Pedicularis Vertisilata",2.75
+"88","MOD2","Petasites frigidus",4
+"89","MOD2","Polygonum bistorta",3
+"90","MOD2","Polygonum viviparum",1
+"91","MOD2","Salix Arctica",17
+"92","MOD2","Stellaria",1
+"93","MOD2","xxxfungus",2
+"94","MOD2","xxxlitter",7.71428571428571
+"95","MOD2","xxxmoss",8.28571428571429
+"96","MOD3","Artemisia",3.5
+"97","MOD3","Astragalus",1
+"98","MOD3","Cassiope tetragona",31.5
+"99","MOD3","Dryas",8.33333333333333
+"100","MOD3","Graminoid/horsetails",8.66666666666667
+"101","MOD3","Lichen",2.8
+"102","MOD3","Lupine",3.42857142857143
+"103","MOD3","otherforb",2.86666666666667
+"104","MOD3","Oxytropis",1
+"105","MOD3","Pedicularis Capitata",4.25
+"106","MOD3","Pedicularis spp",1
+"107","MOD3","Polygonum bistorta",3.875
+"108","MOD3","Polygonum viviparum",2.28571428571429
+"109","MOD3","Pyrola grandiflora",2.25
+"110","MOD3","Salix Other",4.2
+"111","MOD3","Salix Polaris",1
+"112","MOD3","Salix Pulchra",23.4
+"113","MOD3","Salix Reticulata",18
+"114","MOD3","Saxifrage",5.33333333333333
+"115","MOD3","Senecio",1
+"116","MOD3","Stellaria",1
+"117","MOD3","xxxbareground",40
+"118","MOD3","xxxlitter",20.4
+"119","MOD3","xxxmoss",7.14285714285714
+"120","WARM1","Castilleja",3.25
+"121","WARM1","Dryas",24.8333333333333
+"122","WARM1","Graminoid/horsetails",2.9
+"123","WARM1","Lichen",1.5
+"124","WARM1","Lupine",28.8
+"125","WARM1","Monkshood",1.75
+"126","WARM1","otherforb",1.2
+"127","WARM1","Oxytropis",2
+"128","WARM1","Pedicularis Capitata",2.25
+"129","WARM1","Pedicularis spp",1
+"130","WARM1","Pedicularis Vertisilata",7
+"131","WARM1","Petasites frigidus",2.5
+"132","WARM1","Polygonum viviparum",1.66666666666667
+"133","WARM1","Salix Arctica",26.875
+"134","WARM1","Salix Richardsonii ",77
+"135","WARM1","Saxifrage",1.75
+"136","WARM1","Senecio",2
+"137","WARM1","Stellaria",1.14285714285714
+"138","WARM1","xxxfungus",1
+"139","WARM1","xxxlitter",11.25
+"140","WARM1","xxxmoss",6.83333333333333
+"141","WARM1","Yarrow",3.25
+"142","WARM2","Astragalus",3.55555555555556
+"143","WARM2","Castilleja",2.5
+"144","WARM2","Dryas",21.3
+"145","WARM2","Graminoid/horsetails",16.2142857142857
+"146","WARM2","L. Glauca",2
+"147","WARM2","Lichen",2
+"148","WARM2","Lupine",17.7
+"149","WARM2","Monkshood",2.5
+"150","WARM2","otherforb",3
+"151","WARM2","Oxytropis",2.8
+"152","WARM2","Pedicularis Capitata",1
+"153","WARM2","Pedicularis spp",1.75
+"154","WARM2","Pedicularis Vertisilata",3
+"155","WARM2","Petasites frigidus",13
+"156","WARM2","Polygonum bistorta",1
+"157","WARM2","Polygonum viviparum",2.83333333333333
+"158","WARM2","Salix Arctica",17.4
+"159","WARM2","Salix Reticulata",13.5
+"160","WARM2","Saxifrage",2.5
+"161","WARM2","Senecio",1
+"162","WARM2","Stellaria",1.375
+"163","WARM2","xxxlitter",7.88888888888889
+"164","WARM2","xxxmoss",10.75
+"165","WARM3","Astragalus",3.8
+"166","WARM3","Dryas",41
+"167","WARM3","Graminoid/horsetails",4.2
+"168","WARM3","Lichen",2.75
+"169","WARM3","Lupine",17.6
+"170","WARM3","otherforb",1.5
+"171","WARM3","Oxytropis",4.875
+"172","WARM3","Pedicularis Capitata",3.5
+"173","WARM3","Pedicularis spp",2.25
+"174","WARM3","Polygonum viviparum",1.33333333333333
+"175","WARM3","Salix Arctica",17
+"176","WARM3","Salix Reticulata",26.5
+"177","WARM3","Saxifrage",2
+"178","WARM3","Senecio",1
+"179","WARM3","Stellaria",1
+"180","WARM3","xxxlitter",13.4444444444444
+"181","WARM3","xxxmoss",5.5

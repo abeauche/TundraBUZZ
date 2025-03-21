@@ -23,17 +23,25 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 vegetation_raw <- read.csv("./data/raw/QHI_vegetation_2024_raw.csv", stringsAsFactors = TRUE)
 location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
+# Merge to replace aru_id with location_id
+vegetation_raw <- vegetation_raw %>%
+  left_join(location_mapping, by = "aru_id") %>%
+  select(-c(aru_id, polcam_id,tomst_id,site,year,X,microclimate))  # Remove aru_id, now using location_id
+
+# Set seed for repeatability
+set.seed(123)
+
 
 ### Prepare datasets for ordination
 
 # Group by ARU, plot, and species, summarize mean percent cover for both observers
 vegetation_plot_summary <- vegetation_raw %>%
-  group_by(aru_id, plot, class) %>%
+  group_by(location_id, plot, class) %>%
   summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE)) %>%
   mutate(mean_percent_cover = ifelse(is.nan(mean_percent_cover), 0, mean_percent_cover))
 
 vegetation_aru_summary <- vegetation_raw %>%
-  group_by(aru_id, class) %>%
+  group_by(location_id, class) %>%
   summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE)) %>%
   mutate(mean_percent_cover = ifelse(is.nan(mean_percent_cover), 0, mean_percent_cover))
 
@@ -50,7 +58,7 @@ veg_matrix <- veg_matrix %>% select(-any_of("NA"))
 
 # Convert to matrix
 veg_comm_matrix <- as.matrix(veg_matrix[, -1])
-rownames(veg_comm_matrix) <- veg_matrix$aru_id
+rownames(veg_comm_matrix) <- veg_matrix$location_id
 
 
 
@@ -74,7 +82,6 @@ dev.off()
 # k = 3 is a good inflexion point
 
 # Increase trymax to 200 for more iterations
-set.seed(123)
 nmds_result <- metaMDS(veg_comm_matrix, k = 3, trymax = 200, distance = "bray")
 
 # Check stress and plot results
@@ -84,23 +91,23 @@ stressplot(nmds_result)
 dev.off()
 
 # Merge the 'microclimate' classification with the NMDS data
-nmds_data <- data.frame(aru_id = rownames(nmds_result$points), points = nmds_result$points) %>%
-  left_join(veg_matrix %>% filter(aru_id %in% rownames(nmds_result$points)), by = "aru_id")
+nmds_data <- data.frame(location_id = rownames(nmds_result$points), points = nmds_result$points) %>%
+  left_join(veg_matrix %>% filter(location_id %in% rownames(nmds_result$points)), by = "location_id")
 
 nmds_data <- nmds_data %>%
   mutate(microclimate = case_when(
-    aru_id %in% c("ARUQ5", "ARUQ9", "ARUQ7") ~ "Warm",
-    aru_id %in% c("ARUQ3", "ARUQ8", "ARUQ10") ~ "Intermediate",
-    aru_id %in% c("ARUQ6", "ARUQ1", "ARUQ2", "ARUQ4") ~ "Cool"
+    location_id %in% c("WARM1", "WARM2", "WARM3") ~ "Warm",
+    location_id %in% c("MOD1", "MOD2", "MOD3") ~ "Moderate",
+    location_id %in% c("COOL1", "COOL2", "COOL3", "COOL4") ~ "Cool"
   ))
 
 # Export microclimate factor
 microclimate_factor <- factor(nmds_data$microclimate)
 
 # Create a color palette for the microclimate categories
-colors <- c("cool" = "purple4",   # Blue for cool
-            "intermediate" = "forestgreen", # Greenish-blue for intermediate
-            "warm" = "gold")  # Red for warm
+colors <- c("Cool" = "purple4",   # Blue for cool
+            "Moderate" = "forestgreen", # Greenish-blue for moderate
+            "Warm" = "gold")  # Red for warm
 
 # Create 3D NMDS plot with color coding by microclimate
 plot3d(nmds_result$points[,1], nmds_result$points[,2], nmds_result$points[,3], 
@@ -119,7 +126,6 @@ text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3]
 # k = 2 is still below stress threshold of 0.2, still acceptable
 
 # Run NMDS ordination
-set.seed(123)
 nmds_result_k2 <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
 
 # Check stress and plot results
@@ -138,15 +144,15 @@ points(nmds_result_k2$points, col = "blue", pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
 
 # Merge NMDS results with microclimate classifications
-nmds_data_k2 <- data.frame(aru_id = rownames(nmds_result_k2$points), points = nmds_result_k2$points) %>%
-  left_join(veg_matrix %>% filter(aru_id %in% rownames(nmds_result_k2$points)), by = "aru_id")
+nmds_data_k2 <- data.frame(location_id = rownames(nmds_result_k2$points), points = nmds_result_k2$points) %>%
+  left_join(veg_matrix %>% filter(location_id %in% rownames(nmds_result_k2$points)), by = "location_id")
 
 # Define microclimate classification
 nmds_data_k2 <- nmds_data_k2 %>%
   mutate(microclimate = case_when(
-    aru_id %in% c("ARUQ5", "ARUQ9", "ARUQ7") ~ "Warm",
-    aru_id %in% c("ARUQ3", "ARUQ8", "ARUQ10") ~ "Intermediate",
-    aru_id %in% c("ARUQ6", "ARUQ1", "ARUQ2", "ARUQ4") ~ "Cool"
+    location_id %in% c("WARM1", "WARM2", "WARM3") ~ "Warm",
+    location_id %in% c("MOD1", "MOD2", "MOD3") ~ "Moderate",
+    location_id %in% c("COOL1", "COOL2", "COOL3", "COOL4") ~ "Cool"
   ))
 
 # NMDS plot with microclimate classification
@@ -154,7 +160,7 @@ pdf("./outputs/figures/NMDS_microclim_k2.pdf", width = 8.2, height = 6)
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
-legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
+legend("bottomleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
 dev.off()
 
 
@@ -165,12 +171,12 @@ dev.off()
 veg_matrix_plot <- vegetation_plot_summary %>%
   ungroup() %>%
   pivot_wider(names_from = class, values_from = mean_percent_cover, values_fill = 0) %>%
-  mutate(aru_plot = paste(aru_id, plot, sep = "_"))
+  mutate(location_plot = paste(location_id, plot, sep = "_"))
 
 veg_comm_matrix_plot <- veg_matrix_plot %>%
-  select(-c(aru_id, plot, aru_plot)) %>%
+  select(-c(location_id, plot, location_plot)) %>%
   as.matrix()
-rownames(veg_comm_matrix_plot) <- veg_matrix_plot$aru_plot
+rownames(veg_comm_matrix_plot) <- veg_matrix_plot$location_plot
 
 # Calculate a dissimilarity matrix using bray-curtis distance
 dist_plot <- vegdist(veg_comm_matrix_plot,  method = "bray")
@@ -182,7 +188,6 @@ dev.off()
 # k = 3-4 could be okay
 
 # Run NMDS ordination
-set.seed(123)
 nmds_result_plot_k3 <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 3, trymax = 200)
 
 # Check stress and plot results
@@ -192,16 +197,16 @@ stressplot(nmds_result_plot_k3)
 dev.off()
 
 # Create colour vector
-plot_colors <- rainbow(length(unique(veg_matrix_plot$aru_id)))[as.factor(veg_matrix_plot$aru_id)]
+plot_colors <- rainbow(length(unique(veg_matrix_plot$location_id)))[as.factor(veg_matrix_plot$location_id)]
 
 # Create 3D NMDS plot with color coding by site
-plot3d(nmds_result_plot$points[,1], nmds_result_plot$points[,2], nmds_result_plot$points[,3], col = plot_colors, size = 3, xlab = "NMDS1", ylab = "NMDS2", zlab = "NMDS3")
+plot3d(nmds_result_plot_k3$points[,1], nmds_result_plot_k3$points[,2], nmds_result_plot_k3$points[,3], col = plot_colors, size = 3, xlab = "NMDS1", ylab = "NMDS2", zlab = "NMDS3")
 
 # Add labels at the points (you can modify the labels as needed)
-text3d(nmds_result_plot$points[,1], nmds_result_plot$points[,2], nmds_result_plot$points[,3] + 0.05, 
-       texts = rownames(nmds_result_plot$points), cex = 0.7, col = "black")
-text3d(nmds_result_plot$species[,1], nmds_result_plot$species[,2], nmds_result_plot$species[,3], 
-       texts = rownames(nmds_result_plot$species), cex = 0.7, col = "grey")
+text3d(nmds_result_plot_k3$points[,1], nmds_result_plot_k3$points[,2], nmds_result_plot_k3$points[,3] + 0.05, 
+       texts = rownames(nmds_result_plot_k3$points), cex = 0.7, col = "black")
+text3d(nmds_result_plot_k3$species[,1], nmds_result_plot_k3$species[,2], nmds_result_plot_k3$species[,3], 
+       texts = rownames(nmds_result_plot_k3$species), cex = 0.7, col = "grey")
 
 
 
@@ -235,17 +240,17 @@ dev.off()
 # Filtered matrix for core sites
 core_data <- veg_matrix_plot %>% 
   filter(plot == "Core") %>%
-  mutate(site_id =paste(aru_id, plot, sep = "_")) %>%
+  mutate(site_id =paste(location_id, plot, sep = "_")) %>%
   ungroup() 
 veg_matrix_core <- core_data %>%
-  select(-c(aru_id, plot, aru_plot))
+  select(-c(location_id, plot, location_plot))
 
 # Matrix for average sites
 averaged_data <- veg_matrix %>% 
-  mutate(site_id =paste(aru_id)) %>%
+  mutate(site_id =paste(location_id)) %>%
   ungroup() 
 veg_matrix_averaged <- averaged_data %>%
-  select(-c(aru_id))
+  select(-c(location_id))
 
 # Tidy veg_matrix_core
 veg_matrix_core <- veg_matrix_core[, !is.na(colnames(veg_matrix_core))]
@@ -259,9 +264,9 @@ veg_comm_matrix_combined <- veg_matrix_combined %>%
   na.omit()
 rownames(veg_comm_matrix_combined) <- veg_matrix_combined$site_id 
 
-# Match core and averaged points by 'aru_id' (split 'site_id' to get 'aru_id')
-core_data$aru_id <- gsub("_Core", "", core_data$site_id)
-averaged_data$aru_id <- averaged_data$site_id
+# Match core and averaged points by 'location_id' (split 'site_id' to get 'location_id')
+core_data$location_id <- gsub("_Core", "", core_data$site_id)
+averaged_data$location_id <- averaged_data$site_id
 
 # Run NMDS ordination
 nmds_result_combined <- metaMDS(veg_comm_matrix_combined, distance = "bray", k = 2, trymax = 200)
@@ -274,19 +279,19 @@ dev.off()
 
 # Extract the MDS coordinates from the NMDS result
 nmds_coords_combined <- as.data.frame(nmds_result_combined$points)
-nmds_coords_combined$aru_id <- rownames(nmds_coords_combined)  # Make sure aru_id is in the same order
-nmds_coords_combined <- nmds_coords_combined %>% mutate(site_id = aru_id) %>%
-  select(-c(aru_id))
+nmds_coords_combined$location_id <- rownames(nmds_coords_combined)  # Make sure location_id is in the same order
+nmds_coords_combined <- nmds_coords_combined %>% mutate(site_id = location_id) %>%
+  select(-c(location_id))
 
-# Merge the MDS coordinates with the core and averaged data based on 'aru_id'
+# Merge the MDS coordinates with the core and averaged data based on 'location_id'
 core_data <- left_join(core_data, nmds_coords_combined, by = "site_id")
 averaged_data <- left_join(averaged_data, nmds_coords_combined, by = "site_id")
 
 # Ensure both data sets are ordered the same way
 core_data <- core_data %>%
-  select(site_id, aru_id, MDS1, MDS2)
+  select(site_id, location_id, MDS1, MDS2)
 averaged_data <- averaged_data %>%
-  select(site_id, aru_id, MDS1, MDS2)
+  select(site_id, location_id, MDS1, MDS2)
 
 # Create the plot with adjusted xlim and ylim
 pdf("./outputs/figures/NMDS_combined_scaling.pdf", width = 7, height = 6)
@@ -301,6 +306,6 @@ for(i in 1:nrow(core_data)) {
 }
 # Add a legend
 legend("topright", legend = c("Core", "Averaged"), col = c("red", "blue"), pch = 19, cex = 0.8)
-# Add labels for each site based on aru_id 
+# Add labels for each site based on location_id 
 text(nmds_coords_combined[, 1], nmds_coords_combined[, 2], labels = rownames(nmds_coords_combined), pos = 3, cex = 0.8, col = "black")
 dev.off()
