@@ -110,7 +110,6 @@ text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3]
 
 ### IN PROGRESS
 
-
 # Run NMDS ordination
 set.seed(123)
 nmds_result <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 100)
