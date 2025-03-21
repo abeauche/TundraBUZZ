@@ -218,7 +218,7 @@ pdf("./outputs/figures/NMDS_stress_plot_k2.pdf", width = 7, height = 6)
 stressplot(nmds_result_plot_k2)
 dev.off()
 
-# Create 3D NMDS plot with color coding by site
+# Create 2D NMDS plot with color coding by site
 plot(nmds_result_plot_k2, type = "t")
 
 pdf("./outputs/figures/NMDS_plot_k2.pdf", width = 7, height = 6)
@@ -226,6 +226,9 @@ ordiplot(nmds_result_plot_k2, display = "sites", type = "n")
 points(nmds_result_plot_k2$points, col = plot_colors, pch = 19)
 text(nmds_result_plot_k2$points, labels = rownames(nmds_result_plot_k2$points), pos = 3, cex = 0.8)
 dev.off()
+
+
+
 
 
 
