@@ -3,12 +3,13 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-20
-# Last Modified: 2025-03-21
+# Last Modified: 2025-03-25
 # Description: This script creates an ordination for vegetation plots based on vegetation composition data for 10 POLCAM sites on Qikiqtaruk-Herschel Island measured in the summer of 2024 by A. Beauchemin and E. Bowman.
 # Dependencies: XQuartz, QHI_vegetation_2024_raw.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
 
-# Load required packages
+#### SETUP ----
+# Load required packages 
 # install.packages("rgl")
 library(tidyverse)
 library(vegan)
@@ -32,7 +33,7 @@ vegetation_raw <- vegetation_raw %>%
 set.seed(123)
 
 
-### Prepare datasets for ordination
+#### Prepare datasets for ordination ----
 
 # Group by ARU, plot, and species, summarize mean percent cover for both observers
 vegetation_plot_summary <- vegetation_raw %>%
@@ -62,7 +63,7 @@ rownames(veg_comm_matrix) <- veg_matrix$location_id
 
 
 
-### NMDS ORDINATION - From https://ourcodingclub.github.io/tutorials/ordination/
+#### NMDS ORDINATION - From https://ourcodingclub.github.io/tutorials/ordination/ ----
 
 # Calculate a dissimilarity matrix using bray-curtis distance, which is recommended for abundance data
 dist <- vegdist(veg_comm_matrix,  method = "bray")
@@ -122,7 +123,7 @@ text3d(nmds_result$species[,1], nmds_result$species[,2], nmds_result$species[,3]
 
 
 
-### NMDS ORDINATION IN 2D FOR EASIER VISUALIZATION
+#### NMDS ORDINATION IN 2D FOR EASIER VISUALIZATION ----
 # k = 2 is still below stress threshold of 0.2, still acceptable
 
 # Run NMDS ordination
@@ -166,7 +167,7 @@ dev.off()
 
 
 
-### NMDS ORDINATION AT PLOT LEVEL
+#### NMDS ORDINATION AT PLOT LEVEL ----
 # Prepare data for NMDS
 veg_matrix_plot <- vegetation_plot_summary %>%
   ungroup() %>%
@@ -211,7 +212,7 @@ text3d(nmds_result_plot_k3$species[,1], nmds_result_plot_k3$species[,2], nmds_re
 
 
 
-### NMDS ORDINATION AT PLOT LEVEL IN 2D FOR EASIER VISUALIZATION
+#### NMDS ORDINATION AT PLOT LEVEL IN 2D FOR EASIER VISUALIZATION ----
 # stress at k = 2 still around 0.2, not great
 
 # Run NMDS ordination
@@ -235,7 +236,7 @@ dev.off()
 
 
 
-### SCALING ANALYSIS --> COMBINING CORE PLOTS AND AVG PLOTS
+#### SCALING ANALYSIS --> COMBINING CORE PLOTS AND AVG PLOTS ----
 
 # Filtered matrix for core sites
 core_data <- veg_matrix_plot %>% 
