@@ -3,16 +3,16 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-21
-# Last Modified: 2025-03-21
+# Last Modified: 2025-03-25
 # Description: This script TBD.
 # Dependencies: TBD, location_mapping_TundraBUZZ.csv
 # ====================================================
 
+#### SETUP ----
 # Load required packages
 library(tidyverse)
 library(vegan)
 library(RColorBrewer)
-
 
 # Set working directory (if needed)
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -28,3 +28,6 @@ vegetation_raw <- vegetation_raw %>%
 
 # Set seed for repeatability
 set.seed(123)
+
+
+####
