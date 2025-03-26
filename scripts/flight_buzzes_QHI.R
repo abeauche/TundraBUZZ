@@ -20,6 +20,7 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
 ARUQ0_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
+ARUQ456_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ456_raw.csv")
 location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
 # Set seed for repeatability
@@ -28,6 +29,14 @@ set.seed(123)
 # Extract datetime from file names
 ARUQ0_2024_pred <- ARUQ0_2024_pred %>%
   mutate(datetime = as.POSIXct(gsub(".*_(\\d{8})_(\\d{6})\\.wav$", "\\1 \\2", file), format="%Y%m%d %H%M%S"))
+
+ARUQ456_2024_pred <- ARUQ456_2024_pred %>%
+  mutate(
+    file = sub("^.*\\\\", "", file),  # Remove path before backslash
+    aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
+    datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
+  )
+
 
 ####
 
