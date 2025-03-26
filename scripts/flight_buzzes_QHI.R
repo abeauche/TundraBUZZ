@@ -294,17 +294,81 @@ merged_data_ARUQ56 <- summary_pred_duration_agg_ARUQ456_2024 %>%
   left_join(aruq56_data_plot, by = c("date" = "datetime", "location_id")) %>%
   filter(!is.na(month))  # Remove NAs in month column
 
+hist(log(merged_data_ARUQ56$mean_value))
+hist(log(merged_data_ARUQ56$total_duration_day))
+
+
+# Fit the model using log-transformed total_duration_day
+model_ARUQ56 <- lm(log(total_duration_day) ~ log(mean_value), data = merged_data_ARUQ56)
+summary(model_ARUQ56)
+
+# Calculate fitted values and confidence intervals from the model
+predictions_log_ARUQ56 <- predict(model_ARUQ56, newdata = merged_data_ARUQ56, se.fit = TRUE)
+
+# Exponentiate to return to the original scale
+predictions_ARUQ56 <- exp(predictions_log_ARUQ56$fit)
+lower_bound_ARUQ56 <- exp(predictions_log_ARUQ56$fit - 1.96 * predictions_log_ARUQ56$se.fit)  # Lower bound (95% CI)
+upper_bound_ARUQ56 <- exp(predictions_log_ARUQ56$fit + 1.96 * predictions_log_ARUQ56$se.fit)  # Upper bound (95% CI)
+
+
 # Plot total flight buzz duration vs. mean temperature
 ggplot(merged_data_ARUQ56, aes(x = mean_value, y = total_duration_day)) +
   geom_point() +
-  geom_smooth(method = lm, se = TRUE) +
+  # geom_smooth(method = "lm", se = TRUE) +
+  geom_line(aes(x = mean_value, y = predictions_ARUQ56), color = "skyblue4", size = 1) +  # Regression line
+  geom_ribbon(aes(x = mean_value, ymin = lower_bound_ARUQ56, ymax = upper_bound_ARUQ56), alpha = 0.1) +  # Confidence intervals
+  
   labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
        x = "Daily Mean Temperature (°C)",
        y = "Total Flight Buzz Duration (s)") +
-  #geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
-  #annotate("text", x = 6, y = 500, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
-  #annotate("text", x = 12.6, y = 500, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
+  geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = 500, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = 500, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   theme_classic() +
+  #ylim(0,10) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id)
+
+
+
+# Fit separate models for each location_id
+models_ARUQ56 <- merged_data_ARUQ56 %>%
+  group_by(location_id) %>%
+  do(model = lm(log(total_duration_day) ~ log(mean_value), data = .))
+
+# Generate predictions for each location_id
+predictions_ARUQ56 <- merged_data_ARUQ56 %>%
+  group_by(location_id) %>%
+  do({
+    model <- lm(log(total_duration_day) ~ log(mean_value), data = .)
+    pred <- predict(model, newdata = ., se.fit = TRUE)
+    tibble(
+      mean_value = .$mean_value,
+      total_duration_day = .$total_duration_day,
+      predicted = exp(pred$fit),  # Convert back from log scale
+      lower_bound = exp(pred$fit - 1.96 * pred$se.fit),
+      upper_bound = exp(pred$fit + 1.96 * pred$se.fit)
+    )
+  })
+
+# Plot total flight buzz duration vs. mean temperature
+ggplot(predictions_ARUQ56, aes(x = mean_value, y = total_duration_day)) +
+  geom_point() +
+  geom_line(aes(y = predicted), color = "skyblue4", size = 1) +  # Regression line
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.1) +  # Confidence interval
+  
+  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
+       x = "Daily Mean Temperature (°C)",
+       y = "Total Flight Buzz Duration (s)") +
+  geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
+  geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = max(predictions_ARUQ56$total_duration_day, na.rm = TRUE) * 0.8, 
+           label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = max(predictions_ARUQ56$total_duration_day, na.rm = TRUE) * 0.8, 
+           label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  theme_classic() +
+  ylim(0,500) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~location_id)
 
