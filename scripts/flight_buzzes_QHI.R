@@ -193,67 +193,124 @@ ARUQ456_2024_above_threshold <- ARUQ456_2024_pred_mapped %>%
   filter(BUZZ > threshold) %>%
   mutate(duration_above_threshold = 0.15)  # Each segment is 0.3s, so each overlap segment is 0.15s
 
+# Save csv
+write.csv(ARUQ456_2024_above_threshold, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ456_2024_pred_above_threshold.csv", row.names = FALSE)
+
 # Summarize total duration above threshold per datetime
-summary_pred_duration_ARUQ0_2024 <- ARUQ0_2024_pred_above_threshold %>%
-  group_by(datetime) %>%
+summary_pred_duration_ARUQ456_2024 <- ARUQ456_2024_above_threshold %>%
+  group_by(datetime, location_id, microclimate) %>%
   summarize(total_duration_above_threshold = sum(duration_above_threshold), .groups = "drop")
 
 # Convert datetime to UTC-7
-summary_pred_duration_ARUQ0_2024_tz <- summary_pred_duration_ARUQ0_2024 %>%
-  mutate(datetime = with_tz(datetime, tzone = "Etc/GMT+7"),
-         time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
+summary_pred_duration_ARUQ456_2024 <- summary_pred_duration_ARUQ456_2024 %>%
+  mutate(time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
+
+# Save csv
+write.csv(summary_pred_duration_ARUQ456_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_ARUQ456_2024_pred.csv", row.names = FALSE)
+
 
 # Plot flight buzzes over time
-ggplot(summary_pred_duration_ARUQ0_2024, aes(x = datetime, y = total_duration_above_threshold)) +
+ggplot(summary_pred_duration_ARUQ456_2024, aes(x = datetime, y = total_duration_above_threshold)) +
   geom_point() +  
-  labs(title = "Flight Buzzes Over Time - ARUQ0 (Threshold = 8)",
+  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
        x = "Datetime", 
        y = "Total Predicted Flight Buzz Duration (s)") +
-  ylim(0, 100) +
+  #ylim(0, 100) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id)
 
 # Group by week for aggregation
-summary_pred_duration_ARUQ0_2024_month <- summary_pred_duration_ARUQ0_2024_tz %>%
+summary_pred_duration_ARUQ456_2024 <- summary_pred_duration_ARUQ456_2024 %>%
   mutate(week = floor_date(datetime, "week"))
 
 # Get sunrise and sunset times
 lat <- 69.57
 lon <- -138.91
-summary_pred_duration_ARUQ0_2024_sun <- summary_pred_duration_ARUQ0_2024_month %>%
-  mutate(date = as.Date(datetime))
+# summary_pred_duration_ARUQ0_2024_sun <- summary_pred_duration_ARUQ0_2024_month %>%
+#  mutate(date = as.Date(datetime))
 
-sun_times <- getSunlightTimes(data = data.frame(date = unique(summary_pred_duration_ARUQ0_2024_sun$date), lat = lat, lon = lon),
-                              keep = c("sunrise", "sunset"))
+# sun_times <- getSunlightTimes(data = data.frame(date = unique(summary_pred_duration_ARUQ0_2024_sun$date), lat = lat, lon = lon),
+#                              keep = c("sunrise", "sunset"))
 
 # Plot flight buzzes by time of day
-ggplot(summary_pred_duration_ARUQ0_2024_month, aes(x = time_of_day, y = total_duration_above_threshold)) +
+ggplot(summary_pred_duration_ARUQ456_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
   geom_point(alpha = 0.5) +  
-  labs(title = "Flight Buzzes Over a 24-hour Period - ARUQ0 (Threshold = 8)",
+  labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
        x = "Time of Day", 
        y = "Total Predicted Flight Buzz Duration (s)") +
   scale_x_time(breaks = seq(0, 86400, by = 3600), labels = function(x) format(x, "%H:%M")) +
   theme_classic() +
   ylim(0, 50) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~week)
+  facet_wrap(~week + location_id)
 
+# Plot flight buzzes by time of day
+ggplot(summary_pred_duration_ARUQ456_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  geom_smooth(method = loess) +
+  labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
+       x = "Time of Day", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  scale_x_time(breaks = seq(0, 86400, by = 3600), labels = function(x) format(x, "%H:%M")) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) #+
+  #facet_wrap(~location_id)
+
+
+#### Microclimate data ----
 # Read in microclimate data
 aru_temp_daily_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
 aru_temp_hourly_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
 
-# Filter for ARUQ0
+# Clean aru_temp
 aru_temp_daily_micro <- aru_temp_daily_micro %>%
   mutate(month = as.numeric(month),
          day = as.numeric(day))
 
+# Filter for ARUQ0
 aruq0_data_plot <- aru_temp_daily_micro %>%
   filter(aru_name == "ARUQ0") %>%
   mutate(datetime = as.POSIXct(paste(2024, month, day, sep="-"), 
                                format="%Y-%m-%d", tz="UTC"))
 
+# Filter for ARUQ56
+aruq56_data_plot <- aru_temp_daily_micro %>%
+  filter(aru_name %in% c("ARUQ5", "ARUQ6")) %>%
+  mutate(location_id = recode(aru_name, "ARUQ5" = "WARM1", "ARUQ6" = "COOL1")) %>%
+  mutate(datetime = as.POSIXct(paste(2024, month, day, sep="-"), 
+                               format="%Y-%m-%d", tz="UTC"))
 
-#### DEBUG
+# Aggregate total duration above threshold per day
+summary_pred_duration_agg_ARUQ456_2024 <- summary_pred_duration_ARUQ456_2024 %>%
+  mutate(date = as.Date(datetime)) %>%
+  group_by(date, location_id) %>%
+  summarise(total_duration_day = sum(total_duration_above_threshold, na.rm = TRUE), .groups = "drop")
+
+# Merge with daily microclimate data
+merged_data_ARUQ56 <- summary_pred_duration_agg_ARUQ456_2024 %>%
+  filter(location_id %in% c("WARM1", "COOL1")) %>%
+  left_join(aruq56_data_plot, by = c("date" = "datetime", "location_id")) %>%
+  filter(!is.na(month))  # Remove NAs in month column
+
+# Plot total flight buzz duration vs. mean temperature
+ggplot(merged_data_ARUQ56, aes(x = mean_value, y = total_duration_day)) +
+  geom_point() +
+  geom_smooth(method = lm, se = TRUE) +
+  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
+       x = "Daily Mean Temperature (°C)",
+       y = "Total Flight Buzz Duration (s)") +
+  #geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
+  #annotate("text", x = 6, y = 500, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  #annotate("text", x = 12.6, y = 500, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id)
+
+
+
+#### DEBUG ----
 aru_temp_hourly_micro <- aru_temp_hourly_micro %>%
   mutate(month = as.numeric(month),
          day = as.numeric(day),
