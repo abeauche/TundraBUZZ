@@ -374,6 +374,62 @@ ggplot(predictions_ARUQ56, aes(x = mean_value, y = total_duration_day)) +
 
 
 
+class(aruq56_data_plot$datetime)
+aruq56_data_plot$date <- as.POSIXct(aruq56_data_plot$datetime)
+class(summary_pred_duration_agg_ARUQ456_2024$date)
+
+
+
+
+# Convert date columns to Date or POSIXct
+summary_pred_duration_agg_ARUQ456_2024$date <- as.Date(summary_pred_duration_agg_ARUQ456_2024$date)
+aruq56_data_plot$date <- as.Date(aruq56_data_plot$date)
+
+summary_pred_duration_agg_ARUQ456_2024 <- summary_pred_duration_agg_ARUQ456_2024 %>%
+  filter(!location_id == "WARM2")
+
+ggplot() +
+  # Plot the total duration above the threshold over time
+  geom_point(data = summary_pred_duration_agg_ARUQ456_2024, aes(x = date, y = total_duration_day/24), color = "skyblue", alpha = 0.7) +
+  
+  # Temperature curve
+  geom_smooth(data = aruq56_data_plot, aes(x = date, y = mean_value), color = "orange3", method = "loess", alpha = 0.7, se = FALSE) +
+  geom_smooth(data = summary_pred_duration_agg_ARUQ456_2024, aes(x = date, y = total_duration_day/24), color = "skyblue4", method = "loess", se = TRUE) +
+  geom_line(data = aruq56_data_plot, aes(x = date, y = mean_value), color = "orange", alpha = 0.7) +
+  geom_point(data = aruq56_data_plot, aes(x = date, y = mean_value), color = "orange", alpha = 0.7) +
+  
+  # Customizing the plot
+  labs(
+    title = "Flight Buzzes and Temperature Over Time",
+    x = "Datetime", 
+    y = "Mean Flight Buzz Duration per Hour (seconds)",
+    subtitle = "Blue: Flight Buzzes | Orange: Temperature"
+  ) +
+  
+  # Secondary y-axis for temperature
+  scale_y_continuous(
+    name = "Total Duration Above Threshold (seconds)",
+    limits = c(0, 30),
+    sec.axis = sec_axis(~ ., name = "Temperature (°C)", labels = scales::label_number())
+  ) +
+  
+  # Ensure the x-axis is properly formatted and limited
+  scale_x_date(limits = c(as.Date("2024-06-20"), max(summary_pred_duration_agg_ARUQ456_2024$date, na.rm = TRUE))) +
+  
+  # Clean theme and formatting
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "bottom") + 
+  
+  facet_wrap(~location_id)
+
+
+
+
+
+
+
+
 #### DEBUG ----
 aru_temp_hourly_micro <- aru_temp_hourly_micro %>%
   mutate(month = as.numeric(month),
