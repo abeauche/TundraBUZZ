@@ -3,13 +3,13 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-20
-# Last Modified: 2025-03-25
+# Last Modified: 2025-03-26
 # Description: This script creates an ordination for vegetation plots based on vegetation composition data for 10 POLCAM sites on Qikiqtaruk-Herschel Island measured in the summer of 2024 by A. Beauchemin and E. Bowman.
 # Dependencies: XQuartz, QHI_vegetation_2024_raw.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
 
 #### SETUP ----
-# Load required packages 
+# Load required libraries 
 # install.packages("rgl")
 library(tidyverse)
 library(vegan)
