@@ -428,6 +428,140 @@ ggplot() +
 
 
 
+#### POLCAM DATA ----
+
+polcam <- read.csv("/Volumes/TundraBUZZ/data/raw/POLCAM_daily_quick_raw.csv")
+
+
+# Merge to replace aru_id with location_id
+polcam_mapped <- polcam %>%
+  select(-c(site,year)) %>%
+  left_join(location_mapping, by = c("plot" = "polcam_id")) %>%
+  select(-c(aru_id, plot,tomst_id,site,year,notes,observer))  # Remove aru_id, now using location_id
+
+str(polcam_mapped)
+
+# Summing the flower counts per day and location_id
+polcam_mapped$flower_count <- rowSums(polcam_mapped[, c("sal_arc_fem", "sal_arc_male", "sal_rich_fem", 
+                                                        "sal_rich_male", "sal_ret_open", "sal_pul_fem", 
+                                                        "sal_pul_male", "lup_arc", "ped_all", "ped_cap", 
+                                                        "dry_int", "astra", "oxy", "stel_long", "sen", 
+                                                        "cast", "cas_tet", "pyr_gra", "bis_viv")], na.rm = TRUE)
+
+# Summarize the total flower count by day and location
+flower_summary <- polcam_mapped %>%
+  group_by(date, location_id) %>%
+  summarise(total_flower_count = sum(flower_count), .groups = "drop")
+
+
+# Merge the flower count data with the other datasets
+merged_data <- merge(summary_pred_duration_agg_ARUQ456_2024, flower_summary, by = c("date", "location_id"))
+merged_data <- merge(merged_data, aruq56_data_plot, by = c("date", "location_id"))
+
+
+# Filter out rows where total_flower_count is zero
+merged_data_filtered <- merged_data %>%
+  filter(total_flower_count > 0)
+
+# Plot
+ggplot() +
+  # Plot the total duration above the threshold over time
+  geom_point(data = merged_data, aes(x = date, y = total_duration_day/24), color = "skyblue", alpha = 0.7) +
+  
+  # Plot the temperature curve
+  geom_smooth(data = merged_data, aes(x = date, y = mean_value), color = "orange3", method = "loess", alpha = 0.7, se = FALSE) +
+  geom_smooth(data = merged_data, aes(x = date, y = total_duration_day/24), color = "skyblue4", method = "loess", se = FALSE) +
+  geom_line(data = merged_data, aes(x = date, y = mean_value), color = "orange", alpha = 0.7) +
+  geom_point(data = merged_data, aes(x = date, y = mean_value), color = "orange", alpha = 0.7) +
+  
+  # Add the total flower count as a new series
+  geom_smooth(data = merged_data_filtered, aes(x = date, y = total_flower_count), color = "darkolivegreen", size = 1.2, se = FALSE) +
+  geom_point(data = merged_data_filtered, aes(x = date, y = total_flower_count), color = "darkolivegreen", size = 2, alpha = 0.7, se = FALSE) +
+  
+  # Customizing the plot
+  labs(
+    title = "Flight Buzzes, Temperature, and Flower Count Over Time",
+    x = "Datetime", 
+    y = "Mean Flight Buzz Duration per Hour (seconds)",
+    subtitle = "Blue: Flight Buzzes | Orange: Temperature | Green: Flower Count"
+  ) +
+  
+  # Secondary y-axis for temperature
+  scale_y_continuous(
+    name = "Total Duration Above Threshold (seconds)",
+    limits = c(0, 30),
+    sec.axis = sec_axis(~ ., name = "Temperature (°C)", labels = scales::label_number())
+  ) +
+  
+  # Ensure the x-axis is properly formatted and limited
+  scale_x_date(limits = c(as.Date("2024-06-20"), max(merged_data$date, na.rm = TRUE))) +
+  
+  # Clean theme and formatting
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "bottom") + 
+  
+  facet_wrap(~location_id)
+
+
+
+
+# Filter out rows with NA, NaN, or Inf values
+merged_data_clean <- merged_data %>%
+  filter(!is.na(total_duration_day), !is.na(total_flower_count)) %>%
+  filter(!is.nan(total_duration_day), !is.nan(total_flower_count)) %>%
+  filter(total_duration_day != Inf, total_flower_count != Inf)
+
+
+hist(log(merged_data_clean$total_flower_count))
+
+# Fit separate models for each location_id
+models_ARUQ56_flowering <- merged_data_clean %>%
+  group_by(location_id) %>%
+  do(model = lm(log(total_duration_day) ~ total_flower_count, data = .))
+
+# Generate predictions for each location_id
+predictions_ARUQ56_flowering <- merged_data_clean %>%
+  group_by(location_id) %>%
+  do({
+    model <- lm(log(total_duration_day) ~ total_flower_count, data = .)
+    pred <- predict(model, newdata = ., se.fit = TRUE)
+    tibble(
+      total_flower_count = .$total_flower_count,  # Ensure this column is included
+      total_duration_day = .$total_duration_day,
+      predicted = exp(pred$fit),  # Convert back from log scale
+      lower_bound = exp(pred$fit - 1.96 * pred$se.fit),
+      upper_bound = exp(pred$fit + 1.96 * pred$se.fit)
+    )
+  })
+
+
+# Plotting
+ggplot(merged_data_clean, aes(x = total_flower_count, y = total_duration_day)) +
+  geom_point(color = "skyblue") +  # Scatter plot with blue points
+  geom_line(data = predictions_ARUQ56_flowering, aes(x = total_flower_count, y = predicted), color = "skyblue4", size = 1) +
+  geom_ribbon(data = predictions_ARUQ56_flowering, aes(x = total_flower_count, ymin = lower_bound, ymax = upper_bound), alpha = 0.1) +
+  # Add model coefficients and p-values as text annotations
+  # geom_text(data = predictions_ARUQ56_flowering %>%
+  #            group_by(location_id) %>%
+  #            slice(1), 
+  #          aes(x = 1, y = 1600, label = paste("Intercept =", round(coef(models_ARUQ56_flowering)[1], 2), "\np-value =", round(summary(models_ARUQ56_flowering)$coefficients[1,4], 4)),
+  #              color = "black", size = 5)) +  # Intercept annotation with p-value
+  #geom_text(data = predictions_ARUQ56_flowering %>%
+  #            group_by(location_id) %>%
+  #            slice(1),
+  #          aes(x = 1, y = 1400, label = paste("Slope =", round(coef(models_ARUQ56_flowering)[2], 2), "\np-value =", round(summary(models_ARUQ56_flowering)$coefficients[2,4], 4)),
+  #              color = "black", size = 5)) +  # Slope annotation with p-value
+  labs(
+    title = "Total Flight Buzz Duration vs Flowering Count",
+    x = "Daily Flowering Count",
+    y = "Total Flight Buzz Duration (seconds)"
+  ) +
+  theme_classic() +
+  facet_wrap(~location_id)
+
+
+
 
 
 #### DEBUG ----
