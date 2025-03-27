@@ -20,6 +20,7 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
 ARUQ0_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
+ARUQ4_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
 ARUQ456_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ456_raw.csv")
 location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
@@ -61,6 +62,40 @@ ARUQ456_2024_pred_mapped <- ARUQ456_2024_pred_mapped %>%
 
 # Save csv
 write.csv(ARUQ456_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ456_2024_pred_cleaned.csv", row.names = FALSE)
+
+
+
+#### Clean ARUQ4 dataset ----
+# Extract aru_id and clean file structure naming
+ARUQ4_2024_pred <- ARUQ4_2024_pred %>%
+  mutate(
+    file = sub("^.*\\\\", "", file),  # Remove path before backslash
+    aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
+    datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
+  )
+
+# Filter out files not properly named
+ARUQ4_2024_pred <- ARUQ4_2024_pred %>%
+  filter(!is.na(aru_id))
+
+# Change aru_id to factor, check levels and table
+ARUQ4_2024_pred$aru_id <- as.factor(ARUQ4_2024_pred$aru_id)
+levels(ARUQ4_2024_pred$aru_id)
+table(ARUQ4_2024_pred$aru_id)
+
+# Merge to replace aru_id with location_id
+ARUQ4_2024_pred_mapped <- ARUQ4_2024_pred %>%
+  left_join(location_mapping, by = "aru_id") %>%
+  select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
+
+# Mutate datetime to POSIXct format
+ARUQ4_2024_pred_mapped <- ARUQ4_2024_pred_mapped %>% 
+  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
+  )
+
+# Save csv
+write.csv(ARUQ4_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ4_2024_pred_cleaned.csv", row.names = FALSE)
+
 
 #### ----
 
