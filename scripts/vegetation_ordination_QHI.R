@@ -16,9 +16,12 @@ library(vegan)
 library(RColorBrewer)
 library(rgl)
 
-
-# Set working directory (if needed)
+# Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
+
+# Set seed for repeatability
+set.seed(123)
+
 
 # Load data
 vegetation_raw <- read.csv("./data/raw/QHI_vegetation_2024_raw.csv", stringsAsFactors = TRUE)
@@ -29,8 +32,7 @@ vegetation_raw <- vegetation_raw %>%
   left_join(location_mapping, by = "aru_id") %>%
   select(-c(aru_id, polcam_id,tomst_id,site,year,X,microclimate))  # Remove aru_id, now using location_id
 
-# Set seed for repeatability
-set.seed(123)
+
 
 
 #### Prepare datasets for ordination ----
