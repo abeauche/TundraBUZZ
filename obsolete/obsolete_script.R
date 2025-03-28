@@ -39,4 +39,4 @@ ARUQ56_2024_pred_raw <- ARUQ4569_2024_pred_raw %>%
   select(-aru_id, -datetime)
 
 # Save csv
-write.csv(ARUQ56_2024_pred_raw, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_2024_raw.csv", row.names = FALSE)
+write.csv(ARUQ56_2024_pred_raw, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv", row.names = FALSE)
