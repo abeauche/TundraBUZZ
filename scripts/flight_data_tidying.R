@@ -37,7 +37,8 @@ ARUQ_list <- mget(ls(pattern = "ARUQ\\d+_2024_pred_raw"))
 
 # Bind dataframes together
 ARUQ_2024_pred_raw <- bind_rows(ARUQ_list)
-
+rm(list = ls(pattern = "ARUQ\\d+_2024_pred_raw"))
+rm(ARUQ_list)
 
 #### Clean ARUQ_2024_pred_raw dataset ----
 # Extract aru_id and clean file structure naming
@@ -47,7 +48,8 @@ ARUQ_2024_pred_raw <- ARUQ_2024_pred_raw %>%
     aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
     datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
   ) %>%
-  filter(!is.na(aru_id))
+  filter(!is.na(aru_id)) %>%
+  filter(!aru_id == "ARUQ18")
 
 # Change aru_id to factor, check levels and table
 ARUQ_2024_pred_raw$aru_id <- as.factor(ARUQ_2024_pred_raw$aru_id)
@@ -58,51 +60,46 @@ table(ARUQ_2024_pred_raw$aru_id)
 ARUQ_2024_pred_mapped <- ARUQ_2024_pred_raw %>%
   left_join(location_mapping, by = "aru_id") %>%
   select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
+rm(ARUQ_2024_pred_raw)
 
 # Mutate datetime to POSIXct format
 ARUQ_2024_pred_mapped <- ARUQ_2024_pred_mapped %>% 
   mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
   )
+table(ARUQ_2024_pred_mapped$location_id)
 
 # Save csv
 write.csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", row.names = FALSE)
 
 
 
+#### THRESHOLD and FILTER DATA ----
 
-
-
-#### Clean ARUQ56_2024_pred_raw dataset ----
-# Extract aru_id and clean file structure naming
-ARUQ56_2024_pred <- ARUQ56_2024_pred %>%
-  mutate(
-    file = sub("^.*\\\\", "", file),  # Remove path before backslash
-    aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
-    datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
-  )
-
-# Filter out files not properly named, filter out ARUQ4 and ARUQ9
-ARUQ56_2024_pred <- ARUQ56_2024_pred %>%
-  filter(!is.na(aru_id)) %>%
-  filter(!aru_id %in% c("ARUQ4", "ARUQ9"))
-
-# Change aru_id to factor, check levels and table
-ARUQ56_2024_pred$aru_id <- as.factor(ARUQ56_2024_pred$aru_id)
-levels(ARUQ56_2024_pred$aru_id)
-table(ARUQ56_2024_pred$aru_id)
-
-# Merge to replace aru_id with location_id
-ARUQ56_2024_pred_mapped <- ARUQ56_2024_pred %>%
-  left_join(location_mapping, by = "aru_id") %>%
-  select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
-
-# Mutate datetime to POSIXct format
-ARUQ56_2024_pred_mapped <- ARUQ56_2024_pred_mapped %>% 
-  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
-  )
+# Define threshold and filter data
+threshold <- 8  
+ARUQ_2024_bumblebee_detections <- ARUQ_2024_pred_mapped %>%
+  filter(BUZZ > threshold) %>%
+  mutate(duration_above_threshold = 0.15)  # Each segment is 0.3s, so each overlap segment is 0.15s
 
 # Save csv
-write.csv(ARUQ56_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ56_2024_pred_cleaned.csv", row.names = FALSE)
+write.csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv", row.names = FALSE)
+rm(ARUQ_2024_pred_mapped)
+
+
+# Summarize total duration above threshold per datetime
+summary_flightbuzzes_ARUQ_2024 <- ARUQ_2024_bumblebee_detections %>%
+  group_by(datetime, location_id, microclimate) %>%
+  summarize(total_duration_above_threshold = sum(duration_above_threshold), .groups = "drop")
+
+# Convert datetime to UTC-7
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(datetime = with_tz(datetime, tzone = "America/Whitehorse"),
+         time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
+
+write.csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv", row.names = FALSE)
+
+
+
 
 
 
