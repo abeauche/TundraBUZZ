@@ -117,6 +117,14 @@ attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
 
+# Group by week for aggregation
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(week = floor_date(datetime, "week"))
+
+# Extract the date part from the datetime column and ensure it's in Date format
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(date_utc = as.Date(datetime))
+
 write.csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv", row.names = FALSE)
 
 
