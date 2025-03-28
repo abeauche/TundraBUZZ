@@ -33,7 +33,9 @@ lon <- -138.91
 #### Using tidy datasets ----
 # Load data
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
-location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+QHI_sun_data_2024 <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
+QHI_sunrise_sunset_filtered <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_sunset_filtered.csv")
+location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
 
 #### Format dataset ----
@@ -107,14 +109,14 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
   ylim(0, 50) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~week) +
-  geom_vline(data = average_sun_times_filtered, aes(xintercept = avg_sunrise), 
+  geom_vline(data = QHI_sunrise_sunset_filtered, aes(xintercept = avg_sunrise), 
              linetype = "dashed", color = "orange", size = 1) +
-  geom_vline(data = average_sun_times_filtered, aes(xintercept = avg_sunset), 
+  geom_vline(data = QHI_sunrise_sunset_filtered, aes(xintercept = avg_sunset), 
              linetype = "dashed", color = "orange4", size = 1) +
-  geom_text(data = average_sun_times_filtered, 
+  geom_text(data = QHI_sunrise_sunset_filtered, 
             aes(x = avg_sunrise, y = 45, label = "Sunrise"), 
             color = "orange", angle = 90, vjust = -0.5, size = 3) +
-  geom_text(data = average_sun_times_filtered, 
+  geom_text(data = QHI_sunrise_sunset_filtered, 
             aes(x = avg_sunset, y = 45, label = "Sunset"), 
             color = "orange4", angle = 90, vjust = -0.5, size = 3)
 
