@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-21
-# Last Modified: 2025-03-27
+# Last Modified: 2025-03-28
 # Description: This script TBD.
-# Dependencies: TBD, location_mapping_TundraBUZZ.csv
+# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, QHI_sun_data_2024.csv, QHI_sunrise_sunset_filtered.csv, aru_temp_daily_micro.csv, aru_temp_hourly_micro.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
 
 #### SETUP ----
@@ -35,7 +35,10 @@ lon <- -138.91
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
 QHI_sun_data_2024 <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
 QHI_sunrise_sunset_filtered <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_sunset_filtered.csv")
+QHI_temp_daily <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
+QHI_temp_hourly <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+
 
 
 #### Format dataset ----
@@ -122,12 +125,12 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
 
 
 
-
+######## IN PROGRESS ######### -----
 #### MICROCLIMATE DATA ----
 
 # Read in microclimate data
-aru_temp_daily_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
-aru_temp_hourly_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
+aru_temp_daily_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv") #### RENAMED QHI_temp_daily
+aru_temp_hourly_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv") #### RENAMED QHI_temp_hourly
 
 # Filter for ARUQ0
 aru_temp_daily_micro <- aru_temp_daily_micro %>%
