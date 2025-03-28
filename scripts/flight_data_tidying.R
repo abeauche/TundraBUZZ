@@ -51,6 +51,14 @@ ARUQ_2024_pred_raw <- ARUQ_2024_pred_raw %>%
   filter(!is.na(aru_id)) %>%
   filter(!aru_id == "ARUQ18")
 
+# Correct for missing time (i.e., "000000") in filenames
+ARUQ_2024_pred_raw <- ARUQ_2024_pred_raw %>%
+  mutate(
+    datetime = ifelse(str_sub(datetime, 10, 15) == "000000", 
+                      paste0(str_sub(datetime, 1, 8), "_000000"),  # Ensure "000000" for midnight
+                      datetime)
+  )
+
 # Change aru_id to factor, check levels and table
 ARUQ_2024_pred_raw$aru_id <- as.factor(ARUQ_2024_pred_raw$aru_id)
 levels(ARUQ_2024_pred_raw$aru_id)
@@ -71,6 +79,9 @@ table(ARUQ_2024_pred_mapped$location_id)
 # Save csv
 write.csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", row.names = FALSE)
 
+# ARUQ_2024_pred_mapped <- read.csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", stringsAsFactors = TRUE)
+
+
 
 
 #### THRESHOLD and FILTER DATA ----
@@ -85,16 +96,26 @@ ARUQ_2024_bumblebee_detections <- ARUQ_2024_pred_mapped %>%
 write.csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv", row.names = FALSE)
 rm(ARUQ_2024_pred_mapped)
 
-
 # Summarize total duration above threshold per datetime
 summary_flightbuzzes_ARUQ_2024 <- ARUQ_2024_bumblebee_detections %>%
   group_by(datetime, location_id, microclimate) %>%
   summarize(total_duration_above_threshold = sum(duration_above_threshold), .groups = "drop")
 
-# Convert datetime to UTC-7
+# Convert datetime to POSIXct
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>% 
+  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
+  )
+
+# Ensure datetime is in "America/Whitehorse" 
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
-  mutate(datetime = with_tz(datetime, tzone = "America/Whitehorse"),
-         time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
+  mutate(datetime = force_tz(datetime, tzone = "America/Whitehorse"))
+
+# Check timezone
+attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
+
+# Create time_of_day column
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
 
 write.csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv", row.names = FALSE)
 
