@@ -4,8 +4,8 @@
 # Author: Alex Beauchemin
 # Date Created: 2025-03-28
 # Last Modified: 2025-03-28
-# Description: This script TBD.
-# Dependencies: TBD, location_mapping_TundraBUZZ.csv
+# Description: This script uses the suncalc library to obtain sunrise, sunset, and sun altitude data for Qikiqtaruk - Herschel Island for the period from June 21, 2024, at 21:00:00, to August 12, 2024, at 23:59:59.
+# Dependencies: summary_flightbuzzes_ARUQ_2024.csv
 # ====================================================
 
 #### SETUP ----
@@ -26,7 +26,6 @@ lat <- 69.57
 lon <- -138.91
 
 
-
 #### Using tidy datasets ----
 # Load data
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
@@ -34,7 +33,6 @@ summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recogniz
 # Ensure datetime is in "America/Whitehorse" 
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(datetime = force_tz(datetime, tzone = "America/Whitehorse"))
-
 
 
 
@@ -49,7 +47,7 @@ TundraBUZZ_times_2024 <- seq(from = as.POSIXct("2024-06-21 21:00:00", tz = "Amer
 # Get sun data for each hour of the 2024 summer
 sun_data_2024 <- getSunlightPosition(TundraBUZZ_times_2024, lat, lon)
 
-
+write_csv(sun_data_2024, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
 
 
 ### Sunrise and sunset data
@@ -127,3 +125,5 @@ average_sun_times
 # Filter out NAs
 average_sun_times_filtered <- average_sun_times %>%
   filter(!avg_sunrise == "NA")
+
+write_csv(average_sun_times_filtered, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_sunset_filtered.csv")
