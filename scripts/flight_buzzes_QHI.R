@@ -19,7 +19,6 @@ library(lmerTest)
 library(mgcv)
 library(visreg)
 
-
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
@@ -27,132 +26,140 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 set.seed(123)
 
 
+
+#### Using tidy datasets ----
 # Load data
-ARUQ0_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
-ARUQ4_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
-ARUQ56_2024_pred <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
+summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
 location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
 
+#### Format dataset ----
+# Change location_id and microclimate to factor
+summary_flightbuzzes_ARUQ_2024$location_id <- as.factor(summary_flightbuzzes_ARUQ_2024$location_id) 
+summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(summary_flightbuzzes_ARUQ_2024$microclimate)
+  
+# Check levels and table
+levels(summary_flightbuzzes_ARUQ_2024$location_id)
+table(summary_flightbuzzes_ARUQ_2024$location_id)
+levels(summary_flightbuzzes_ARUQ_2024$microclimate)
+table(summary_flightbuzzes_ARUQ_2024$microclimate)
 
-#### CLEAN UP DATASETS ----
-#### Clean ARUQ56 dataset ----
-# Extract aru_id and clean file structure naming
-ARUQ56_2024_pred <- ARUQ56_2024_pred %>%
-  mutate(
-    file = sub("^.*\\\\", "", file),  # Remove path before backslash
-    aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
-    datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
-  )
+# Check timezone
+attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
 
-# Filter out files not properly named, filter out ARUQ4 and ARUQ9
-ARUQ56_2024_pred <- ARUQ56_2024_pred %>%
-  filter(!is.na(aru_id)) %>%
-  filter(!aru_id %in% c("ARUQ4", "ARUQ9"))
-
-# Change aru_id to factor, check levels and table
-ARUQ56_2024_pred$aru_id <- as.factor(ARUQ56_2024_pred$aru_id)
-levels(ARUQ56_2024_pred$aru_id)
-table(ARUQ56_2024_pred$aru_id)
-
-# Merge to replace aru_id with location_id
-ARUQ56_2024_pred_mapped <- ARUQ56_2024_pred %>%
-  left_join(location_mapping, by = "aru_id") %>%
-  select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
-
-# Mutate datetime to POSIXct format
-ARUQ56_2024_pred_mapped <- ARUQ56_2024_pred_mapped %>% 
-  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
-)
-
-# Save csv
-write.csv(ARUQ56_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ56_2024_pred_cleaned.csv", row.names = FALSE)
-
-
-
-#### Clean ARUQ4 dataset ----
-# Extract aru_id and clean file structure naming
-ARUQ4_2024_pred <- ARUQ4_2024_pred %>%
-  mutate(
-    file = sub("^.*\\\\", "", file),  # Remove path before backslash
-    aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
-    datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
-  )
-
-# Filter out files not properly named
-ARUQ4_2024_pred <- ARUQ4_2024_pred %>%
-  filter(!is.na(aru_id))
-
-# Change aru_id to factor, check levels and table
-ARUQ4_2024_pred$aru_id <- as.factor(ARUQ4_2024_pred$aru_id)
-levels(ARUQ4_2024_pred$aru_id)
-table(ARUQ4_2024_pred$aru_id)
-
-# Merge to replace aru_id with location_id
-ARUQ4_2024_pred_mapped <- ARUQ4_2024_pred %>%
-  left_join(location_mapping, by = "aru_id") %>%
-  select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
-
-# Mutate datetime to POSIXct format
-ARUQ4_2024_pred_mapped <- ARUQ4_2024_pred_mapped %>% 
-  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
-  )
-
-# Save csv
-write.csv(ARUQ4_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ4_2024_pred_cleaned.csv", row.names = FALSE)
-
-
-#### ----
-
-#### Merge datasets together
-
-
-#### Work with ARUQ0 data ----
-# Extract datetime from file names
-ARUQ0_2024_pred <- ARUQ0_2024_pred %>%
-  mutate(datetime = as.POSIXct(gsub(".*_(\\d{8})_(\\d{6})\\.wav$", "\\1 \\2", file), format="%Y%m%d %H%M%S"))
-
-# Define threshold and filter data
-threshold <- 8  
-ARUQ0_2024_pred_above_threshold <- ARUQ0_2024_pred %>%
-  filter(BUZZ > threshold) %>%
-  mutate(duration_above_threshold = 0.15)  # Each segment is 0.3s, so each overlap segment is 0.15s
-
-# Summarize total duration above threshold per datetime
-summary_pred_duration_ARUQ0_2024 <- ARUQ0_2024_pred_above_threshold %>%
-  group_by(datetime) %>%
-  summarize(total_duration_above_threshold = sum(duration_above_threshold), .groups = "drop")
-
-# Convert datetime to UTC-7
-summary_pred_duration_ARUQ0_2024_tz <- summary_pred_duration_ARUQ0_2024 %>%
-  mutate(datetime = with_tz(datetime, tzone = "Etc/GMT+7"),
-         time_of_day = hms::as_hms(format(datetime, "%H:%M:%S")))
-
-# Plot flight buzzes over time
-ggplot(summary_pred_duration_ARUQ0_2024, aes(x = datetime, y = total_duration_above_threshold)) +
-  geom_point() +  
-  labs(title = "Flight Buzzes Over Time - ARUQ0 (Threshold = 8)",
-       x = "Datetime", 
-       y = "Total Predicted Flight Buzz Duration (s)") +
-  ylim(0, 100) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Ensure datetime is in "America/Whitehorse" 
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(datetime = force_tz(datetime, tzone = "America/Whitehorse"))
 
 # Group by week for aggregation
-summary_pred_duration_ARUQ0_2024_month <- summary_pred_duration_ARUQ0_2024_tz %>%
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(week = floor_date(datetime, "week"))
+
+
+
+
+#### SUNRISE AND SUNSET DATA ----
 
 # Get sunrise and sunset times
 lat <- 69.57
 lon <- -138.91
-summary_pred_duration_ARUQ0_2024_sun <- summary_pred_duration_ARUQ0_2024_month %>%
-  mutate(date = as.Date(datetime))
 
-sun_times <- getSunlightTimes(data = data.frame(date = unique(summary_pred_duration_ARUQ0_2024_sun$date), lat = lat, lon = lon),
-                              keep = c("sunrise", "sunset"))
+# Extract the date part from the datetime column and ensure it's in Date format
+summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(date_utc = as.Date(datetime))
+
+# Extract the unique dates
+unique_dates <- unique(summary_flightbuzzes_ARUQ_2024$date_utc)
+
+# Get sunlight times for the given location and dates
+sun_times <- getSunlightTimes(
+  data = data.frame(date = unique_dates, lat = lat, lon = lon),
+  keep = c("sunrise", "sunset")
+)
+
+# Convert suntimes to proper timezone
+sun_times_tz <- sun_times %>%
+mutate(sunrise = with_tz(sunrise, tzone = "America/Whitehorse"),
+       sunset = with_tz(sunset, tzone = "America/Whitehorse"), 
+       week = floor_date(date, "week")) 
+
+
+# Convert sunset times to numeric (seconds since midnight) and handle wraparound
+sun_times_tz <- sun_times_tz %>%
+  mutate(
+    # Convert to America/Whitehorse timezone to ensure correct offset
+    sunrise = with_tz(sunrise, tzone = "America/Whitehorse"),
+    sunset = with_tz(sunset, tzone = "America/Whitehorse"),
+    
+    # Get seconds since midnight for sunrise and sunset
+    sunrise_seconds = as.numeric(sunrise) %% 86400, 
+    sunset_seconds = as.numeric(sunset) %% 86400, 
+    
+    # Handle wraparound for sunset (if negative, add 86400 seconds)
+    sunset_seconds = if_else(sunset_seconds < 0, sunset_seconds + 86400, sunset_seconds)
+  )
+
+# Calculate average sunrise and sunset times per week
+average_sun_times <- sun_times_tz %>%
+  group_by(week) %>%
+  summarise(
+    avg_sunrise = mean(sunrise_seconds, na.rm = TRUE),   # Average sunrise in seconds
+    avg_sunset = mean(sunset_seconds, na.rm = TRUE)      # Average sunset in seconds
+  ) %>%
+  mutate(
+    # Convert seconds back to POSIXct with America/Whitehorse as the timezone
+    avg_sunrise = as.POSIXct(avg_sunrise, origin = "1970-01-01", tz = "America/Whitehorse"),
+    avg_sunset = as.POSIXct(avg_sunset, origin = "1970-01-01", tz = "America/Whitehorse"),
+    
+    # Ensure the result is properly formatted as hh:mm:ss
+    avg_sunrise = format(avg_sunrise, "%H:%M:%S"),
+    avg_sunset = format(avg_sunset, "%H:%M:%S")
+  )
+
+# Convert avg_sunrise and avg_sunset from character to POSIXct (hh:mm:ss format)
+average_sun_times <- average_sun_times %>%
+  mutate(
+    avg_sunrise = as.POSIXct(avg_sunrise, format = "%H:%M:%S", tz = "America/Whitehorse"),
+    avg_sunset = as.POSIXct(avg_sunset, format = "%H:%M:%S", tz = "America/Whitehorse")
+  )
+
+# Add 1 hour (3600 seconds) to avg_sunrise and avg_sunset
+average_sun_times <- average_sun_times %>%
+  mutate(
+    avg_sunrise = avg_sunrise + 3600,  # Add 1 hour to avg_sunrise
+    avg_sunset = avg_sunset + 3600     # Add 1 hour to avg_sunset
+  )
+
+# Only keep hh:mm:ss format
+average_sun_times <- average_sun_times %>% 
+  mutate(avg_sunrise = as_hms(avg_sunrise),  # Convert seconds to hms format
+         avg_sunset = as_hms(avg_sunset)     # Convert seconds to hms format
+)
+# View the result
+average_sun_times
+
+# Filter out NAs
+average_sun_times_filtered <- average_sun_times %>%
+  filter(!avg_sunrise == "NA")
+
+
+
+
+#### Data visualization ----
+# Plot flight buzzes over time
+ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = datetime, y = total_duration_above_threshold)) +
+  geom_point() +  
+  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
+       x = "Datetime", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  ylim(0, 150) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id)
+
 
 # Plot flight buzzes by time of day
-ggplot(summary_pred_duration_ARUQ0_2024_month, aes(x = time_of_day, y = total_duration_above_threshold)) +
+ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
   geom_point(alpha = 0.5) +  
   labs(title = "Flight Buzzes Over a 24-hour Period - ARUQ0 (Threshold = 8)",
        x = "Time of Day", 
@@ -161,7 +168,48 @@ ggplot(summary_pred_duration_ARUQ0_2024_month, aes(x = time_of_day, y = total_du
   theme_classic() +
   ylim(0, 50) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~week)
+  facet_wrap(~location_id)
+
+
+# Plot flight buzzes by time of day, week
+ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
+       x = "Time of Day", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  scale_x_time(breaks = seq(0, 86400, by = 3600), labels = function(x) format(x, "%H:%M")) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id + week)
+
+
+# Plot flight buzzes by time of day, week with sunrise and sunset
+ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
+       x = "Time of Day", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  scale_x_time(breaks = seq(0, 86400, by = 3600), labels = function(x) format(x, "%H:%M")) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~week) +
+  geom_vline(data = average_sun_times_filtered, aes(xintercept = avg_sunrise), 
+             linetype = "dashed", color = "orange", size = 1) +
+  geom_vline(data = average_sun_times_filtered, aes(xintercept = avg_sunset), 
+             linetype = "dashed", color = "orange4", size = 1) +
+  geom_text(data = average_sun_times_filtered, 
+            aes(x = avg_sunrise, y = 45, label = "Sunrise"), 
+            color = "orange", angle = 90, vjust = -0.5, size = 3) +
+  geom_text(data = average_sun_times_filtered, 
+            aes(x = avg_sunset, y = 45, label = "Sunset"), 
+            color = "orange4", angle = 90, vjust = -0.5, size = 3)
+
+
+
+
+#### MICROCLIMATE DATA ----
 
 # Read in microclimate data
 aru_temp_daily_micro <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
@@ -176,6 +224,10 @@ aruq0_data_plot <- aru_temp_daily_micro %>%
   filter(aru_name == "ARUQ0") %>%
   mutate(datetime = as.POSIXct(paste(2024, month, day, sep="-"), 
                                format="%Y-%m-%d", tz="UTC"))
+
+
+
+
 
 
 #### DEBUG
