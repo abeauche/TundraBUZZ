@@ -26,7 +26,7 @@ set.seed(123)
 ARUQ0_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
 ARUQ4_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
 ARUQ56_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
-location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
 
 
 #### CLEAN UP DATASETS ----
@@ -77,7 +77,7 @@ ARUQ_2024_pred_mapped <- ARUQ_2024_pred_mapped %>%
 table(ARUQ_2024_pred_mapped$location_id)
 
 # Save csv
-write.csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", row.names = FALSE)
+write_csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
 
 # ARUQ_2024_pred_mapped <- read.csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", stringsAsFactors = TRUE)
 
@@ -93,7 +93,7 @@ ARUQ_2024_bumblebee_detections <- ARUQ_2024_pred_mapped %>%
   mutate(duration_above_threshold = 0.15)  # Each segment is 0.3s, so each overlap segment is 0.15s
 
 # Save csv
-write.csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv", row.names = FALSE)
+write_csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv")
 rm(ARUQ_2024_pred_mapped)
 
 # Summarize total duration above threshold per datetime
@@ -125,7 +125,7 @@ summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(date_utc = as.Date(datetime))
 
-write.csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv", row.names = FALSE)
+write_csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
 
 
 
