@@ -15,7 +15,7 @@ library(lubridate)
 library(suncalc)
 library(hms)
 
-# Set working directory (if needed)
+# Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
