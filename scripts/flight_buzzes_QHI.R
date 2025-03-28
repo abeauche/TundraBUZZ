@@ -14,6 +14,11 @@ library(tidyverse)
 library(lubridate)
 library(suncalc)
 library(hms)
+library(lme4)
+library(lmerTest) 
+library(mgcv)
+library(visreg)
+
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -325,9 +330,17 @@ ggplot(summary_pred_duration_ARUQ4_2024, aes(x = datetime, y = total_duration_ab
        y = "Total Predicted Flight Buzz Duration (s)") +
   #ylim(0, 100) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~location_id)
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
+# Plot flight buzzes over time
+ggplot(summary_pred_duration_ARUQ4_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+  geom_point() +  
+  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
+       x = "Datetime", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  #ylim(0, 100) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 
 #### Microclimate data ----
@@ -713,6 +726,58 @@ ggplot(merged_data_clean, aes(x = total_flower_count, y = total_duration_day)) +
 
 
 
+#### TEST ARUQ56 ----
+# Fit linear model
+model_merged_data_clean <- lm(total_duration_day ~ total_flower_count + mean_value, 
+                         data = merged_data_clean)
+
+summary(model_merged_data_clean)
+plot(model_merged_data_clean)  # Residuals vs. fitted values
+qqnorm(resid(model_merged_data_clean))
+qqline(resid(model_merged_data_clean))
+
+
+merged_data_clean$datetime <- as.POSIXct(merged_data_clean$datetime)  # Ensure datetime is POSIXct
+merged_data_clean$datetime_num <- as.numeric(merged_data_clean$datetime) / (60*60*24)  # Convert to days
+
+
+# Fit GAMM model
+model_merged_gam <- gam(total_duration_day ~ 
+                         s(datetime_num, bs = "cs") +  
+                         total_flower_count + mean_value + location_id,                
+                       data = merged_data_clean, 
+                       method = "REML")
+
+summary(model_merged_gam)
+
+
+# Plot effect of date on activity
+plot(model_merged_gam, pages = 1, shade = TRUE)
+
+# Check residuals
+gam.check(model_merged_gam)
+
+
+# Fit interaction GAMM model
+model_merged_gam_interaction <- gam(total_duration_day ~ 
+                                     s(datetime_num, bs = "cs") +  
+                                     total_flower_count * mean_value + location_id,  # Interaction term
+                                   data = merged_data_clean, 
+                                   method = "REML")
+
+summary(model_merged_gam_interaction)
+
+
+# Visualize interaction
+visreg(model_merged_gam_interaction, "total_flower_count", by = "mean_value", overlay = TRUE)
+
+
+
+
+
+
+
+
 
 #### ARUQ4 ----
 # Merge the flower count data with the other datasets
@@ -819,6 +884,52 @@ ggplot(merged_data_clean_aruq4, aes(x = total_flower_count, y = total_duration_d
   theme_classic() 
 
 
+
+#### Test ARUQ4 ----
+# Fit linear model
+model_aruq4_merged <- lm(total_duration_day ~ total_flower_count + mean_value, 
+              data = merged_data_aruq4)
+
+summary(model_aruq4_merged)
+plot(model_aruq4_merged)  # Residuals vs. fitted values
+qqnorm(resid(model_aruq4_merged))
+qqline(resid(model_aruq4_merged))
+
+
+merged_data_aruq4$datetime <- as.POSIXct(merged_data_aruq4$datetime)  # Ensure datetime is POSIXct
+merged_data_aruq4$datetime_num <- as.numeric(merged_data_aruq4$datetime) / (60*60*24)  # Convert to days
+
+
+# Fit GAMM model
+model_aruq4_gam <- gam(total_duration_day ~ 
+                         s(datetime_num, bs = "cs") +  
+                         total_flower_count +       
+                         mean_value,                
+                       data = merged_data_aruq4, 
+                       method = "REML")
+
+summary(model_aruq4_gam)
+
+
+# Plot effect of date on activity
+plot(model_aruq4_gam, pages = 1, shade = TRUE)
+
+# Check residuals
+gam.check(model_aruq4_gam)
+
+
+# Fit interaction GAMM model
+model_aruq4_gam_interaction <- gam(total_duration_day ~ 
+                                     s(datetime_num, bs = "cs") +  
+                                     total_flower_count * mean_value,  # Interaction term
+                                   data = merged_data_aruq4, 
+                                   method = "REML")
+
+summary(model_aruq4_gam_interaction)
+
+
+# Visualize interaction
+visreg(model_aruq4_gam_interaction, "total_flower_count", by = "mean_value", overlay = TRUE)
 
 
 
