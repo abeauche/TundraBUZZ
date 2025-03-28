@@ -35,12 +35,6 @@ location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", strin
 
 
 
-# Extract datetime from file names
-ARUQ0_2024_pred <- ARUQ0_2024_pred %>%
-  mutate(datetime = as.POSIXct(gsub(".*_(\\d{8})_(\\d{6})\\.wav$", "\\1 \\2", file), format="%Y%m%d %H%M%S"))
-
-
-
 #### CLEAN UP DATASETS ----
 #### Clean ARUQ56 dataset ----
 # Extract aru_id and clean file structure naming
@@ -114,6 +108,10 @@ write.csv(ARUQ4_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_output
 
 
 #### Work with ARUQ0 data ----
+# Extract datetime from file names
+ARUQ0_2024_pred <- ARUQ0_2024_pred %>%
+  mutate(datetime = as.POSIXct(gsub(".*_(\\d{8})_(\\d{6})\\.wav$", "\\1 \\2", file), format="%Y%m%d %H%M%S"))
+
 # Define threshold and filter data
 threshold <- 8  
 ARUQ0_2024_pred_above_threshold <- ARUQ0_2024_pred %>%
