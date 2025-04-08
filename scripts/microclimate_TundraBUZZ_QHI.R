@@ -27,7 +27,7 @@ location_mapping <- location_mapping %>%
   select(location_id, tomst_id, microclimate)
 
 # Set file path
-tomst_file_path <- "/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/QHI_TOMST_2024_fixed"
+tomst_file_path <- "/Volumes/TundraBUZZ/data/raw/QHI_TOMST_2024_fixed"
 
 # Set seed for repeatability
 set.seed(123)
@@ -141,6 +141,7 @@ hourly_temp_mapped <- location_mapping %>%
   mutate(datetime = datetime_local) %>%
   select(-tomst_id, -datetime_local)
 
+write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
 
 
 
@@ -184,6 +185,9 @@ daily_temp_mapped <- location_mapping %>%
   left_join(daily_dt_T3_filtered, by = c("tomst_id" = "locality_id")) %>%
   select(-tomst_id)
 
+write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+
+# Order sites by mean summer temperature based on daily temperatures
 ordered_site_temp_summer <- daily_temp_mapped %>%
   group_by(location_id) %>%
   summarize(summer_temp = mean(value, na.rm = TRUE)) %>%
