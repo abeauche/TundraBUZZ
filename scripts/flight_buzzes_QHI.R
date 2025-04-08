@@ -33,10 +33,11 @@ lon <- -138.91
 #### Using tidy datasets ----
 # Load data
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
+daily_summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
 environmental_variables_hourly <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
 environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
-QHI_temp_daily <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
-QHI_temp_hourly <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
+QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+QHI_temp_hourly <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
@@ -57,8 +58,19 @@ attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
 
 # Ensure datetime is in "America/Whitehorse" 
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
-  mutate(datetime = force_tz(datetime, tzone = "America/Whitehorse"))
+  mutate(datetime = with_tz(datetime, tzone = "America/Whitehorse"))
 
+# Convert temp data to POSIXct (UTC timezone)
+QHI_temp_hourly$datetime <- ymd_hms(QHI_temp_hourly$datetime, tz = "UTC")
+
+# Ensure datetime is in "America/Whitehorse"
+QHI_temp_hourly$datetime <- with_tz(QHI_temp_hourly$datetime, tzone = "America/Whitehorse")
+
+
+
+
+
+#### Merge datasets ----
 
 
 
