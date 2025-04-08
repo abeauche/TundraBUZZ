@@ -37,7 +37,7 @@ QHI_sun_data_2024 <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data
 QHI_sunrise_sunset_filtered <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_sunset_filtered.csv")
 QHI_temp_daily <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
 QHI_temp_hourly <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
-location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
 
