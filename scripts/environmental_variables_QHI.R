@@ -3,7 +3,7 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-04-07
-# Last Modified: 2025-04-07
+# Last Modified: 2025-04-08
 # Description: This script TBD.
 # Dependencies: 
 # ====================================================
@@ -127,10 +127,11 @@ write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ
 #### Combine daily variables ----
 
 environmental_variables_daily <- eccc_summer_2024_daily %>%
-  left_join(met_station_pauline_cove_hourly, by = "date") %>%
+  left_join(met_station_pauline_cove_daily, by = "date") %>%
   left_join(sunrise_daily, by = "date") %>%
-  left_join(cloud_cover, by = "date")
+  left_join(cloud_cover, by = "date") %>%
+  select(-"week")
 
-write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
+write_csv(environmental_variables_daily, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
 
 
