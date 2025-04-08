@@ -130,6 +130,18 @@ write_csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognize
 
 
 
+# Summarize total duration per *local* date
+daily_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(datetime_local = force_tz(datetime, tzone = "UTC"), 
+         date = as.Date(datetime_local)) %>%
+  group_by(date, location_id, microclimate) %>%
+  summarize(daily_duration_above_threshold = sum(total_duration_above_threshold), .groups = "drop")
+
+# Optional: export
+write_csv(daily_summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
+
+
+
 
 
 
