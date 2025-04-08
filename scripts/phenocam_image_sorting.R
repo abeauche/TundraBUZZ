@@ -1,8 +1,16 @@
-# Camera traps were programmed to run on two separate programs simultaneously: 
+# ====================================================
+# Script Name: phenocam_image_sorting.R
+# Project: TundraBUZZ 2024-25
+# Author: Alex Beauchemin
+# Date Created: 2025-03-20
+# Last Modified: 2025-03-20
+# Description: Camera traps were programmed to run on two separate programs simultaneously: 
 #   1) A timelapse program taking four photos per day (from 12:00 to 15:00);
 #   2) A motion detection program taking three photos separated by 1s intervals, followed by a dynamic video recording up to 10s.
 # All files are put out by the RECONYX camera in the same folder with no difference in naming. 
 # This is my code to disentangle the timelapse photos from the motion activated photos and videos.
+# ====================================================
+
 
 
 # Set working directory to RECONYX folder in drive
