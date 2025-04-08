@@ -47,6 +47,13 @@ TundraBUZZ_times_2024 <- seq(from = as.POSIXct("2024-06-21 21:00:00", tz = "Amer
 # Get sun data for each hour of the 2024 summer
 sun_data_2024 <- getSunlightPosition(TundraBUZZ_times_2024, lat, lon)
 
+# Convert the datetime to local time (America/Whitehorse)
+sun_data_2024$datetime <- with_tz(sun_data_2024$date, tzone = "America/Whitehorse") 
+
+# Remove the original 'date' column
+sun_data_2024 <- sun_data_2024 %>% select(-date)
+
+
 write_csv(sun_data_2024, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
 
 
