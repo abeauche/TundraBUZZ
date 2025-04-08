@@ -27,7 +27,7 @@ ARUQ0_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/
 ARUQ4_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
 ARUQ56_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
 ARUQ9_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ9_raw.csv")
-location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
 #### CLEAN UP DATASETS ----
