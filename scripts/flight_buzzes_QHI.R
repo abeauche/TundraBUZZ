@@ -33,8 +33,8 @@ lon <- -138.91
 #### Using tidy datasets ----
 # Load data
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
-QHI_sun_data_2024 <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
-QHI_sunrise_sunset_filtered <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_sunset_filtered.csv")
+environmental_variables_hourly <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
+environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
 QHI_temp_daily <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_daily_micro.csv")
 QHI_temp_hourly <- read.csv("/Users/alexandrebeauchemin/Desktop/Team_Shrub_2024/team_shrub_beauchemin_honours/aru_temp_hourly_micro.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
