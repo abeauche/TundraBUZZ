@@ -91,7 +91,6 @@ QHI_temp_daily <- QHI_temp_daily %>%
 
 
 
-
 #### Merge datasets ----
 ## Hourly datasets
 flight_buzz_hourly <- hourly_summary_flightbuzzes_ARUQ_2024 %>%
