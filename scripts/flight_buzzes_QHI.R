@@ -42,11 +42,14 @@ location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
 
-#### Format dataset ----
+#### Format datasets ----
 # Change location_id and microclimate to factor
 summary_flightbuzzes_ARUQ_2024$location_id <- as.factor(summary_flightbuzzes_ARUQ_2024$location_id) 
 summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(summary_flightbuzzes_ARUQ_2024$microclimate)
-  
+daily_summary_flightbuzzes_ARUQ_2024$location_id <- as.factor(daily_summary_flightbuzzes_ARUQ_2024$location_id) 
+daily_summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(daily_summary_flightbuzzes_ARUQ_2024$microclimate)
+
+
 # Check levels and table
 levels(summary_flightbuzzes_ARUQ_2024$location_id)
 table(summary_flightbuzzes_ARUQ_2024$location_id)
@@ -60,17 +63,50 @@ attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(datetime = with_tz(datetime, tzone = "America/Whitehorse"))
 
+# Aggregate flight_buzz data to hourly
+hourly_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
+  mutate(datetime = floor_date(datetime, unit = "hour")) %>%
+  group_by(datetime, location_id, microclimate) %>%
+  summarize(total_duration_above_threshold = sum(total_duration_above_threshold, na.rm = TRUE),
+            .groups = "drop")
+
 # Convert temp data to POSIXct (UTC timezone)
 QHI_temp_hourly$datetime <- ymd_hms(QHI_temp_hourly$datetime, tz = "UTC")
 
 # Ensure datetime is in "America/Whitehorse"
 QHI_temp_hourly$datetime <- with_tz(QHI_temp_hourly$datetime, tzone = "America/Whitehorse")
 
+# Select columns for merging
+QHI_temp_hourly <- QHI_temp_hourly %>%
+  mutate(mean_temp = value) %>%
+  select(location_id, datetime, mean_temp)
+
+# Properly name columns
+QHI_temp_daily <- QHI_temp_daily %>%
+  mutate(mean_temp = value) %>%
+  mutate(date = as.POSIXct(datetime, tz = "UTC")) %>%  # or use "America/Whitehorse"
+  select(location_id, date, mean_temp)
+
+
 
 
 
 
 #### Merge datasets ----
+## Hourly datasets
+flight_buzz_hourly <- hourly_summary_flightbuzzes_ARUQ_2024 %>%
+  left_join(environmental_variables_hourly, by = "datetime") %>%
+  left_join(QHI_temp_hourly, by = c("datetime", "location_id"))
+
+write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
+
+## Daily datasets
+flight_buzz_daily <- daily_summary_flightbuzzes_ARUQ_2024 %>%
+  left_join(environmental_variables_daily, by = "date") %>%
+  left_join(QHI_temp_daily, by = c("date", "location_id"))
+
+write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
+
 
 
 
