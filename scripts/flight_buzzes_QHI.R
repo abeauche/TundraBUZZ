@@ -3,7 +3,7 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-21
-# Last Modified: 2025-03-31
+# Last Modified: 2025-04-08
 # Description: This script TBD.
 # Dependencies: summary_flightbuzzes_ARUQ_2024.csv, QHI_sun_data_2024.csv, QHI_sunrise_sunset_filtered.csv, aru_temp_daily_micro.csv, aru_temp_hourly_micro.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
