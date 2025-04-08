@@ -186,11 +186,12 @@ daily_temp_mapped <- location_mapping %>%
 
 ordered_site_temp_summer <- daily_temp_mapped %>%
   group_by(location_id) %>%
-  summarize(summer_temp = mean(value, na.rm = TRUE))
-
-
-
-
-#%>%
+  summarize(summer_temp = mean(value, na.rm = TRUE)) %>%
   arrange(desc(summer_temp))
+
+write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+
+
+
+
 
