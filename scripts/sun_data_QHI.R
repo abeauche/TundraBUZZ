@@ -3,7 +3,7 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-28
-# Last Modified: 2025-03-28
+# Last Modified: 2025-04-07
 # Description: This script uses the suncalc library to obtain sunrise, sunset, and sun altitude data for Qikiqtaruk - Herschel Island for the period from June 21, 2024, at 21:00:00, to August 12, 2024, at 23:59:59.
 # Dependencies: summary_flightbuzzes_ARUQ_2024.csv
 # ====================================================
@@ -68,6 +68,18 @@ sun_times_tz <- sun_times %>%
          week = floor_date(date, "week")) 
 
 
+## Calculate day length
+# Calculate day length in hours
+sun_times_tz$day_length_hours <- as.numeric(difftime(sun_times_tz$sunset, sun_times_tz$sunrise, units = "hours"))
+
+# Replace NA values with 24
+sun_times_tz$day_length_hours[is.na(sun_times_tz$day_length_hours)] <- 24
+
+write_csv(sun_times_tz, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_daily.csv")
+
+
+
+## Calculate average sunrise and sunset per week
 # Convert sunset times to numeric (seconds since midnight) and handle wraparound
 sun_times_tz <- sun_times_tz %>%
   mutate(
