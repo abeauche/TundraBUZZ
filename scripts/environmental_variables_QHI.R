@@ -82,9 +82,9 @@ met_station_pauline_cove <- met_station_pauline_cove %>%
 # Summarize hourly
 met_station_pauline_cove_hourly <- met_station_pauline_cove %>%
   mutate(
-    datetime_hour = floor_date(datetime, "hour")  # Truncate datetime to the hour
+    datetime = floor_date(datetime, "hour")  # Truncate datetime to the hour
   ) %>%
-  group_by(datetime_hour) %>%
+  group_by(datetime) %>%
   summarise(
     avg_air_rh_1m = mean(air_rh_1m, na.rm = TRUE),  # Average relative humidity per hour
     .groups = "drop"
@@ -101,9 +101,36 @@ met_station_pauline_cove_daily <- met_station_pauline_cove %>%
     .groups = "drop"
   )
 
-#### Correct timezone for sun_data ---- IN PROGRESS
-# Remove " UTC" from the datetime strings and then parse as POSIXct
-sun_data$datetime <- ymd_hms(gsub(" UTC", "", sun_data$datetime))
+
+
+
+#### Correct timezone for sun_data ---- 
+str(sun_data)
 
 # Convert the datetime column to the "America/Whitehorse" timezone
 sun_data$datetime <- with_tz(sun_data$datetime, tzone = "America/Whitehorse")
+
+
+
+
+#### Combine hourly variables ----
+
+environmental_variables_hourly <- eccc_summer_2024_hourly %>%
+  left_join(met_station_pauline_cove_hourly, by = "datetime") %>%
+  left_join(sun_data, by = "datetime")
+
+write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
+
+
+
+
+#### Combine daily variables ----
+
+environmental_variables_daily <- eccc_summer_2024_daily %>%
+  left_join(met_station_pauline_cove_hourly, by = "date") %>%
+  left_join(sunrise_daily, by = "date") %>%
+  left_join(cloud_cover, by = "date")
+
+write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
+
+
