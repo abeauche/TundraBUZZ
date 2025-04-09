@@ -117,6 +117,7 @@ write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.c
 # Plot flight buzzes over time
 ggplot(flight_buzz_hourly, aes(x = datetime, y = total_duration_above_threshold)) +
   geom_point() +  
+  geom_smooth(method="loess", aes(colour = microclimate)) +
   labs(title = "Flight Buzzes Over Time (Threshold = 8)",
        x = "Datetime", 
        y = "Total Predicted Flight Buzz Duration (s)") +
@@ -124,6 +125,56 @@ ggplot(flight_buzz_hourly, aes(x = datetime, y = total_duration_above_threshold)
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~location_id)
+
+
+
+
+
+#### Testing POLCAM data ----
+
+polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+
+flower_counts <- polcam_data_long %>%
+  group_by(date, location_id) %>%
+  summarize(total_flower_count = sum(count, na.rm = TRUE), .groups = "drop") %>%
+  filter(total_flower_count > 0)
+
+ggplot(flower_counts, aes(x = date, y = total_flower_count)) +
+  geom_point(color = "darkgreen") +
+  geom_smooth(method = "loess", se = FALSE, alpha = 0.7, color = "darkolivegreen") +
+  #geom_line(color = "darkgreen") +
+  labs(title = "Total Flower Count Over Time",
+       x = "Date",
+       y = "Total Flower Count") +
+  theme_classic() +
+  facet_wrap(~location_id, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Merge the two datasets
+combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "location_id"))
+
+scale_factor <- 10
+
+# Plot with two y-axes using ggplot2 and ggplot2-secondary-axis functionality
+ggplot(combined_data, aes(x = date)) +
+  geom_point(aes(y = daily_duration_above_threshold, color = "Flight Buzz Duration"), alpha = 0.5) +
+  geom_point(aes(y = total_flower_count*10, color = "Flower Count"), alpha = 0.9) +
+  geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = "Flight Buzz Duration"), se = FALSE) +
+  geom_smooth(method = "loess", aes(y = total_flower_count*10, color = "Flower Count"), se = FALSE) +
+  scale_y_continuous(
+    name = "Total Flight Buzz Duration (s)",
+    sec.axis = sec_axis(~./10, name = "Total Flower Count")
+  ) +
+  facet_wrap(~location_id) +
+  labs(title = "Flight Buzzes and Flower Counts Over Time") +
+  scale_color_manual(values = c("Flight Buzz Duration" = "lightblue4", "Flower Count" = "darkolivegreen")) +
+  ylim(0,1200) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+#####
+
+
 
 
 # Plot flight buzzes by time of day
@@ -265,6 +316,9 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   ylim(0,400) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~microclimate)
+
+
+
 
 
 
