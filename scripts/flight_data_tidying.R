@@ -3,7 +3,7 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-28
-# Last Modified: 2025-04-08
+# Last Modified: 2025-04-09
 # Description: This script TBD.
 # Dependencies: TBD, location_mapping_TundraBUZZ.csv
 # ====================================================
@@ -27,6 +27,7 @@ ARUQ0_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/
 ARUQ4_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
 ARUQ56_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
 ARUQ9_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ9_raw.csv")
+ARUQ10_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ10_raw.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
@@ -49,8 +50,8 @@ ARUQ_2024_pred_raw <- ARUQ_2024_pred_raw %>%
     aru_id = str_extract(file, "ARUQ\\d+"),  # Extract "ARUQ5" or similar
     datetime = str_extract(file, "\\d{8}_\\d{6}")  # Extract "20240626_013000"
   ) %>%
-  filter(!is.na(aru_id)) %>%
-  filter(!aru_id == "ARUQ18")
+  filter(!is.na(aru_id)) %>% # Filter out files that were recorded prior to the ARU being named
+  filter(!aru_id == "ARUQ18") # Filter out beebox ARU before it was deployed as beebox
 
 # Correct for missing time (i.e., "000000") in filenames
 ARUQ_2024_pred_raw <- ARUQ_2024_pred_raw %>%
@@ -69,13 +70,13 @@ table(ARUQ_2024_pred_raw$aru_id)
 ARUQ_2024_pred_mapped <- ARUQ_2024_pred_raw %>%
   left_join(location_mapping, by = "aru_id") %>%
   select(-c(aru_id, polcam_id,tomst_id,site,year))  # Remove aru_id, now using location_id
+table(ARUQ_2024_pred_mapped$location_id)
 rm(ARUQ_2024_pred_raw)
 
 # Mutate datetime to POSIXct format
 ARUQ_2024_pred_mapped <- ARUQ_2024_pred_mapped %>% 
   mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
   )
-table(ARUQ_2024_pred_mapped$location_id)
 
 # Save csv
 write_csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
