@@ -91,11 +91,15 @@ QHI_temp_daily <- QHI_temp_daily %>%
 
 
 
+
 #### Merge datasets ----
 ## Hourly datasets
 flight_buzz_hourly <- hourly_summary_flightbuzzes_ARUQ_2024 %>%
   left_join(environmental_variables_hourly, by = "datetime") %>%
   left_join(QHI_temp_hourly, by = c("datetime", "location_id"))
+
+flight_buzz_hourly <- flight_buzz_hourly %>%
+  mutate(time_hour = hms::as_hms(floor_date(datetime, unit = "hour")))
 
 write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
 
@@ -111,7 +115,7 @@ write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.c
 
 #### Data visualization ----
 # Plot flight buzzes over time
-ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = datetime, y = total_duration_above_threshold)) +
+ggplot(flight_buzz_hourly, aes(x = datetime, y = total_duration_above_threshold)) +
   geom_point() +  
   labs(title = "Flight Buzzes Over Time (Threshold = 8)",
        x = "Datetime", 
@@ -123,7 +127,7 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = datetime, y = total_duration_abov
 
 
 # Plot flight buzzes by time of day
-ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+ggplot(flight_buzz_hourly, aes(x = time_hour, y = total_duration_above_threshold)) +
   geom_point(alpha = 0.5) +  
   labs(title = "Flight Buzzes Over a 24-hour Period - ARUQ0 (Threshold = 8)",
        x = "Time of Day", 
@@ -136,7 +140,7 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
 
 
 # Plot flight buzzes by time of day, week
-ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_above_threshold)) +
+ggplot(flight_buzz_hourly, aes(x = time_hour, y = total_duration_above_threshold)) +
   geom_point(alpha = 0.5) +  
   labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
        x = "Time of Day", 
@@ -145,7 +149,7 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
   theme_classic() +
   ylim(0, 50) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~location_id + week)
+  facet_wrap(~location_id + month)
 
 
 # Plot flight buzzes by time of day, week with sunrise and sunset
@@ -172,6 +176,101 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
 
 
 
+
+
+# Plot total flight buzz duration vs. mean temperature
+ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
+  geom_point(aes(color = as.factor(microclimate)), alpha = 0.5) +
+  geom_smooth(method = "lm", aes(color = as.factor(microclimate)), se = TRUE) +
+  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
+       x = "Hourly Mean Temperature (°C)",
+       y = "Hourly Flight Buzz Duration (s)") +
+  geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = 120, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = 120, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  #ylim(0,150) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# Plot total flight buzz duration vs. mean temperature
+ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
+       x = "Hourly Mean Temperature (°C)",
+       y = "Hourly Flight Buzz Duration (s)") +
+  geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = 80, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = 80, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  ylim(0,100) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+# Plot flight buzzes over time
+ggplot(flight_buzz_daily, aes(x = date, y = daily_duration_above_threshold)) +
+  geom_point(aes(colour=microclimate), alpha = 0.4) +  
+  geom_smooth(aes(colour=microclimate), method= "loess", se = FALSE) +
+  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
+       x = "Datetime", 
+       y = "Total Predicted Flight Buzz Duration (s)") +
+  #ylim(0, 60) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+
+
+
+# Fit separate models for each location_id
+models_daily <- flight_buzz_daily %>%
+  group_by(microclimate) %>%
+  do(model = lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .))
+
+# Generate predictions for each location_id
+predictions <- flight_buzz_daily %>%
+  group_by(microclimate) %>%
+  do({
+    model <- lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .)
+    pred <- predict(model, newdata = ., se.fit = TRUE)
+    tibble(
+      mean_temp = .$mean_temp,
+      daily_duration_above_threshold = .$daily_duration_above_threshold,
+      predicted = exp(pred$fit),  # Convert back from log scale
+      lower_bound = exp(pred$fit - 1.96 * pred$se.fit),
+      upper_bound = exp(pred$fit + 1.96 * pred$se.fit)
+    )
+  })
+
+
+# Plot total flight buzz duration vs. mean temperature
+ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
+  geom_point() +
+  geom_line(aes(y = predicted), color = "skyblue4", size = 1) +  # Regression line
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.1) +  # Confidence interval
+  
+  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
+       x = "Daily Mean Temperature (°C)",
+       y = "Total Flight Buzz Duration (s)") +
+  geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
+  geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.8, 
+           label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.8, 
+           label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  theme_classic() +
+  ylim(0,400) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~microclimate)
+
+
+
+
+
+
 ######## IN PROGRESS ######### -----
 #### MICROCLIMATE DATA ----
 
@@ -188,6 +287,9 @@ aruq0_data_plot <- aru_temp_daily_micro %>%
   filter(aru_name == "ARUQ0") %>%
   mutate(datetime = as.POSIXct(paste(2024, month, day, sep="-"), 
                                format="%Y-%m-%d", tz="UTC"))
+
+
+
 
 
 
