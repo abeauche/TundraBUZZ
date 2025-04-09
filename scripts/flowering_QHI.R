@@ -55,6 +55,8 @@ polcam_data_long <- polcam_data %>%
 polcam_data_long <- polcam_data_long %>%
   mutate(species = sub("^([^_]+_[^_]+)_.*", "\\1", flower_type))
 
+write_csv(polcam_data_long, "/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+
 # Group per species
 polcam_data_species <- polcam_data_long %>%
   group_by(species, location_id, date) %>%
