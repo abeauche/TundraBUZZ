@@ -121,7 +121,7 @@ ggplot(flight_buzz_hourly, aes(x = datetime, y = total_duration_above_threshold)
   labs(title = "Flight Buzzes Over Time (Threshold = 8)",
        x = "Datetime", 
        y = "Total Predicted Flight Buzz Duration (s)") +
-  ylim(0, 150) +
+  ylim(0, 140) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~location_id)
@@ -313,7 +313,7 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   annotate("text", x = 12.6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.4, 
            label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   theme_classic() +
-  ylim(0,400) +
+  #ylim(0,400) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~microclimate)
 
