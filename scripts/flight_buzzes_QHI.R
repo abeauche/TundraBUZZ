@@ -45,9 +45,9 @@ location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 #### Format datasets ----
 # Change location_id and microclimate to factor
 summary_flightbuzzes_ARUQ_2024$location_id <- as.factor(summary_flightbuzzes_ARUQ_2024$location_id) 
-summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(summary_flightbuzzes_ARUQ_2024$microclimate)
+summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(summary_flightbuzzes_ARUQ_2024$microclimate2)
 daily_summary_flightbuzzes_ARUQ_2024$location_id <- as.factor(daily_summary_flightbuzzes_ARUQ_2024$location_id) 
-daily_summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(daily_summary_flightbuzzes_ARUQ_2024$microclimate)
+daily_summary_flightbuzzes_ARUQ_2024$microclimate <- as.factor(daily_summary_flightbuzzes_ARUQ_2024$microclimate2)
 
 
 # Check levels and table
@@ -180,14 +180,15 @@ ggplot(combined_data, aes(x = date)) +
 # Plot flight buzzes by time of day
 ggplot(flight_buzz_hourly, aes(x = time_hour, y = total_duration_above_threshold)) +
   geom_point(alpha = 0.5) +  
-  labs(title = "Flight Buzzes Over a 24-hour Period - ARUQ0 (Threshold = 8)",
+  geom_smooth(method = "loess", aes(colour = microclimate)) +
+  labs(title = "Flight Buzzes Over a 24-hour Period (Threshold = 8)",
        x = "Time of Day", 
        y = "Total Predicted Flight Buzz Duration (s)") +
   scale_x_time(breaks = seq(0, 86400, by = 3600), labels = function(x) format(x, "%H:%M")) +
   theme_classic() +
   ylim(0, 50) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~location_id)
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # +
+  # facet_wrap(~location_id)
 
 
 # Plot flight buzzes by time of day, week
@@ -239,11 +240,44 @@ ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold
   geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
   annotate("text", x = 6, y = 120, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   annotate("text", x = 12.6, y = 120, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
-  #ylim(0,150) +
+  ylim(0,150) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+
+
+
+#### Exploratory ----
+
+library(broom)
+
+mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+
+slopes_flower_adj <- combined_data %>%
+  filter(!is.na(mean_temp), !is.na(total_flower_count), !is.na(daily_duration_above_threshold)) %>%
+  group_by(location_id) %>%
+  filter(n() > 2) %>%  # Only keep groups with at least 3 complete rows
+  do(tidy(lm(daily_duration_above_threshold ~ mean_temp + total_flower_count, data = .))) %>%
+  filter(term == "mean_temp") %>%
+  rename(slope = estimate)
+
+slope_temp_df <- slopes_flower_adj %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+ggplot(slope_temp_df, aes(x = summer_temp, y = slope)) +
+  geom_point(color = "steelblue", size = 3, alpha = 0.8) +
+  geom_smooth(method = "lm", color = "darkred", se = FALSE) +
+  labs(
+    title = "Effect of Microclimate on Temperature-Activity Sensitivity",
+    x = "Mean Summer Temperature (°C)",
+    y = "Slope of Temperature Effect on Bumblebee Activity (adj. for Flower Count)"
+  ) +
+  theme_classic()
+
+
+
+#### Other plotting ----
 
 # Plot total flight buzz duration vs. mean temperature
 ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
