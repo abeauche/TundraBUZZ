@@ -27,6 +27,7 @@ ARUQ0_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/
 ARUQ3_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ3_raw.csv")
 ARUQ4_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
 ARUQ56_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
+ARUQ7_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ7_raw.csv")
 ARUQ9_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ9_raw.csv")
 ARUQ10_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ10_raw.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
@@ -74,11 +75,6 @@ ARUQ_2024_pred_mapped <- ARUQ_2024_pred_raw %>%
 table(ARUQ_2024_pred_mapped$location_id)
 rm(ARUQ_2024_pred_raw)
 
-# Mutate datetime to POSIXct format
-ARUQ_2024_pred_mapped <- ARUQ_2024_pred_mapped %>% 
-  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
-  )
-
 # Save csv
 write_csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
 
@@ -95,13 +91,18 @@ ARUQ_2024_bumblebee_detections <- ARUQ_2024_pred_mapped %>%
   filter(BUZZ > threshold) %>%
   mutate(duration_above_threshold = 0.15)  # Each segment is 0.3s, so each overlap segment is 0.15s
 
+# Mutate datetime to POSIXct format
+ARUQ_2024_bumblebee_detections <- ARUQ_2024_bumblebee_detections %>% 
+  mutate(datetime = as.POSIXct(datetime, format="%Y%m%d_%H%M%S", tz="UTC")  # Convert to POSIXct
+  )
+
 # Save csv
 write_csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv")
 rm(ARUQ_2024_pred_mapped)
 
 # Summarize total duration above threshold per datetime
 summary_flightbuzzes_ARUQ_2024 <- ARUQ_2024_bumblebee_detections %>%
-  group_by(datetime, location_id, microclimate) %>%
+  group_by(datetime, location_id, microclimate2) %>%
   summarize(total_duration_above_threshold = sum(duration_above_threshold), .groups = "drop")
 
 # Convert datetime to POSIXct
@@ -136,7 +137,7 @@ write_csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognize
 daily_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(datetime_local = force_tz(datetime, tzone = "UTC"), 
          date = as.Date(datetime_local)) %>%
-  group_by(date, location_id, microclimate) %>%
+  group_by(date, location_id, microclimate2) %>%
   summarize(daily_duration_above_threshold = sum(total_duration_above_threshold), .groups = "drop")
 
 # Export
