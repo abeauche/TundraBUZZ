@@ -5,7 +5,7 @@
 # Date Created: 2025-03-28
 # Last Modified: 2025-04-10
 # Description: This script wrangles raw recognizer outputs, combines them into a single organized dataframe (ARUQ_2024_pred_mapped.csv) with columns for file, start_time, end_time, BUZZ, datetime, location_id, microclimate. The script then sets a threshold and filters observations with a score above the confidence threshold, and exports the dataset with a new column for duration_above_threshold (ARUQ_2024_bumblebee_detections.csv). Last, the script aggregates duration above threshold per datetime (summary_flightbuzzes_ARUQ2024.csv) and per date (daily_summary_flightbuzzes_ARUQ2024.csv) and exports these to the local drive. 
-# Dependencies: predictions_ARUQ0_raw.csv, predictions_ARUQ1_raw.csv, predictions_ARUQ2_raw.csv, predictions_ARUQ3_raw.csv, predictions_ARUQ4_raw.csv, predictions_ARUQ56_raw.csv, predictions_ARUQ7_raw.csv, predictions_ARUQ9_raw.csv, predictions_ARUQ10_raw.csv, location_mapping_TundraBUZZ.csv
+# Dependencies: predictions_ARUQ0_raw.csv, predictions_ARUQ1_raw.csv, predictions_ARUQ2_raw.csv, predictions_ARUQ3_raw.csv, predictions_ARUQ4_raw.csv, predictions_ARUQ56_raw.csv, predictions_ARUQ7_raw.csv, predictions_ARUQ9_raw.csv, predictions_ARUQ10_raw.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms.
 # ====================================================
 
 #### SETUP ----
