@@ -335,6 +335,9 @@ predictions <- flight_buzz_daily %>%
   })
 
 
+
+##### SOON: MAKE THIS IN BAYESIAN FRAMEWORK
+
 # Plot total flight buzz duration vs. mean temperature
 ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   geom_point() +
