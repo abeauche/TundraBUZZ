@@ -5,7 +5,7 @@
 # Date Created: 2025-03-21
 # Last Modified: 2025-04-10
 # Description: This script TBD.
-# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, daily_summary_flightbuzzes_ARUQ_2024.csv, environmental_variables_hourly.csv, environmental_variables_daily.csv, QHI_location_temperature_hourly.csv, QHI_location_temperature_daily.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg.
+# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, daily_summary_flightbuzzes_ARUQ_2024.csv, environmental_variables_hourly.csv, environmental_variables_daily.csv, QHI_location_temperature_hourly.csv, QHI_location_temperature_daily.csv, mean_summer_temp_TundraBUZZ.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg, patchwork, cowplot, viridis.
 # ====================================================
 
 #### SETUP ----
@@ -18,6 +18,9 @@ library(lme4)
 library(lmerTest) 
 library(mgcv)
 library(visreg)
+library(patchwork)
+library(cowplot)
+library(viridis)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -39,6 +42,7 @@ environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ
 QHI_temp_hourly <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
 QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
+mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
 
 
@@ -114,17 +118,35 @@ write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.c
 
 
 #### Data visualization ----
+flight_buzz_daily_sites <- flight_buzz_daily %>%
+  filter(!location_id == "BEEBOX")
+flight_buzz_beebox <- flight_buzz_daily %>%
+  filter(location_id == "BEEBOX")
+
 # Plot flight buzzes over time
-ggplot(flight_buzz_hourly, aes(x = datetime, y = total_duration_above_threshold)) +
+ggplot(flight_buzz_daily_sites, aes(x = date, y = daily_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="loess", aes(colour = microclimate)) +
-  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
-       x = "Datetime", 
-       y = "Total Predicted Flight Buzz Duration (s)") +
-  ylim(0, 140) +
+  labs(x = "2024 Growing Season", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)",
+       colour = "Microclimate") +
+  ylim(0, 600) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~location_id)
+  facet_wrap(~location_id) +
+  scale_colour_manual(values = c("#440154", "forestgreen","gold"))
+
+# Plot flight buzzes at BEEBOX over time
+ggplot(flight_buzz_beebox, aes(x = date, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="loess", colour = "grey44") +
+  labs(x = "2024 Growing Season", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
 
 
 
@@ -155,22 +177,188 @@ combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "loc
 
 scale_factor <- 10
 
+combined_data_filtered <- combined_data %>%
+  filter(!location_id == "BEEBOX")
+
 # Plot with two y-axes using ggplot2 and ggplot2-secondary-axis functionality
-ggplot(combined_data, aes(x = date)) +
-  geom_point(aes(y = daily_duration_above_threshold, color = "Flight Buzz Duration"), alpha = 0.5) +
-  geom_point(aes(y = total_flower_count*10, color = "Flower Count"), alpha = 0.9) +
-  geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = "Flight Buzz Duration"), se = FALSE) +
-  geom_smooth(method = "loess", aes(y = total_flower_count*10, color = "Flower Count"), se = FALSE) +
+ggplot(combined_data_filtered, aes(x = date)) +
+  geom_point(aes(y = daily_duration_above_threshold)) +
+  geom_point(aes(y = total_flower_count*5), colour = "darkolivegreen") +
+  geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate), se = TRUE) +
+  #geom_smooth(method = "loess", aes(y = total_flower_count*5), colour = "darkolivegreen", se = FALSE) +
   scale_y_continuous(
     name = "Total Flight Buzz Duration (s)",
-    sec.axis = sec_axis(~./10, name = "Total Flower Count")
+    sec.axis = sec_axis(~./5, name = "Total Flower Count")
   ) +
   facet_wrap(~location_id) +
   labs(title = "Flight Buzzes and Flower Counts Over Time") +
-  scale_color_manual(values = c("Flight Buzz Duration" = "lightblue4", "Flower Count" = "darkolivegreen")) +
-  ylim(0,1200) +
+  scale_colour_manual(values = c("#440154", "forestgreen","gold")) +
+  ylim(0,600) +
+  theme_classic() +
+  theme(legend.title = element_blank()) 
+  
+
+p1 <- ggplot(combined_data_filtered, aes(x = date)) +
+  geom_point(aes(y = daily_duration_above_threshold)) +
+  geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate), se = TRUE) +
+  scale_y_continuous(name = "Total Flight Buzz Duration (s)") +
+  facet_wrap(~location_id) +
+  labs(title = "Flight Buzzes and Flower Counts Over Time") +
+  scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
+  ylim(0, 600) +
   theme_classic() +
   theme(legend.title = element_blank())
+
+
+filtered_data <- combined_data_filtered %>%
+  filter(!is.na(total_flower_count))
+
+p2 <- ggplot(filtered_data, aes(x = date, y = 1, fill = total_flower_count)) +
+  geom_tile() +
+  scale_fill_gradient(low = "forestgreen", high = "gold", name = "Flower Count") +
+  facet_wrap(~location_id) +
+  theme_void() +
+  theme(
+    legend.position = "bottom",
+    strip.background = element_blank(),
+    strip.text = element_blank()
+  )
+
+p1 / p2  + plot_layout(heights = c(6, 1))
+
+
+
+
+#### Test ----
+# Get unique location IDs
+locations <- unique(combined_data_filtered$location_id)
+
+# Create a list to store combined plots per location
+plot_list <- list()
+
+# Loop through each location
+for (loc in locations) {
+  df_loc <- combined_data_filtered %>% filter(location_id == loc)
+  flower_df <- df_loc %>% filter(!is.na(total_flower_count))
+  
+  # Flower tile strip with viridis gradient
+  p2 <- ggplot(flower_df, aes(x = date, y = 0.5, fill = total_flower_count)) +
+    geom_tile() +
+    scale_fill_viridis(option = "C", name = "Flower Count") +  # Using viridis palette
+    scale_x_date(limits = c(date_min, date_max)) +
+    theme_void() +
+    theme(legend.position = "none")
+  
+  # Buzz plot
+  p1 <- ggplot(df_loc, aes(x = date)) +
+    geom_point(aes(y = daily_duration_above_threshold)) +
+    geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate), se = TRUE) +
+    scale_y_continuous(name = "Buzz Duration (s)") +
+    labs(title = paste("Location:", loc)) +
+    scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
+    ylim(0, 600) +
+    theme_classic() +
+    theme(legend.position = "none")
+  
+  # Combine tile strip + buzz plot for this location
+  combined <- p1 / p2  + plot_layout(heights = c(6, 1))
+  
+  # Store in list
+  plot_list[[loc]] <- combined
+}
+
+# Split the plot list into rows of 3
+row1 <- cowplot::plot_grid(plotlist = plot_list[1:3], nrow = 1)
+row2 <- cowplot::plot_grid(plotlist = plot_list[4:6], nrow = 1)
+row3 <- cowplot::plot_grid(plotlist = plot_list[7:9], nrow = 1)
+
+# Combine all rows vertically
+final_plot <- cowplot::plot_grid(row1, row2, row3, ncol = 1)
+
+# Show it!
+final_plot
+
+
+
+
+
+
+# 1. Ensure your full dataset has the date column in Date format
+combined_data_filtered <- combined_data_filtered %>%
+  mutate(
+    date = as.Date(date),
+    microclimate = factor(microclimate, levels = c("Cool", "Moderate", "Warm"))
+  )
+
+# 2. Get shared x-axis limits
+date_min <- min(combined_data_filtered$date, na.rm = TRUE)
+date_max <- max(combined_data_filtered$date, na.rm = TRUE)
+
+# 3. Get unique location IDs
+locations <- unique(combined_data_filtered$location_id)
+locations <- sort(unique(combined_data_filtered$location_id))
+
+# 4. Loop and build plots
+plot_list <- list()
+
+for (loc in locations) {
+  
+  # These must be *inside* the loop so you get location-specific data each time
+  df_loc <- combined_data_filtered %>%
+    filter(location_id == loc)
+  
+  flower_df <- df_loc %>%
+    filter(!is.na(total_flower_count))
+  
+  # Flower tile strip with viridis gradient
+  p2 <- ggplot(flower_df, aes(x = date, y = 0.5, fill = total_flower_count)) +
+    geom_tile() +
+    scale_fill_gradient(low = "forestgreen", high = "gold", name = "Flower Count") +
+    scale_x_date(limits = c(date_min, date_max)) +
+    theme_void() +
+    theme(legend.position = "none")
+  
+  # Buzz plot
+  p1 <- ggplot(df_loc, aes(x = date)) +
+    geom_point(aes(y = daily_duration_above_threshold)) +
+    geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate, fill = microclimate), se = TRUE, alpha = 0.3) +
+    scale_y_continuous(name = "Buzz Duration (s)") +
+    scale_x_date(limits = c(date_min, date_max)) +
+    scale_colour_manual(
+      values = c("Cool" = "#440154", "Moderate" = "forestgreen", "Warm" = "gold")
+    ) +
+    scale_fill_manual(
+      values = c("Cool" = "#440154", "Moderate" = "forestgreen", "Warm" = "gold")
+    ) +
+    ylim(0, 600) +
+    theme_classic() +
+    theme(legend.position = "none",
+          axis.title = element_blank()
+          ) +
+    facet_wrap(~location_id)
+  
+  # Combine and store
+  combined <- p1 / p2 + plot_layout(heights = c(6, 0.5))
+  plot_list[[loc]] <- combined
+}
+
+# Optional: Combine into rows and final plot
+row1 <- cowplot::plot_grid(plotlist = plot_list[1:3], nrow = 1)
+row2 <- cowplot::plot_grid(plotlist = plot_list[4:6], nrow = 1)
+row3 <- cowplot::plot_grid(plotlist = plot_list[7:9], nrow = 1)
+
+# Combine your rows (assuming row1, row2, row3 already created)
+final_plot <- cowplot::plot_grid(row1, row2, row3, ncol = 1, rel_heights = c(1, 1, 1), align = "v", axis = "tblr", vjust = -1, hjust = -2) 
+
+# Wrap with ggdraw() to apply margin spacing
+final_plot_with_margin <- ggdraw(final_plot) +
+  theme(plot.margin = margin(t = 10, r = 20, b = 30, l = 20))
+
+# Then add labels with ggdraw
+(final_with_labels <- ggdraw(final_plot_with_margin) +
+  draw_label("2024 Growing Season", x = 0.5, y = 0.04, vjust = 1, angle = 0) +
+  draw_label("Daily Bumblebee Flight Buzz Detections (s)", x = 0.02, y = 0.5, angle = 90, vjust = 1))
+
 
 #####
 
@@ -189,6 +377,54 @@ ggplot(flight_buzz_hourly, aes(x = time_hour, y = total_duration_above_threshold
   ylim(0, 50) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # +
   # facet_wrap(~location_id)
+
+flight_buzz_hourly_centered <- flight_buzz_hourly %>%
+  mutate(time_hour_shifted = (as.numeric(time_hour) - 7200) %% 86400)
+
+ggplot(flight_buzz_hourly_centered, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  geom_smooth(method = "loess", aes(colour = microclimate)) +
+  labs(x = "Time of Day", 
+       y = "Hourly Flight Buzz Detection (s)") +
+  scale_x_continuous(
+    breaks = seq(0, 86400, by = 3600),
+    labels = function(x) format(as.POSIXct((x + 7200) %% 86400, origin = "1970-01-01", tz = "UTC"), "%H:%M")
+  ) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# Prepare data
+
+buzz_beebox <- flight_buzz_hourly_centered %>%
+  filter(location_id == "BEEBOX") %>%
+  mutate(
+    date = as.Date(datetime),  # Replace with your actual column name
+    week = floor_date(date, unit = "week")
+  )
+
+buzz_beebox <- buzz_beebox %>%
+  filter(!week == "2024-08-11")
+
+# Plot
+ggplot(buzz_beebox, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
+  geom_point(aes(colour = as.factor(week)), alpha = 0.6) +  
+  geom_smooth(aes(colour = as.factor(week)), method = "loess", se = FALSE) +  # One overall trend line
+  labs(
+    x = "Time of Day", 
+    y = "Hourly Flight Buzz Detection (s)",
+    colour = "Week of"
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 86400, by = 3600),
+    labels = function(x) format(as.POSIXct((x + 7200) %% 86400, origin = "1970-01-01", tz = "UTC"), "%H:%M")
+  ) +
+  scale_colour_viridis_d() +  # Apply discrete Viridis color scale
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 # Plot flight buzzes by time of day, week
@@ -303,12 +539,13 @@ ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold
 ggplot(flight_buzz_daily, aes(x = date, y = daily_duration_above_threshold)) +
   geom_point(aes(colour=microclimate), alpha = 0.4) +  
   geom_smooth(aes(colour=microclimate), method= "loess", se = FALSE) +
-  labs(title = "Flight Buzzes Over Time (Threshold = 8)",
-       x = "Datetime", 
-       y = "Total Predicted Flight Buzz Duration (s)") +
-  #ylim(0, 60) +
+  labs(x = "2024 Growing Season", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)",
+       colour = "Microclimate") +
+  ylim(0, 600) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
 
 
 
