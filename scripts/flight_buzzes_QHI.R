@@ -342,12 +342,12 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
        y = "Total Flight Buzz Duration (s)") +
   geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
   geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
-  annotate("text", x = 6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.4, 
+  annotate("text", x = 6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.3, 
            label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
-  annotate("text", x = 12.6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.4, 
+  annotate("text", x = 12.6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.3, 
            label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   theme_classic() +
-  #ylim(0,400) +
+  ylim(0,400) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~microclimate)
 

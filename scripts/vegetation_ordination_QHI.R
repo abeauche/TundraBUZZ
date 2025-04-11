@@ -163,8 +163,13 @@ pdf("./outputs/figures/NMDS_microclim_k2.pdf", width = 8.2, height = 6)
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
-legend("bottomleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
+legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
 dev.off()
+
+ordiplot(nmds_result_k2, display = c("species", "sites"), type = "n")
+points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
+text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
+legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
 
 
 
