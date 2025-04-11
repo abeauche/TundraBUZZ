@@ -24,7 +24,7 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 # Load files
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 location_mapping <- location_mapping %>%
-  select(location_id, tomst_id, microclimate)
+  select(location_id, tomst_id, microclimate, microclimate2)
 
 # Set file path
 tomst_file_path <- "/Volumes/TundraBUZZ/data/raw/QHI_TOMST_2024_fixed"
@@ -196,6 +196,33 @@ ordered_site_temp_summer <- daily_temp_mapped %>%
 write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
 
+#### PLOTTING ----
+#ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+ordered_site_temp_summer <- ordered_site_temp_summer %>%
+  left_join(location_mapping, by = "location_id")
+
+ordered_site_temp_summer$location_id <- factor(ordered_site_temp_summer$location_id,
+                                               levels = unique(ordered_site_temp_summer$location_id))
+ordered_site_temp_summer$microclimate2 <- factor(ordered_site_temp_summer$microclimate2,
+                                               levels = unique(ordered_site_temp_summer$microclimate2))
+
+# Plot summer temp per site
+clean_summer_temp_per_site <- ggplot(ordered_site_temp_summer, aes(x = location_id, y = summer_temp, colour = microclimate2)) +
+  geom_boxplot() +
+  labs(x = "Site",
+       y = "Mean Summer Temperature (°C)",
+       colour = "Microclimate") +
+  theme_classic() +
+  scale_colour_manual(values = c("grey44","gold", "forestgreen", "#440154"))
+
+# Plot summer temp per microclimate
+clean_summer_temp_per_microclimate <- ggplot(ordered_site_temp_summer, aes(x = microclimate2, y = summer_temp, fill = microclimate2)) +
+  geom_boxplot() +
+  labs(x = "Microclimate Classification",
+       y = "Mean Summer Temperature (°C)",
+       fill = "Microclimate") +
+  theme_classic() +
+  scale_fill_manual(values = c("grey44","gold", "forestgreen", "#440154"))
 
 
 
