@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-21
-# Last Modified: 2025-04-08
+# Last Modified: 2025-04-10
 # Description: This script TBD.
-# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, QHI_sun_data_2024.csv, QHI_sunrise_sunset_filtered.csv, aru_temp_daily_micro.csv, aru_temp_hourly_micro.csv, location_mapping_TundraBUZZ.csv
+# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, daily_summary_flightbuzzes_ARUQ_2024.csv, environmental_variables_hourly.csv, environmental_variables_daily.csv, QHI_location_temperature_hourly.csv, QHI_location_temperature_daily.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg.
 # ====================================================
 
 #### SETUP ----
@@ -36,8 +36,8 @@ summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recogniz
 daily_summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
 environmental_variables_hourly <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
 environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
-QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 QHI_temp_hourly <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
+QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 
