@@ -232,17 +232,18 @@ ggplot(summary_flightbuzzes_ARUQ_2024, aes(x = time_of_day, y = total_duration_a
 
 # Plot total flight buzz duration vs. mean temperature
 ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
-  geom_point(aes(color = as.factor(microclimate)), alpha = 0.5) +
+  geom_point(aes(color = as.factor(microclimate)), alpha = 0.2) +
   geom_smooth(method = "lm", aes(color = as.factor(microclimate)), se = TRUE) +
-  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
-       x = "Hourly Mean Temperature (°C)",
-       y = "Hourly Flight Buzz Duration (s)") +
+  labs(x = "Hourly Mean Temperature (°C)",
+       y = "Hourly Flight Buzz Duration (s)",
+       colour = "Microclimate") +
   geom_vline(xintercept = c(6, 12.6), color = c("orange", "orange4"), linetype = "dashed", size = 1, alpha = 0.7) +
-  annotate("text", x = 6, y = 120, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
-  annotate("text", x = 12.6, y = 120, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
-  ylim(0,150) +
+  annotate("text", x = 6, y = 70, label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = 70, label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  ylim(0,100) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
 
 
 
@@ -256,7 +257,7 @@ mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_Tu
 
 slopes_flower_adj <- combined_data %>%
   filter(!is.na(mean_temp), !is.na(total_flower_count), !is.na(daily_duration_above_threshold)) %>%
-  group_by(location_id) %>%
+  group_by(location_id, microclimate) %>%
   filter(n() > 2) %>%  # Only keep groups with at least 3 complete rows
   do(tidy(lm(daily_duration_above_threshold ~ mean_temp + total_flower_count, data = .))) %>%
   filter(term == "mean_temp") %>%
@@ -266,14 +267,17 @@ slope_temp_df <- slopes_flower_adj %>%
   left_join(mean_summer_temp, by = "location_id")
 
 ggplot(slope_temp_df, aes(x = summer_temp, y = slope)) +
-  geom_point(color = "steelblue", size = 3, alpha = 0.8) +
-  geom_smooth(method = "lm", color = "darkred", se = FALSE) +
+  geom_errorbar(aes(ymin = slope - std.error, ymax = slope + std.error, colour = microclimate), width = 0.2) +
+  geom_point(aes(colour = microclimate), size = 3) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_smooth(method = "lm", color = "grey4", se = TRUE) +
   labs(
-    title = "Effect of Microclimate on Temperature-Activity Sensitivity",
     x = "Mean Summer Temperature (°C)",
-    y = "Slope of Temperature Effect on Bumblebee Activity (adj. for Flower Count)"
+    y = "Temperature Sensitivity Slope (adj. for Flower Count)",
+    colour = "Microclimate"
   ) +
-  theme_classic()
+  theme_classic() +
+  scale_colour_manual(values = c("#440154", "forestgreen", "gold"))
 
 
 
@@ -334,12 +338,12 @@ predictions <- flight_buzz_daily %>%
 # Plot total flight buzz duration vs. mean temperature
 ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   geom_point() +
-  geom_line(aes(y = predicted), color = "skyblue4", size = 1) +  # Regression line
-  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = 0.1) +  # Confidence interval
+  geom_line(aes(y = predicted, colour = microclimate), size = 1) +  # Regression line
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound, colour = microclimate), alpha = 0.1) +  # Confidence interval
   
-  labs(title = "Total Flight Buzz Duration vs. Mean Temperature",
-       x = "Daily Mean Temperature (°C)",
-       y = "Total Flight Buzz Duration (s)") +
+  labs(x = "Daily Mean Temperature (°C)",
+       y = "Total Flight Buzz Duration (s)",
+       colour = "Microclimate") +
   geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
   geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
   annotate("text", x = 6, y = max(predictions$daily_duration_above_threshold, na.rm = TRUE) * 0.3, 
@@ -349,7 +353,8 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   theme_classic() +
   ylim(0,400) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~microclimate)
+  facet_wrap(~microclimate) +
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
 
 
 
