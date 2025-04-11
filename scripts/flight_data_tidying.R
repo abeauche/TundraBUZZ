@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-28
-# Last Modified: 2025-04-09
-# Description: This script TBD.
-# Dependencies: TBD, location_mapping_TundraBUZZ.csv
+# Last Modified: 2025-04-10
+# Description: This script wrangles raw recognizer outputs, combines them into a single organized dataframe (ARUQ_2024_pred_mapped.csv) with columns for file, start_time, end_time, BUZZ, datetime, location_id, microclimate. The script then sets a threshold and filters observations with a score above the confidence threshold, and exports the dataset with a new column for duration_above_threshold (ARUQ_2024_bumblebee_detections.csv). Last, the script aggregates duration above threshold per datetime (summary_flightbuzzes_ARUQ2024.csv) and per date (daily_summary_flightbuzzes_ARUQ2024.csv) and exports these to the local drive. 
+# Dependencies: predictions_ARUQ0_raw.csv, predictions_ARUQ1_raw.csv, predictions_ARUQ2_raw.csv, predictions_ARUQ3_raw.csv, predictions_ARUQ4_raw.csv, predictions_ARUQ56_raw.csv, predictions_ARUQ7_raw.csv, predictions_ARUQ9_raw.csv, predictions_ARUQ10_raw.csv, location_mapping_TundraBUZZ.csv
 # ====================================================
 
 #### SETUP ----
@@ -17,20 +17,23 @@ library(suncalc)
 library(hms)
 
 # Set working directory
-setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
+setwd("/Volumes/TundraBUZZ/")
 
 # Set seed for repeatability
 set.seed(123)
 
 # Load data
-ARUQ0_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
-ARUQ3_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ3_raw.csv")
-ARUQ4_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
-ARUQ56_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
-ARUQ7_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ7_raw.csv")
-ARUQ9_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ9_raw.csv")
-ARUQ10_2024_pred_raw <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/raw/predictions_ARUQ10_raw.csv")
+ARUQ0_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ0_raw.csv")
+ARUQ1_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ1_raw.csv")
+ARUQ2_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ2_raw.csv")
+ARUQ3_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ3_raw.csv")
+ARUQ4_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ4_raw.csv")
+ARUQ56_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ56_raw.csv")
+ARUQ7_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ7_raw.csv")
+ARUQ9_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ9_raw.csv")
+ARUQ10_2024_pred_raw <- read_csv("./outputs/recognizer_outputs/raw/predictions_ARUQ10_raw.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
+
 
 
 #### CLEAN UP DATASETS ----
@@ -76,9 +79,9 @@ table(ARUQ_2024_pred_mapped$location_id)
 rm(ARUQ_2024_pred_raw)
 
 # Save csv
-write_csv(ARUQ_2024_pred_mapped, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
+write_csv(ARUQ_2024_pred_mapped, "./outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
 
-# ARUQ_2024_pred_mapped <- read.csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv", stringsAsFactors = TRUE)
+# ARUQ_2024_pred_mapped <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_pred_mapped.csv")
 
 
 
@@ -97,7 +100,7 @@ ARUQ_2024_bumblebee_detections <- ARUQ_2024_bumblebee_detections %>%
   )
 
 # Save csv
-write_csv(ARUQ_2024_bumblebee_detections, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv")
+write_csv(ARUQ_2024_bumblebee_detections, "./outputs/recognizer_outputs/clean/ARUQ_2024_bumblebee_detections.csv")
 rm(ARUQ_2024_pred_mapped)
 
 # Summarize total duration above threshold per datetime
@@ -129,11 +132,11 @@ summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(date_utc = as.Date(datetime))
 
-write_csv(summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
+write_csv(summary_flightbuzzes_ARUQ_2024, "./outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
 
 
 
-# Summarize total duration per *local* date
+# Summarize total duration per local date
 daily_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(datetime_local = force_tz(datetime, tzone = "UTC"), 
          date = as.Date(datetime_local)) %>%
@@ -141,7 +144,7 @@ daily_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   summarize(daily_duration_above_threshold = sum(total_duration_above_threshold), .groups = "drop")
 
 # Export
-write_csv(daily_summary_flightbuzzes_ARUQ_2024, "/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
+write_csv(daily_summary_flightbuzzes_ARUQ_2024, "./outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
 
 
 
