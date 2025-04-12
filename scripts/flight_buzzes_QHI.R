@@ -155,15 +155,20 @@ ggplot(flight_buzz_beebox, aes(x = date, y = daily_duration_above_threshold)) +
 #### Testing POLCAM data ----
 
 polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+daily_nectar_per_site <- read_csv("/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
+
 
 flower_counts <- polcam_data_long %>%
   group_by(date, location_id) %>%
   summarize(total_flower_count = sum(count, na.rm = TRUE), .groups = "drop") %>%
   filter(total_flower_count > 0)
 
+flower_counts <- flower_counts %>%
+  left_join(daily_nectar_per_site, by = c("location_id", "date"))
+
 ggplot(flower_counts, aes(x = date, y = total_flower_count)) +
-  geom_point(color = "darkgreen") +
-  geom_smooth(method = "loess", se = FALSE, alpha = 0.7, color = "darkolivegreen") +
+  geom_point(color = "pink") +
+  geom_smooth(method = "loess", se = FALSE, alpha = 0.7, color = "magenta") +
   #geom_line(color = "darkgreen") +
   labs(title = "Total Flower Count Over Time",
        x = "Date",
@@ -172,8 +177,34 @@ ggplot(flower_counts, aes(x = date, y = total_flower_count)) +
   facet_wrap(~location_id, scales = "free_y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+ggplot(flower_counts, aes(x = date, y = daily_nectar_sugar_mg)) +
+  geom_point(color = "gold") +
+  geom_smooth(method = "loess", se = FALSE, alpha = 0.7, color = "orange") +
+  #geom_line(color = "darkgreen") +
+  labs(title = "Total Nectar Sugar Availability Over Time",
+       x = "Date",
+       y = "Nectar Sugar Availability (mg)") +
+  theme_classic() +
+  facet_wrap(~location_id, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(flower_counts, aes(x = date)) +
+  geom_point(aes(y = total_flower_count), color = "pink") +
+  geom_smooth(aes(y = total_flower_count), method = "loess", se = FALSE, alpha = 0.7, color = "magenta") +
+  geom_point(aes(y = daily_nectar_sugar_mg), color = "gold") +
+  geom_smooth(aes(y = daily_nectar_sugar_mg), method = "loess", se = FALSE, alpha = 0.7, color = "orange") +
+  #geom_line(color = "darkgreen") +
+  labs(title = "Flower Count and Nectar Sugar Over Time",
+       x = "Date",
+       y = "Total Flower and Nectar Availability") +
+  theme_classic() +
+  facet_wrap(~location_id, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 # Merge the two datasets
-combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "location_id"))
+combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "location_id", "microclimate"))
 
 scale_factor <- 10
 
@@ -183,7 +214,8 @@ combined_data_filtered <- combined_data %>%
 # Plot with two y-axes using ggplot2 and ggplot2-secondary-axis functionality
 ggplot(combined_data_filtered, aes(x = date)) +
   geom_point(aes(y = daily_duration_above_threshold)) +
-  geom_point(aes(y = total_flower_count*5), colour = "darkolivegreen") +
+  geom_point(aes(y = total_flower_count*5), colour = "magenta") +
+  geom_point(aes(y = daily_nectar_sugar_mg*5), colour = "orange") +
   geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate), se = TRUE) +
   #geom_smooth(method = "loess", aes(y = total_flower_count*5), colour = "darkolivegreen", se = FALSE) +
   scale_y_continuous(
@@ -233,60 +265,16 @@ p1 / p2  + plot_layout(heights = c(6, 1))
 # Get unique location IDs
 locations <- unique(combined_data_filtered$location_id)
 
-# Create a list to store combined plots per location
-plot_list <- list()
-
-# Loop through each location
-for (loc in locations) {
-  df_loc <- combined_data_filtered %>% filter(location_id == loc)
-  flower_df <- df_loc %>% filter(!is.na(total_flower_count))
-  
-  # Flower tile strip with viridis gradient
-  p2 <- ggplot(flower_df, aes(x = date, y = 0.5, fill = total_flower_count)) +
-    geom_tile() +
-    scale_fill_viridis(option = "C", name = "Flower Count") +  # Using viridis palette
-    scale_x_date(limits = c(date_min, date_max)) +
-    theme_void() +
-    theme(legend.position = "none")
-  
-  # Buzz plot
-  p1 <- ggplot(df_loc, aes(x = date)) +
-    geom_point(aes(y = daily_duration_above_threshold)) +
-    geom_smooth(method = "loess", aes(y = daily_duration_above_threshold, color = microclimate), se = TRUE) +
-    scale_y_continuous(name = "Buzz Duration (s)") +
-    labs(title = paste("Location:", loc)) +
-    scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
-    ylim(0, 600) +
-    theme_classic() +
-    theme(legend.position = "none")
-  
-  # Combine tile strip + buzz plot for this location
-  combined <- p1 / p2  + plot_layout(heights = c(6, 1))
-  
-  # Store in list
-  plot_list[[loc]] <- combined
-}
-
-# Split the plot list into rows of 3
-row1 <- cowplot::plot_grid(plotlist = plot_list[1:3], nrow = 1)
-row2 <- cowplot::plot_grid(plotlist = plot_list[4:6], nrow = 1)
-row3 <- cowplot::plot_grid(plotlist = plot_list[7:9], nrow = 1)
-
-# Combine all rows vertically
-final_plot <- cowplot::plot_grid(row1, row2, row3, ncol = 1)
-
-# Show it!
-final_plot
-
-
-
-
-
-
 # 1. Ensure your full dataset has the date column in Date format
 combined_data_filtered <- combined_data_filtered %>%
+  mutate(date = as.Date(date)) %>%
+  group_by(location_id) %>%
   mutate(
-    date = as.Date(date),
+    flower_count_std = total_flower_count / max(total_flower_count, na.rm = TRUE),
+    nectar_sugar_std = daily_nectar_sugar_mg / max(daily_nectar_sugar_mg, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  mutate(
     microclimate = factor(microclimate, levels = c("Cool", "Moderate", "Warm"))
   )
 
@@ -310,13 +298,18 @@ for (loc in locations) {
   flower_df <- df_loc %>%
     filter(!is.na(total_flower_count))
   
-  # Flower tile strip with viridis gradient
-  p2 <- ggplot(flower_df, aes(x = date, y = 0.5, fill = total_flower_count)) +
-    geom_tile() +
+  # Flower tile strip
+  p2 <- ggplot(flower_df, aes(x = date)) +
+    geom_tile(aes(y = 2, fill = flower_count_std)) +
     scale_fill_gradient(low = "forestgreen", high = "gold", name = "Flower Count") +
+    new_scale_fill() +
+    geom_tile(aes(y = 0.5, fill = nectar_sugar_std)) +
+    scale_fill_gradient(low = "#A0522D", high = "#FFA500", name = "Nectar Sugar") +
     scale_x_date(limits = c(date_min, date_max)) +
     theme_void() +
-    theme(legend.position = "none")
+    theme(legend.position = "none") +
+    annotate("text", x = date_min, y = 2, label = "F", hjust = 1, size = 3.5) +
+    annotate("text", x = date_min, y = 0.5, label = "N", hjust = 1, size = 3.5)
   
   # Buzz plot
   p1 <- ggplot(df_loc, aes(x = date)) +
@@ -338,7 +331,7 @@ for (loc in locations) {
     facet_wrap(~location_id)
   
   # Combine and store
-  combined <- p1 / p2 + plot_layout(heights = c(6, 0.5))
+  combined <- p1 / p2 + plot_layout(heights = c(6, 1.5))
   plot_list[[loc]] <- combined
 }
 
@@ -355,13 +348,69 @@ final_plot_with_margin <- ggdraw(final_plot) +
   theme(plot.margin = margin(t = 10, r = 20, b = 30, l = 20))
 
 # Then add labels with ggdraw
-(final_with_labels <- ggdraw(final_plot_with_margin) +
+final_with_labels <- ggdraw(final_plot_with_margin) +
   draw_label("2024 Growing Season", x = 0.5, y = 0.04, vjust = 1, angle = 0) +
-  draw_label("Daily Bumblebee Flight Buzz Detections (s)", x = 0.02, y = 0.5, angle = 90, vjust = 1))
+  draw_label("Daily Bumblebee Flight Buzz Detections (s)", x = 0.02, y = 0.5, angle = 90, vjust = 1)
 
 
+
+# Dummy plot for microclimate
+legend_microclimate <- ggplot(combined_data_filtered, aes(x = date, y = 1)) +
+  geom_point() +
+  geom_smooth(method = "loess", aes(fill = microclimate, colour = microclimate), se = TRUE, alpha = 0.3) +
+  scale_fill_manual(
+    name = "Microclimate",
+    values = c("Cool" = "#440154", "Moderate" = "forestgreen", "Warm" = "gold")
+  ) +
+  scale_colour_manual(
+    name = "Microclimate",
+    values = c("Cool" = "#440154", "Moderate" = "forestgreen", "Warm" = "gold")
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+
+# Dummy plot for flower count
+legend_flower <- ggplot(combined_data_filtered, aes(x = date, y = 1, fill = flower_count_std)) +
+  geom_tile() +
+  scale_fill_gradient(low = "forestgreen", high = "gold", name = "Relative\nFlower Count") +
+  theme_void() +
+  theme(legend.position = "right")
+
+# Dummy plot for nectar sugar
+legend_nectar <- ggplot(combined_data_filtered, aes(x = date, y = 1, fill = nectar_sugar_std)) +
+  geom_tile() +
+  scale_fill_gradient(low = "#A0522D", high = "#FFA500", name = "Rel. Nectar Sugar\nAvailability") +
+  theme_void() +
+  theme(legend.position = "right")
+
+# Extract legends from cowplot
+legend_microclimate_only <- get_legend(legend_microclimate)
+legend_flower_only <- get_legend(legend_flower)
+legend_nectar_only <- get_legend(legend_nectar)
+
+# Stack legends
+legend_stack <- cowplot::plot_grid(
+  legend_microclimate_only,
+  legend_flower_only,
+  legend_nectar_only,
+  ncol = 1,
+  align = "v"
+)
+
+# Plot with legends
+final_with_all_legends <- plot_grid(
+  final_with_labels,
+  legend_stack,
+  rel_widths = c(4, 0.6)
+)
+
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flight_buzzes_flowering_nectar_panels.pdf",
+  plot = final_with_all_legends,
+  width = 11,       # adjust based on layout
+  height = 8
+)
 #####
-
 
 
 
