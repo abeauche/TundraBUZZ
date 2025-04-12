@@ -120,7 +120,7 @@ write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.c
 #### Data visualization ----
 flight_buzz_daily_sites <- flight_buzz_daily %>%
   filter(!location_id == "BEEBOX")
-flight_buzz_beebox <- flight_buzz_daily %>%
+flight_buzz_daily_beebox <- flight_buzz_daily %>%
   filter(location_id == "BEEBOX")
 
 # Plot flight buzzes over time
@@ -137,7 +137,7 @@ ggplot(flight_buzz_daily_sites, aes(x = date, y = daily_duration_above_threshold
   scale_colour_manual(values = c("#440154", "forestgreen","gold"))
 
 # Plot flight buzzes at BEEBOX over time
-ggplot(flight_buzz_beebox, aes(x = date, y = daily_duration_above_threshold)) +
+ggplot(flight_buzz_daily_beebox, aes(x = date, y = daily_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="loess", colour = "grey44") +
   labs(x = "2024 Growing Season", 
@@ -148,6 +148,145 @@ ggplot(flight_buzz_beebox, aes(x = date, y = daily_duration_above_threshold)) +
   facet_wrap(~location_id) 
 
 
+
+#### CONTINUE IN BAYESIAN FRAMEWORK ####
+#### CLIMATE VARIABLES
+
+ggplot(flight_buzz_daily_beebox, aes(x = mean_wind_speed, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Wind Speed (km/h)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = mean_stn_press_k_pa, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Atmospheric Pressure (kPa)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = predominant_wind_dir, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  #geom_smooth(method="loess", colour = "grey44") +
+  labs(x = "Daily Predominant Wind Direction", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = avg_air_rh_1m, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Relative Humidity", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = day_length_hours, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Day Length", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = cloud_cover_pct, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Cloud Cover", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_daily_beebox, aes(x = mean_temp, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Temperature (°C)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+
+
+### ACROSS ALL SITES
+ggplot(flight_buzz_daily, aes(x = mean_wind_speed, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Wind Speed (km/h)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(flight_buzz_daily, aes(x = mean_stn_press_k_pa, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Atmospheric Pressure (kPa)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(flight_buzz_daily, aes(x = predominant_wind_dir, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  #geom_smooth(method="loess", colour = "grey44") +
+  labs(x = "Daily Predominant Wind Direction", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(flight_buzz_daily, aes(x = avg_air_rh_1m, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Relative Humidity", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(flight_buzz_daily, aes(x = day_length_hours, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Day Length", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(flight_buzz_daily, aes(x = cloud_cover_pct, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Cloud Cover", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Mean Temperature (°C)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
@@ -261,11 +400,11 @@ p1 / p2  + plot_layout(heights = c(6, 1))
 
 
 
-#### Test ----
+#### PANEL FIGURE FLIGHT BUZZES VS FLOWER AND NECTAR ----
 # Get unique location IDs
 locations <- unique(combined_data_filtered$location_id)
 
-# 1. Ensure your full dataset has the date column in Date format
+# Format date column in Date format
 combined_data_filtered <- combined_data_filtered %>%
   mutate(date = as.Date(date)) %>%
   group_by(location_id) %>%
@@ -278,20 +417,20 @@ combined_data_filtered <- combined_data_filtered %>%
     microclimate = factor(microclimate, levels = c("Cool", "Moderate", "Warm"))
   )
 
-# 2. Get shared x-axis limits
+# Get shared x-axis limits
 date_min <- min(combined_data_filtered$date, na.rm = TRUE)
 date_max <- max(combined_data_filtered$date, na.rm = TRUE)
 
-# 3. Get unique location IDs
+# Get unique location IDs
 locations <- unique(combined_data_filtered$location_id)
 locations <- sort(unique(combined_data_filtered$location_id))
 
-# 4. Loop and build plots
+# Loop and build plots
 plot_list <- list()
 
 for (loc in locations) {
   
-  # These must be *inside* the loop so you get location-specific data each time
+  # Keep these inside plot
   df_loc <- combined_data_filtered %>%
     filter(location_id == loc)
   
@@ -335,23 +474,22 @@ for (loc in locations) {
   plot_list[[loc]] <- combined
 }
 
-# Optional: Combine into rows and final plot
+# Combine into rows and final plot
 row1 <- cowplot::plot_grid(plotlist = plot_list[1:3], nrow = 1)
 row2 <- cowplot::plot_grid(plotlist = plot_list[4:6], nrow = 1)
 row3 <- cowplot::plot_grid(plotlist = plot_list[7:9], nrow = 1)
 
-# Combine your rows (assuming row1, row2, row3 already created)
+# Combine rows
 final_plot <- cowplot::plot_grid(row1, row2, row3, ncol = 1, rel_heights = c(1, 1, 1), align = "v", axis = "tblr", vjust = -1, hjust = -2) 
 
 # Wrap with ggdraw() to apply margin spacing
 final_plot_with_margin <- ggdraw(final_plot) +
   theme(plot.margin = margin(t = 10, r = 20, b = 30, l = 20))
 
-# Then add labels with ggdraw
+# Add labels with ggdraw
 final_with_labels <- ggdraw(final_plot_with_margin) +
   draw_label("2024 Growing Season", x = 0.5, y = 0.04, vjust = 1, angle = 0) +
   draw_label("Daily Bumblebee Flight Buzz Detections (s)", x = 0.02, y = 0.5, angle = 90, vjust = 1)
-
 
 
 # Dummy plot for microclimate
@@ -383,7 +521,7 @@ legend_nectar <- ggplot(combined_data_filtered, aes(x = date, y = 1, fill = nect
   theme_void() +
   theme(legend.position = "right")
 
-# Extract legends from cowplot
+# Extract legends using cowplot
 legend_microclimate_only <- get_legend(legend_microclimate)
 legend_flower_only <- get_legend(legend_flower)
 legend_nectar_only <- get_legend(legend_nectar)
@@ -404,6 +542,7 @@ final_with_all_legends <- plot_grid(
   rel_widths = c(4, 0.6)
 )
 
+# Save figure
 ggsave(
   filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flight_buzzes_flowering_nectar_panels.pdf",
   plot = final_with_all_legends,
@@ -445,7 +584,6 @@ ggplot(flight_buzz_hourly_centered, aes(x = time_hour_shifted, y = total_duratio
 
 
 # Prepare data
-
 buzz_beebox <- flight_buzz_hourly_centered %>%
   filter(location_id == "BEEBOX") %>%
   mutate(
@@ -456,10 +594,203 @@ buzz_beebox <- flight_buzz_hourly_centered %>%
 buzz_beebox <- buzz_beebox %>%
   filter(!week == "2024-08-11")
 
+# Get the full sequence of dates and hours in the range
+all_times <- expand.grid(
+  date = seq(min(buzz_beebox$date), max(buzz_beebox$date), by = "day"),
+  time_hour = 0:23)
+
+# Convert time_hour from integer to "HH:00:00" format
+all_times$time_hour <- sprintf("%02d:00:00", all_times$time_hour)
+
+# Convert time_hour to time class
+all_times$time_hour <- hms::as_hms(all_times$time_hour)
+
+# Shift_time_hour
+all_times <- all_times %>%
+  mutate(time_hour_shifted = (as.numeric(time_hour) - 7200) %% 86400)
+
+
+# Join and fill in missing values
+buzz_beebox_complete <- buzz_beebox %>%
+  right_join(all_times, by = c("date", "time_hour_shifted", "time_hour")) %>%
+  mutate(
+    location_id = "BEEBOX",
+    week = floor_date(date, unit = "week"),
+    total_duration_above_threshold = replace_na(total_duration_above_threshold, 0)
+  )
+
+# Join and fill in missing values
+buzz_beebox_complete <- buzz_beebox_complete %>%
+  select(location_id, total_duration_above_threshold, time_hour, time_hour_shifted, date)
+
+# Combine date and time_hour into a datetime column
+buzz_beebox_merge <- buzz_beebox_complete %>%
+  mutate(datetime = as.POSIXct(paste(date, time_hour), format = "%Y-%m-%d %H:%M:%S")) %>%
+  select(-time_hour)
+
+
+
+flight_buzz_hourly_beebox_complete <- buzz_beebox_merge %>%
+  left_join(environmental_variables_hourly, by = c("datetime")) %>%
+  left_join(QHI_temp_hourly, by = c("datetime", "location_id"))
+
+
+flight_buzz_hourly_beebox_complete <- flight_buzz_hourly_beebox_complete %>%
+  mutate(datetime = with_tz(datetime, tz = "America/Whitehorse")) %>%
+  mutate(time_hour = hms::as_hms(floor_date(datetime, unit = "hour")))
+
+
+#### CONTINUE IN BAYESIAN FRAMEWORK ####
+#### CLIMATE VARIABLES
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = wind_spd_km_h, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Hourly Mean Wind Speed (km/h)", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = stn_press_k_pa, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Hourly Atmospheric Pressure (kPa)", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = wind_dir_deg, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="loess", colour = "grey44") +
+  labs(x = "Wind Direction (in degrees)", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = avg_air_rh_1m, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Relative Humidity", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = altitude, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Sun altitude", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = azimuth, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="loess", colour = "grey44") +
+  labs(x = "Sun azimuth", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+ggplot(flight_buzz_hourly_beebox_complete, aes(x = mean_temp, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Air Temperature", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  #ylim(0, 90) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) 
+
+
+
+
+
+
+
+#### CONTINUE IN BAYESIAN FRAMEWORK ####
+#### CLIMATE VARIABLES ----
+
+ggplot(flight_buzz_hourly, aes(x = wind_spd_km_h, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Hourly Mean Wind Speed (km/h)", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(flight_buzz_hourly, aes(x = stn_press_k_pa, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Hourly Atmospheric Pressure (kPa)", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(flight_buzz_hourly, aes(x = avg_air_rh_1m, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Relative Humidity", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+ggplot(flight_buzz_hourly, aes(x = altitude, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Sun altitude", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+
+# Fit a linear mixed-effects model
+library(lme4)
+model <- lmer(total_duration_above_threshold ~ altitude + (1|day), data = flight_buzz_hourly)
+summary(model)
+
+
+ggplot(flight_buzz_hourly, aes(x = abs(azimuth), y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Sun azimuth", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Air Temperature", 
+       y = "Hourly Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 120) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
 # Plot
-ggplot(buzz_beebox, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
-  geom_point(aes(colour = as.factor(week)), alpha = 0.6) +  
-  geom_smooth(aes(colour = as.factor(week)), method = "loess", se = FALSE) +  # One overall trend line
+ggplot(buzz_beebox_complete, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
+  geom_point(aes(colour = as.factor(week)), alpha = 0.4, size = 3) +  
+  geom_smooth(aes(colour = as.factor(week)), method = "loess", se = F) +  # One overall trend line
   labs(
     x = "Time of Day", 
     y = "Hourly Flight Buzz Detection (s)",
@@ -471,7 +802,7 @@ ggplot(buzz_beebox, aes(x = time_hour_shifted, y = total_duration_above_threshol
   ) +
   scale_colour_viridis_d() +  # Apply discrete Viridis color scale
   theme_classic() +
-  ylim(0, 50) +
+  ylim(0, 90) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
