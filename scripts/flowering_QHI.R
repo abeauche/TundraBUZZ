@@ -34,8 +34,9 @@ set.seed(123)
 polcam_data <- read_csv("/Volumes/TundraBUZZ/data/raw/POLCAM_data.csv", skip = 1)
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 mean_summer_temperature <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
-FloRes_raw <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/5_FloRes_no_corolla.csv")
-
+FloRes_raw <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/5_FloRes_raw.csv")
+FloRes_aggregate_species <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/3_Aggregate_species.csv")
+flower_list <- read_csv("/Volumes/TundraBUZZ/data/raw/flower_list_POLCAM.csv")
 
 #### Tidy data ----
 # Select and format columns of interest
@@ -67,7 +68,25 @@ write_csv(polcam_data_long, "/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv
 # Group per species
 polcam_data_species <- polcam_data_long %>%
   group_by(species, location_id, date, microclimate) %>%
-  summarize(count = sum(count))
+  summarize(count = sum(count), .groups = "drop") %>%
+  left_join(flower_list %>% select(species, sugar_production_daily_flower),
+            by = "species")
+
+# Fliter FloRes for species in dataset
+FloRes_filtered <- FloRes_raw %>%
+  filter(taxon %in% flower_list$taxon)
+
+# Fliter FloRes for species in dataset
+FloRes_aggregate_species_filtered <- FloRes_aggregate_species %>%
+  filter(species %in% flower_list$taxon)
+
+# Calculate sugar per observation and summarize per site per day
+daily_nectar_per_site <- polcam_data_species %>%
+  mutate(daily_nectar_sugar_mg = count * sugar_production_daily_flower) %>%
+  group_by(location_id, date, microclimate) %>%
+  summarize(daily_nectar_sugar_mg = sum(daily_nectar_sugar_mg, na.rm = TRUE), .groups = "drop")
+
+write_csv(daily_nectar_per_site, "/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
 
 
 
