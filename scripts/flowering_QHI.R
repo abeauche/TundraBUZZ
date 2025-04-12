@@ -173,6 +173,13 @@ plot(mod_duration)
 pp_check(mod_duration)
 
 
+# Save each model as an RDS file
+saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_first.rds")
+saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_last.rds")
+saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_peak.rds")
+saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_duration.rds")
+
+
 #### Coding club code
 # mod_first_fit <- flowering_bayes %>%
 #   add_predicted_draws(mod_first) %>%  # adding the posterior distribution
@@ -448,7 +455,11 @@ plot(mod_duration_species)
 pp_check(mod_duration_species)
 
 
-
+# Save each model as an RDS file
+saveRDS(mod_first_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_first_species.rds")
+saveRDS(mod_last_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_last_species.rds")
+saveRDS(mod_peak_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_peak_species.rds")
+saveRDS(mod_duration_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_duration_species.rds")
 
 
 ### First flowering date per species
