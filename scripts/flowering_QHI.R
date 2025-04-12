@@ -34,6 +34,7 @@ set.seed(123)
 polcam_data <- read_csv("/Volumes/TundraBUZZ/data/raw/POLCAM_data.csv", skip = 1)
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 mean_summer_temperature <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+FloRes_raw <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/5_FloRes_no_corolla.csv")
 
 
 #### Tidy data ----
