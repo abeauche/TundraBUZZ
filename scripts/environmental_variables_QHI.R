@@ -119,7 +119,7 @@ environmental_variables_hourly <- eccc_summer_2024_hourly %>%
   left_join(met_station_pauline_cove_hourly, by = "datetime") %>%
   left_join(sun_data, by = "datetime")
 
-write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
+# write_csv(environmental_variables_hourly, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
 
 
 
@@ -132,6 +132,45 @@ environmental_variables_daily <- eccc_summer_2024_daily %>%
   left_join(cloud_cover, by = "date") %>%
   select(-"week")
 
-write_csv(environmental_variables_daily, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
+# write_csv(environmental_variables_daily, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
 
+environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
+QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+str(environmental_variables_daily)
+
+QHI_temp_daily_micro <- QHI_temp_daily %>%
+  select(datetime, location_id, microclimate, value, cumulative_GDD0) %>%
+  group_by(datetime, microclimate) %>%
+  summarize(value = mean(value),
+            cumulative_GDD0 = mean(cumulative_GDD0)) %>%
+  mutate(date = as.Date(datetime))
+
+# Join by date (adjust if your date columns have different names)
+env_combined <- environmental_variables_daily %>%
+  left_join(QHI_temp_daily_micro, by = "date")
+
+environmental_daily_filtered <- env_combined %>%
+  select(-c(max_wind_speed, predominant_wind_dir, lat, lon, sunrise, sunset, datetime))
+
+env_long <- environmental_daily_filtered %>%
+  pivot_longer(
+    cols = -c(date, microclimate),
+    names_to = "variable",
+    values_to = "value"
+  )
+
+big_env_plot <- ggplot(env_long, aes(x = date, y = value, colour = microclimate)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+  theme_classic(base_size = 12) +
+  labs(x = "Date", y = "Value") +
+  theme(strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/environmental_variables_plot_QHI2024.pdf",
+  plot = big_env_plot,
+  width = 16,       # adjust based on layout
+  height = 10
+)
 
