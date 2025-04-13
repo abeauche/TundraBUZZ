@@ -209,10 +209,11 @@ hourly_temp_mapped <- hourly_temp_mapped %>%
     by = c("location_id", "datetime")
   )
 
-write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
-write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly.csv")
-write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly.csv")
+# write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
+# write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly.csv")
+# write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly.csv")
 
+# hourly_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
 
 #### Aggregate into daily data ----
 daily.tms <- mc_agg(
@@ -302,9 +303,11 @@ daily_temp_mapped <- daily_temp_mapped %>%
     by = c("location_id", "datetime")
   )
 
-write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
-write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
-write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
+# write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+# write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
+# write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
+
+# daily_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 
 # Order sites by mean summer temperature based on daily temperatures
 ordered_site_temp_summer <- daily_temp_mapped %>%
@@ -314,7 +317,9 @@ ordered_site_temp_summer <- daily_temp_mapped %>%
             summer_GDD5 = max(cumulative_GDD5, na.rm = TRUE)) %>%
   arrange(desc(summer_temp))
 
-write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+# write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+
+ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
 ordered_site_GDD0 <- daily_temp_mapped %>%
   group_by(location_id, microclimate) %>%
@@ -392,4 +397,34 @@ clean_summer_temp_per_microclimate <- ggplot(ordered_site_temp_summer, aes(x = m
   scale_fill_manual(values = c("grey44","gold", "forestgreen", "#440154"))
 
 
+# Convert to long format
+GDD_long <- ordered_site_temp_summer %>%
+  pivot_longer(cols = c(summer_GDD0, summer_GDD5),
+               names_to = "GDD_type",
+               values_to = "GDD_value")
 
+# Plot
+GDD_by_temp <- ggplot(GDD_long, aes(x = summer_temp, y = GDD_value, colour = GDD_type)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_classic() +
+  scale_colour_manual(
+    values = c("summer_GDD0" = "steelblue", "summer_GDD5" = "orange3"),
+    labels = c("GDD (0°C base)", "GDD (5°C base)"),
+    name = "GDD Type"
+  ) +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Cumulative Growing Degree Days"
+  )
+
+GDD_by_temp
+
+# Get the slope for each GDD type
+slopes <- GDD_long %>%
+  group_by(GDD_type) %>%
+  do(tidy(lm(GDD_value ~ summer_temp, data = .))) %>%
+  filter(term == "summer_temp") %>%
+  select(GDD_type, estimate, std.error, statistic, p.value)
+
+print(slopes)
