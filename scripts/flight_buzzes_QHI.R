@@ -37,8 +37,8 @@ lon <- -138.91
 
 #### Using tidy datasets ----
 # Load data
-summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
-daily_summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/daily_summary_flightbuzzes_ARUQ_2024.csv")
+summary_flightbuzzes_ARUQ_2024 <- read_csv("./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
+daily_summary_flightbuzzes_ARUQ_2024 <- read_csv("./data/clean/daily_flight_buzzes_complete_TundraBUZZ.csv")
 environmental_variables_hourly <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_hourly.csv")
 environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
 QHI_temp_hourly <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
@@ -73,7 +73,7 @@ summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
 hourly_summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
   mutate(datetime = floor_date(datetime, unit = "hour")) %>%
   group_by(datetime, location_id, microclimate) %>%
-  summarize(total_duration_above_threshold = sum(total_duration_above_threshold, na.rm = TRUE),
+  summarize(total_duration_above_threshold = mean(total_duration_above_threshold, na.rm = TRUE)*2,
             .groups = "drop")
 
 # Convert temp data to POSIXct (UTC timezone)
