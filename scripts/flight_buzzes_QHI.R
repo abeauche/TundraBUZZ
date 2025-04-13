@@ -11,6 +11,7 @@
 #### SETUP ----
 # Load required libraries
 library(tidyverse)
+library(dplyr)
 library(lubridate)
 library(suncalc)
 library(hms)
@@ -23,6 +24,7 @@ library(cowplot)
 library(viridis)
 library(brms)
 library(tidybayes)
+library(slider)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -85,13 +87,13 @@ QHI_temp_hourly$datetime <- with_tz(QHI_temp_hourly$datetime, tzone = "America/W
 # Select columns for merging
 QHI_temp_hourly <- QHI_temp_hourly %>%
   mutate(mean_temp = value) %>%
-  select(location_id, datetime, mean_temp)
+  select(location_id, datetime, mean_temp, cumulative_GDD0, cumulative_GDD5)
 
 # Properly name columns
 QHI_temp_daily <- QHI_temp_daily %>%
   mutate(mean_temp = value) %>%
   mutate(date = as.POSIXct(datetime, tz = "UTC")) %>%  # or use "America/Whitehorse"
-  select(location_id, date, mean_temp)
+  select(location_id, date, mean_temp, cumulative_GDD0, cumulative_GDD5)
 
 
 
@@ -117,6 +119,168 @@ flight_buzz_daily <- flight_buzz_daily %>%
   mutate(location_id = as.factor(location_id))
 
 write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
+
+
+
+#### Obtain 3-day moving average with the highest bumblebee activity per site
+# Calculate centered 3-day moving average and assign to middle date
+moving_avg_df <- flight_buzz_daily %>%
+  arrange(location_id, date) %>%
+  group_by(location_id) %>%
+  mutate(
+    ma_3day = slide_dbl(
+      daily_duration_above_threshold,
+      mean,
+      .before = 1,
+      .after = 1,
+      .complete = TRUE
+    )
+  ) %>%
+  ungroup()
+
+# Extract the date where the centered 3-day average is highest
+peak_dates <- moving_avg_df %>%
+  group_by(location_id) %>%
+  filter(ma_3day == max(ma_3day, na.rm = TRUE)) %>%
+  slice(1) %>%  # in case of ties
+  select(location_id, peak_date = date, peak_ma_3day = ma_3day)
+
+# View result
+peak_dates %>%
+  select(location_id, peak_date, peak_ma_3day)
+
+# Join with summer temp
+peak_temp_df <- peak_dates %>%
+  left_join(mean_summer_temp, by = "location_id")  # assuming env_summary has mean_summer_temp
+
+
+ggplot(peak_temp_df, aes(x = summer_temp, y = peak_date)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method="lm") +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Date of Peak Bumblebee Activity (3-day avg)"
+  ) +
+  theme_classic()
+
+ggplot(peak_temp_df, aes(x = summer_GDD0, y = peak_date)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method="lm") +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Date of Peak Bumblebee Activity (3-day avg)"
+  ) +
+  theme_classic()
+
+
+
+#### From flowering_QHI.R
+peak_temp_flowering <- peak_temp_df %>%
+  left_join(peak_flowering, by = "location_id")  # assuming env_summary has mean_summer_temp
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(difference_days = as.numeric(peak_date - peak_flowering)
+) %>%
+  filter(!location_id == "BEEBOX")
+
+
+ggplot(peak_temp_flowering, aes(x = summer_temp, y = difference_days)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method="lm") +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Phenological Mismatch"
+  ) +
+  theme_classic()
+
+ggplot(peak_temp_flowering, aes(x = summer_GDD0, y = difference_days)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method="lm") +
+  labs(
+    x = "Cumulative Summer GDD0 (°C)",
+    y = "Phenological Mismatch"
+  ) +
+  theme_classic()
+
+ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method="lm") +
+  labs(
+    x = "Cumulative Summer GDD5 (°C)",
+    y = "Phenological Mismatch"
+  ) +
+  theme_classic()
+
+
+# Convert peak_date and peak_flowering to Date class if they are not already
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(
+    peak_date = as.Date(peak_date),  # Ensure peak_date is in Date format
+    peak_flowering = as.Date(peak_flowering)  # Ensure peak_flowering is in Date format
+  )
+
+# Convert peak_date and peak_flowering to numeric (days since the first date)
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(
+    peak_date_numeric = as.numeric(peak_date),
+    peak_flowering_numeric = as.numeric(peak_flowering)
+  )
+
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(
+    peak_date_numeric = peak_date_numeric - 19913.5,
+    peak_flowering_numeric = peak_flowering_numeric - 19913.5)
+
+# Now let's plot using ggplot with a separate y-axis for difference_days
+ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
+  # Plot Peak Date with distinct color
+  geom_point(aes(y = peak_date_numeric), size = 3, color = "goldenrod", alpha = 0.6) +
+  # Plot Peak Flowering Date with distinct color
+  geom_point(aes(y = peak_flowering_numeric), size = 3, color = "pink", alpha = 0.6) +
+  # Plot Difference in Days with distinct color on a separate axis
+  geom_point(aes(y = difference_days), size = 3, color = "steelblue", alpha = 0.6) +
+  # Add linear regression lines for peak_date, peak_flowering, and difference_days
+  geom_smooth(aes(y = peak_date_numeric), method = "lm", color = "goldenrod", se = FALSE) +
+  geom_smooth(aes(y = peak_flowering_numeric), method = "lm", color = "pink", se = FALSE) +
+  geom_smooth(aes(y = difference_days), method = "lm", color = "steelblue", se = FALSE) +
+  # Add a secondary y-axis for difference_days
+  scale_y_continuous(
+    name = "Phenological Timing (Days)",
+    sec.axis = sec_axis(~ ., name = "Phenological Mismatch (Days)")
+  ) +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Phenological Timing / Mismatch"
+  ) +
+  theme_classic()
+
+# Fit the linear models
+model_peak_date <- lm(peak_date_numeric ~ summer_GDD5, data = peak_temp_flowering)
+model_peak_flowering <- lm(peak_flowering_numeric ~ summer_GDD5, data = peak_temp_flowering)
+model_difference_days <- lm(difference_days ~ summer_GDD5, data = peak_temp_flowering)
+
+summary(model_peak_date)
+summary(model_peak_flowering)
+summary(model_difference_days)
+
+# Extract slopes (coefficients) and standard errors
+slopes <- tibble(
+  variable = c("Peak Bumblebee Activity", "Peak Flowering", "Difference in Days"),
+  slope = c(coef(model_peak_date)[2], coef(model_peak_flowering)[2], coef(model_difference_days)[2]),
+  se = c(summary(model_peak_date)$coefficients[2, 2],
+         summary(model_peak_flowering)$coefficients[2, 2],
+         summary(model_difference_days)$coefficients[2, 2])
+)
+
+# Plot slopes with error lines (standard errors)
+ggplot(slopes, aes(x = slope, y = variable)) +
+  geom_point(size = 3) +  # Points for the slopes
+  geom_errorbar(aes(xmin = slope - se, xmax = slope + se), width = 0.2) +  # Error bars for standard errors
+  labs(
+    x = "Effect Size and Credible Interval of Cumulative GDD5",
+    y = "Phenological Trait"
+  ) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_classic() 
 
 
 
@@ -353,6 +517,11 @@ scale_factor <- 10
 
 combined_data_filtered <- combined_data %>%
   filter(!location_id == "BEEBOX")
+
+ggplot(combined_data_filtered, aes(x = cumulative_GDD0)) +
+  geom_point(aes(y = daily_duration_above_threshold)) +
+  geom_point(aes(y = total_flower_count*5), colour = "magenta") +
+  geom_point(aes(y = daily_nectar_sugar_mg*5), colour = "orange") 
 
 # Plot with two y-axes using ggplot2 and ggplot2-secondary-axis functionality
 ggplot(combined_data_filtered, aes(x = date)) +
