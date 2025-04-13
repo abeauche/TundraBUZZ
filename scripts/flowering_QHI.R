@@ -318,10 +318,20 @@ flowering_bayes <- flowering_bayes %>%
 
 flowering_bayes$censored <- factor(flowering_bayes$censored, levels = c("none", "left"))
 
+flowering_bayes <- flowering_bayes %>%
+  mutate(
+    cens_duration = ifelse(first_flowering == as.Date("2024-06-23"), "right", "none")
+  )
 
+flowering_bayes$cens_duration <- factor(flowering_bayes$cens_duration, levels = c("none", "right"))
+
+summary(flowering_bayes$duration_days)
+table(flowering_bayes$cens_duration)
+anyNA(flowering_bayes$duration_days)
+head(flowering_bayes)
 
 #### FIT MODELS
-
+hist(flowering_bayes$first_flowering_num)
 # First flowering model --> censored left given that there is uncertainty regarding start date prior to installation of camera
 mod_first <- brm(
   first_flowering_num | cens(censored) ~ summer_GDD0,
@@ -348,8 +358,31 @@ plot(mod_peak)
 pp_check(mod_peak)
 
 # Duration (numeric so no conversion needed)
-mod_duration <- brm(duration_days ~ summer_GDD0, 
-                    data = flowering_bayes, family = gaussian(), cores = 4)
+# Manually specify initial values for the parameters
+init_values <- function() {
+  list(
+    b = rnorm(1, 0, 1),           # Set initial value for the regression coefficient
+    Intercept = rnorm(1, 30, 5),   # Set initial value for the intercept (based on your data)
+    sigma = runif(1, 0.1, 5)       # Set initial value for the standard deviation
+  )
+}
+
+mod_duration_cens <- brm(
+  bf(duration_days | cens(cens_duration) ~ summer_GDD0),
+  data = flowering_bayes,
+  family = gaussian(),
+  prior = c(
+    prior(normal(0, 5), class = "b"), # maybe -1, 3?
+    prior(normal(30, 10), class = "Intercept"),
+    prior(exponential(1), class = "sigma")
+  ),
+  chains = 4,
+  cores = 4,
+  control = list(adapt_delta = 0.999),
+  init = init_values,  # Set initial values manually,
+  seed = 123
+)
+
 summary(mod_duration)
 plot(mod_duration)
 pp_check(mod_duration)
@@ -376,7 +409,7 @@ saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms
 
 ### First flowering date
 # Get predicted values from Bayesian model
-preds_first <- ggpredict(mod_first, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_first <- ggpredict(mod_first, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
 
 # Convert predictions to Date format if the response was numeric date
 preds_first$predicted_date <- as.Date(preds_first$predicted, origin = "2024-06-23")
@@ -386,22 +419,25 @@ preds_first$conf.high_date <- as.Date(preds_first$conf.high, origin = "2024-06-2
 # Plot
 mod_first_plot <- ggplot(preds_first, aes(x = x, y = predicted_date)) +
   geom_ribbon(aes(ymin = conf.low_date, ymax = conf.high_date), alpha = 0.3, fill = "grey60") +
-  geom_line(size = 1.2, color = "black") +
-  geom_point(data = flowering_bayes, aes(x = summer_temp, y = as.Date(first_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
+  geom_line(linewidth = 1.2, color = "black") +
+  geom_hline(yintercept = as.Date("2024-06-23")-0.5, linetype = "dashed", color = "grey44") +  # Horizontal line
+  annotate("text", x = Inf, y = as.Date("2024-06-23") - 1.5, label = "Camera Deployment", 
+           hjust = 1, vjust = 0, color = "grey44", size = 4, fontface = "italic") +
+  geom_point(data = flowering_bayes, aes(x = summer_GDD0, y = as.Date(first_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
   scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
   scale_y_date(date_labels = "%b %d") +
   labs(
-    x = "Mean Summer Temperature (°C)",
+    x = "Total Growing Degree Days (T = 0°C)",
     y = "First Flowering Date",
     colour = "Microclimate"
   ) +
-  theme_classic() 
+  theme_classic()
 
 
 
 ### Last flowering date
 # Get predicted values from Bayesian model
-preds_last <- ggpredict(mod_last, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_last <- ggpredict(mod_last, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
 
 # Convert predictions to Date format if the response was numeric date
 preds_last$predicted_date <- as.Date(preds_last$predicted, origin = "2024-06-23")
@@ -412,11 +448,11 @@ preds_last$conf.high_date <- as.Date(preds_last$conf.high, origin = "2024-06-23"
 mod_last_plot <- ggplot(preds_last, aes(x = x, y = predicted_date)) +
   geom_ribbon(aes(ymin = conf.low_date, ymax = conf.high_date), alpha = 0.3, fill = "grey60") +
   geom_line(size = 1.2, color = "black") +
-  geom_point(data = flowering_bayes, aes(x = summer_temp, y = as.Date(last_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
+  geom_point(data = flowering_bayes, aes(x = summer_GDD0, y = as.Date(last_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
   scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
   scale_y_date(date_labels = "%b %d") +
   labs(
-    x = "Mean Summer Temperature (°C)",
+    x = "Total Growing Degree Days (T = 0°C)",
     y = "Last Flowering Date",
     colour = "Microclimate"
   ) +
@@ -425,7 +461,7 @@ mod_last_plot <- ggplot(preds_last, aes(x = x, y = predicted_date)) +
 
 ### Peak flowering date
 # Get predicted values from Bayesian model
-preds_peak <- ggpredict(mod_peak, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_peak <- ggpredict(mod_peak, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
 
 # Convert predictions to Date format if the response was numeric date
 preds_peak$predicted_date <- as.Date(preds_peak$predicted, origin = "2024-06-23")
@@ -436,11 +472,11 @@ preds_peak$conf.high_date <- as.Date(preds_peak$conf.high, origin = "2024-06-23"
 mod_peak_plot <- ggplot(preds_peak, aes(x = x, y = predicted_date)) +
   geom_ribbon(aes(ymin = conf.low_date, ymax = conf.high_date), alpha = 0.3, fill = "grey60") +
   geom_line(size = 1.2, color = "black") +
-  geom_point(data = flowering_bayes, aes(x = summer_temp, y = as.Date(peak_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
+  geom_point(data = flowering_bayes, aes(x = summer_GDD0, y = as.Date(peak_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
   scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
   scale_y_date(date_labels = "%b %d") +
   labs(
-    x = "Mean Summer Temperature (°C)",
+    x = "Total Growing Degree Days (T = 0°C)",
     y = "Peak Flowering Date",
     colour = "Microclimate"
   ) +
@@ -449,16 +485,16 @@ mod_peak_plot <- ggplot(preds_peak, aes(x = x, y = predicted_date)) +
 
 ### Duration
 # Get predicted values from Bayesian model
-preds_duration <- ggpredict(mod_duration, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_duration <- ggpredict(mod_duration, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
 
 # Plot
 mod_duration_plot <- ggplot(preds_duration, aes(x = x, y = predicted)) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "grey60") +
   geom_line(size = 1.2, color = "black") +
-  geom_point(data = flowering_bayes, aes(x = summer_temp, y = duration_days, colour = microclimate), size = 3) +
+  geom_point(data = flowering_bayes, aes(x = summer_GDD0, y = duration_days, colour = microclimate), size = 3) +
   scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
   labs(
-    x = "Mean Summer Temperature (°C)",
+    x = "Total Growing Degree Days (T = 0°C)",
     y = "Flowering Duration",
     colour = "Microclimate"
   ) +
