@@ -113,6 +113,8 @@ write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly
 flight_buzz_daily <- daily_summary_flightbuzzes_ARUQ_2024 %>%
   left_join(environmental_variables_daily, by = "date") %>%
   left_join(QHI_temp_daily, by = c("date", "location_id"))
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(location_id = as.factor(location_id))
 
 write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
 
@@ -724,6 +726,7 @@ ggplot(flight_buzz_hourly_beebox_complete, aes(x = mean_temp, y = total_duration
 #### CONTINUE IN BAYESIAN FRAMEWORK ####
 #### CLIMATE VARIABLES ----
 
+hist(flight_buzz_hourly$wind_spd_km_h)
 ggplot(flight_buzz_hourly, aes(x = wind_spd_km_h, y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -733,6 +736,7 @@ ggplot(flight_buzz_hourly, aes(x = wind_spd_km_h, y = total_duration_above_thres
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+hist(flight_buzz_hourly$stn_press_k_pa)
 ggplot(flight_buzz_hourly, aes(x = stn_press_k_pa, y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -742,6 +746,7 @@ ggplot(flight_buzz_hourly, aes(x = stn_press_k_pa, y = total_duration_above_thre
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
+hist(flight_buzz_hourly$avg_air_rh_1m)
 ggplot(flight_buzz_hourly, aes(x = avg_air_rh_1m, y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -751,6 +756,7 @@ ggplot(flight_buzz_hourly, aes(x = avg_air_rh_1m, y = total_duration_above_thres
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
+hist(flight_buzz_hourly$altitude)
 ggplot(flight_buzz_hourly, aes(x = altitude, y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -767,7 +773,7 @@ library(lme4)
 model <- lmer(total_duration_above_threshold ~ altitude + (1|day), data = flight_buzz_hourly)
 summary(model)
 
-
+hist(flight_buzz_hourly$azimuth)
 ggplot(flight_buzz_hourly, aes(x = abs(azimuth), y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -777,6 +783,7 @@ ggplot(flight_buzz_hourly, aes(x = abs(azimuth), y = total_duration_above_thresh
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+hist(flight_buzz_hourly$mean_temp)
 ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -786,7 +793,8 @@ ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-
+model_temp <- lm(total_duration_above_threshold ~ mean_temp, data = flight_buzz_hourly)
+summary(model_temp)
 
 
 # Plot
@@ -864,8 +872,8 @@ ggplot(flight_buzz_hourly, aes(x = mean_temp, y = total_duration_above_threshold
   scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
 
 
-
-
+hist(flight_buzz_hourly$mean_temp)
+hist(log(flight_buzz_hourly$total_duration_above_threshold))
 
 #### Exploratory ----
 
@@ -931,29 +939,66 @@ ggplot(flight_buzz_daily, aes(x = date, y = daily_duration_above_threshold)) +
 
 
 
-
+hist(log(flight_buzz_daily$daily_duration_above_threshold))
 
 # Fit separate models for each location_id
+# models_daily <- flight_buzz_daily %>%
+#  group_by(microclimate) %>%
+#  do(model = lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .))
+
+
+# Fit models per microclimate using quasipoisson GLM
 models_daily <- flight_buzz_daily %>%
+  filter(!is.na(daily_duration_above_threshold), !is.na(mean_temp)) %>%
   group_by(microclimate) %>%
-  do(model = lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .))
-
-
-
-# Generate predictions for each location_id
-predictions <- flight_buzz_daily %>%
-  group_by(microclimate) %>%
-  do({
-    model <- lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .)
-    pred <- predict(model, newdata = ., se.fit = TRUE)
+  nest() %>%
+  mutate(model = map(data, ~ glm(daily_duration_above_threshold ~ log(mean_temp), 
+                                 family = quasipoisson(), data = .)))
+# Generate predictions from each model
+predictions <- models_daily %>%
+  mutate(pred_data = map2(data, model, ~ {
+    preds <- predict(.y, newdata = .x, se.fit = TRUE, type = "link")
     tibble(
-      mean_temp = .$mean_temp,
-      daily_duration_above_threshold = .$daily_duration_above_threshold,
-      predicted = exp(pred$fit),  # Convert back from log scale
-      lower_bound = exp(pred$fit - 1.96 * pred$se.fit),
-      upper_bound = exp(pred$fit + 1.96 * pred$se.fit)
+      mean_temp = .x$mean_temp,
+      daily_duration_above_threshold = .x$daily_duration_above_threshold,
+      predicted = exp(preds$fit),
+      lower_bound = exp(preds$fit - 1.96 * preds$se.fit),
+      upper_bound = exp(preds$fit + 1.96 * preds$se.fit)
     )
-  })
+  })) %>%
+  select(microclimate, pred_data) %>%
+  unnest(pred_data)
+
+
+
+
+# Use GLM with quasipoisson family instead of LM
+slopes_flower_adj <- combined_data %>%
+  filter(!is.na(mean_temp), !is.na(total_flower_count), !is.na(daily_duration_above_threshold)) %>%
+  group_by(location_id, microclimate) %>%
+  filter(n() > 2) %>%  # Only keep groups with at least 3 complete rows
+  do(tidy(glm(daily_duration_above_threshold ~ mean_temp + total_flower_count, 
+              family = quasipoisson(), data = .))) %>%
+  filter(term == "mean_temp") %>%
+  rename(slope = estimate)
+
+# Join with mean summer temperature
+slope_temp_df <- slopes_flower_adj %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+# Plot
+ggplot(slope_temp_df, aes(x = summer_temp, y = slope)) +
+  geom_errorbar(aes(ymin = slope - std.error, ymax = slope + std.error, colour = microclimate), width = 0.2) +
+  geom_point(aes(colour = microclimate), size = 3) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_smooth(method = "lm", color = "grey4", se = TRUE) +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "Temperature Sensitivity Slope (adj. for Flower Count)",
+    colour = "Microclimate"
+  ) +
+  theme_classic() +
+  scale_colour_manual(values = c("#440154", "forestgreen", "gold"))
 
 
 
@@ -984,82 +1029,101 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
 
 
 # Fit Bayesian model with group-specific slopes and intercepts for microclimate
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(duration_rounded = round(daily_duration_above_threshold))
+
+hist(flight_buzz_daily$duration_rounded)
+hist(flight_buzz_daily$mean_temp)
+
+flight_buzz_daily %>%
+  summarise(
+    mean_buzz = mean(duration_rounded, na.rm = TRUE),
+    var_buzz = var(duration_rounded, na.rm = TRUE)
+  )
+
+# Bayesian Negative Binomial model
 temp_flight_buzz_bayes <- brm(
-  formula = log(daily_duration_above_threshold) ~ log(mean_temp) * microclimate,
+  formula = duration_rounded ~ mean_temp + (1 + mean_temp | location_id),
   data = flight_buzz_daily,
-  family = gaussian(),
+  family = negbinomial(),
   chains = 4,
   cores = 4,
-  iter = 2000
+  iter = 2000,
+  control = list(adapt_delta = 0.999)
 )
 
-summary(temp_flight_buzz_bayes)
-plot(temp_flight_buzz_bayes)
-pp_check(temp_flight_buzz_bayes)
-
-model_simple <- brm(
-  log(daily_duration_above_threshold) ~ log(mean_temp),
+# Bayesian Negative Binomial model with reparametrization
+temp_flight_buzz_bayes2 <- brm(
+  formula = duration_rounded ~ mean_temp + 
+    (1 | location_id) + (0 + mean_temp | location_id),
   data = flight_buzz_daily,
-  family = gaussian()
-)
-summary(model_simple)
-plot(model_simple)
-pp_check(model_simple)
-
-loo_compare(loo(temp_flight_buzz_bayes), loo(model_simple))
-
-model_site_random <- brm(
-  log(daily_duration_above_threshold) ~ log(mean_temp) * microclimate +
-    (1 + log(mean_temp) | microclimate/location_id),
-  data = flight_buzz_daily,
-  family = gaussian(),
-  chains = 4, cores = 4
+  family = negbinomial(),
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  control = list(adapt_delta = 0.999)
 )
 
-summary(model_site_random)
-plot(model_simple)
-pp_check(model_simple)
+summary(temp_flight_buzz_bayes2)
+plot(temp_flight_buzz_bayes2)
+pp_check(temp_flight_buzz_bayes2)
 
 # sites are the real sampling unit, microclimate is a post-hoc label
-model_site_replicate <- brm(
-  log(daily_duration_above_threshold) ~ log(mean_temp) + (1 + log(mean_temp) | location_id),
-  data = flight_buzz_daily,
-  family = gaussian(),
-  control = list(adapt_delta = 0.99)
-)
 
-summary(model_site_replicate)
-plot(model_site_replicate)
-pp_check(model_site_replicate)
 
 
 # Save last model as an RDS file
-saveRDS(model_site_replicate, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_randomsite_model.rds")
+saveRDS(temp_flight_buzz_bayes2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_negbinomial_model.rds")
 
 # Plot conditional effects per site
-conditional_effects(model_site_replicate, 
+conditional_effects(temp_flight_buzz_bayes2, 
                     effects = "mean_temp", 
                     re_formula = NULL,  # include random effects
                     conditions = data.frame(location_id = unique(flight_buzz_daily$location_id)))
-# Correct way to use conditional_effects() given your model structure
-conditional_effects(model_site_replicate, 
+
+conditional_effects(temp_flight_buzz_bayes2, 
+                    effects = "mean_temp")
+conditional_effects(temp_flight_buzz_bayes2, 
                     effects = "mean_temp", 
-                    re_formula = "~(1 + log(mean_temp)|location_id)")  # Include random slopes for location_id
+                    re_formula = ~(1 + mean_temp | location_id))
+
 
 library(ggeffects)
 # Use ggeffects to generate predictions from your model
-predictions <- ggpredict(model_site_replicate, 
-                        terms = "mean_temp")
+predictions <- ggpredict(temp_flight_buzz_bayes2,
+                         terms = "mean_temp",
+                         bias_correction = TRUE,
+                         interval = "prediction")
+
+predictions_by_site <- ggpredict(
+  temp_flight_buzz_bayes2,
+  terms = c("mean_temp", "location_id"),
+  type = "random",  # includes random effects
+  bias_correction = TRUE,
+  interval = "prediction"
+)
+
+ggplot(flight_buzz_daily, aes(x = mean_temp)) +
+  geom_point(aes(y = daily_duration_above_threshold), alpha = 0.4, colour = "grey") +
+  geom_line(data = predictions_by_site, aes(x = x, y = predicted, colour = group), size = 1) +
+  geom_ribbon(data = predictions_by_site, aes(x = x, ymin = conf.low, ymax = conf.high, fill = group), alpha = 0.15) +
+  labs(
+    x = "Daily Mean Temperature (°C)",
+    y = "Flight Buzz Duration (s)",
+    colour = "Site",
+    fill = "Site"
+  ) +
+  theme_classic() +
+  ylim(0,600)
 
 # Plotting raw data and predictions
-ggplot(flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold)) +
-  geom_point(alpha = 0.4, colour = "grey") +  # Raw data points
+ggplot(flight_buzz_daily, aes(x = mean_temp)) +
+  geom_point(aes(y = daily_duration_above_threshold), alpha = 0.4, colour = "grey") +  # Raw data points
   geom_line(data = predictions, aes(x = x, y = predicted), colour = "steelblue", size = 1) +  # Predicted line
   geom_ribbon(data = predictions, aes(x = x, ymin = conf.low, ymax = conf.high), fill = "steelblue", alpha = 0.1) +  # Confidence interval
   labs(x = "Daily Mean Temperature (°C)",
-       y = "Flight Buzz Duration (s)",
-       title = "Flight Buzz Duration vs. Temperature with Predicted Values") +
-  theme_classic()
+       y = "Flight Buzz Duration (s)") +
+  theme_classic() 
 
 
 # Plotting raw data and predictions
@@ -1071,7 +1135,6 @@ ggplot(flight_buzz_daily, aes(x = mean_temp)) +
        y = "Flight Buzz Duration (s)") +
   theme_classic() +
   ylim(0,600)
-
 
 
 
