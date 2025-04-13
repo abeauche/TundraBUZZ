@@ -130,6 +130,12 @@ flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
     week = floor_date(datetime, unit = "week")
   )
 
+location_microclim <- location_mapping %>%
+  select(location_id, microclimate2)
+
+flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
+  left_join(location_microclim, by = "location_id")
+
 # Save the dataset to a CSV file
 write_csv(flightbuzzes_ARUQ_2024_complete, "./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
 
