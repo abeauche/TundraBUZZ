@@ -40,6 +40,7 @@ flight_buzz_daily <- read_csv("/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.
 flight_buzz_hourly <- read_csv("/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
 mean_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 
 # Make sure datetime is in proper format
 summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
@@ -106,4 +107,30 @@ active_aru_dates_plot <- ggplot(recording_windows_clean, aes(x = datetime, y = f
 ggsave("./outputs/figures/active_aru_dates_plot.pdf", 
        plot = active_aru_dates_plot,   # Save the most recent plot
        width = 10, height = 6)  # Customize the size as needed
+
+
+# Join recording_windows_clean with summary_flightbuzzes_ARUQ_2024, filter dates within recording windows
+flightbuzzes_ARUQ_2024_complete <- recording_windows_clean %>%
+  left_join(summary_flightbuzzes_ARUQ_2024, by = c("location_id", "datetime")) %>%
+  mutate(total_duration_above_threshold = ifelse(is.na(total_duration_above_threshold), 0, total_duration_above_threshold))  # Replace NAs with 0
+
+flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
+  select(-microclimate2)
+
+# Complete dataset
+flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
+  mutate(
+    # Extract time of day (hour, minute, second)
+    time_of_day = format(datetime, "%H:%M:%S"),
+    
+    # Extract date in UTC format
+    date_utc = as.Date(datetime, tz = "UTC"),
+    
+    # Extract week number from datetime
+    week = floor_date(datetime, unit = "week")
+  )
+
+# Save the dataset to a CSV file
+write_csv(flightbuzzes_ARUQ_2024_complete, "./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
+
 
