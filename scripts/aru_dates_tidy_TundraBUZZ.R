@@ -114,6 +114,27 @@ active_aru_dates_plot <- ggplot(recording_windows_clean, aes(x = datetime, y = f
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 10))  # Adjust y-axis text size for better readability
 
+recording_windows_clean <- recording_windows_clean %>%
+  left_join(location_mapping, by = "location_id") %>%
+  select(location_id, datetime, microclimate2)
+
+# Visualize active periods as tiles with space between tiles
+active_aru_dates_plot <- ggplot(recording_windows_clean, aes(
+  x = datetime,
+  y = factor(location_id, levels = rev(ordered_locations)),
+  fill = factor(microclimate2), 
+  colour = factor(microclimate2)
+)) +
+  geom_tile(width = 0.8, height = 0.8) +
+  theme_classic() +
+  labs(x = "2024 Growing Season", y = "Site", colour = "Microclimate", fill = "Microclimate") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), 
+    axis.text.y = element_text(size = 10)
+  ) +
+  scale_fill_manual(values = c("grey44", "#440154", "forestgreen", "gold"))+
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
+
 # Save the plot as a PDF
 ggsave("./outputs/figures/active_aru_dates_plot.pdf", 
        plot = active_aru_dates_plot,   # Save the most recent plot
