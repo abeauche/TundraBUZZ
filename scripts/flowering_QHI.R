@@ -358,12 +358,17 @@ plot(mod_peak)
 pp_check(mod_peak)
 
 # Duration (numeric so no conversion needed)
+mod_duration <- brm(duration_days ~ summer_GDD0, 
+                data = flowering_bayes, family = gaussian(), cores = 4)
+summary(mod_duration)
+plot(mod_duration)
+pp_check(mod_duration)
 # Manually specify initial values for the parameters
 init_values <- function() {
   list(
-    b = rnorm(1, 0, 1),           # Set initial value for the regression coefficient
-    Intercept = rnorm(1, 30, 5),   # Set initial value for the intercept (based on your data)
-    sigma = runif(1, 0.1, 5)       # Set initial value for the standard deviation
+    b = c(rnorm(1, 0, 1)),         # ✅ wrap in c() to make it a vector
+    Intercept = rnorm(1, 30, 5),
+    sigma = runif(1, 0.1, 5)
   )
 }
 
