@@ -140,3 +140,39 @@ flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
 write_csv(flightbuzzes_ARUQ_2024_complete, "./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
 
 
+
+
+
+flightbuzzes_ARUQ_2024_date <- flightbuzzes_ARUQ_2024_complete %>%
+  mutate(
+    date = as.Date(datetime, tz = "America/Whitehorse")  # Convert to local date
+  )
+
+# Step 1: Count how many hours of data are available for each day and location (based on local time)
+complete_days <- flightbuzzes_ARUQ_2024_date %>%
+  group_by(location_id, date) %>%
+  summarise(
+    num_hours = n_distinct(hour(datetime)),
+    .groups = "drop"
+  ) %>%
+  filter(num_hours == 24)  # Keep only days with 24 hours of data (complete days)
+
+# Step 2: Aggregate data by day (for complete days) and keep date_local
+daily_aggregated_data <- flightbuzzes_ARUQ_2024_date %>%  # Only keep complete days
+  group_by(location_id, date) %>%
+  summarise(
+    daily_duration_above_threshold = sum(total_duration_above_threshold, na.rm = TRUE),  # Example of an aggregation, can be changed based on your needs
+    .groups = "drop"
+  )
+# Filter for complete days (by both location_id and date)
+daily_aggregated_data <- daily_aggregated_data %>%
+  semi_join(complete_days, by = c("location_id", "date"))
+
+# View the aggregated dataset
+head(daily_aggregated_data)
+
+daily_flightbuzzes_ARUQ_2024_complete <- daily_aggregated_data %>%
+  left_join(location_microclim, by = "location_id")
+
+# Save the dataset to a CSV file
+write_csv(daily_flightbuzzes_ARUQ_2024_complete, "./data/clean/daily_flight_buzzes_complete_TundraBUZZ.csv")
