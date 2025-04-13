@@ -58,14 +58,25 @@ summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
 # Define the expected time step (30 minutes in this case)
 time_step <- as.difftime(30, units = "mins")
 
-# Get min and max datetime per location_id
+# Round up to next 30-minute mark
+round_up_30min <- function(time) {
+  ceiling_date(time, unit = "30 minutes")
+}
+
+# Round down to previous 30-minute mark
+round_down_30min <- function(time) {
+  floor_date(time, unit = "30 minutes")
+}
+
+# Cleaned recording window with rounded times
 recording_windows <- summary_flightbuzzes_ARUQ_2024 %>%
   group_by(location_id) %>%
   summarise(
-    start = min(datetime),
-    end = max(datetime),
+    start = round_up_30min(min(datetime)),
+    end   = round_down_30min(max(datetime)),
     .groups = "drop"
   )
+
 
 # Generate full sequence of expected times per location
 expected_times <- recording_windows %>%
