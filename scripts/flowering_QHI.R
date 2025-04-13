@@ -37,6 +37,7 @@ mean_summer_temperature <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_
 FloRes_raw <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/5_FloRes_raw.csv")
 FloRes_aggregate_species <- read_csv("/Volumes/TundraBUZZ/FloRes_database/doi_10_5061_dryad_djh9w0w29__v20220825/Data/3_Aggregate_species.csv")
 flower_list <- read_csv("/Volumes/TundraBUZZ/data/raw/flower_list_POLCAM.csv")
+QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 
 #### Tidy data ----
 # Select and format columns of interest
@@ -63,7 +64,7 @@ polcam_data_long <- polcam_data %>%
 polcam_data_long <- polcam_data_long %>%
   mutate(species = sub("^([^_]+_[^_]+)_.*", "\\1", flower_type))
 
-write_csv(polcam_data_long, "/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+# write_csv(polcam_data_long, "/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
 
 # Group per species
 polcam_data_species <- polcam_data_long %>%
@@ -86,7 +87,7 @@ daily_nectar_per_site <- polcam_data_species %>%
   group_by(location_id, date, microclimate) %>%
   summarize(daily_nectar_sugar_mg = sum(daily_nectar_sugar_mg, na.rm = TRUE), .groups = "drop")
 
-write_csv(daily_nectar_per_site, "/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
+# write_csv(daily_nectar_per_site, "/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
 
 
 
@@ -101,6 +102,7 @@ flowering_metrics <- polcam_data_species %>%
     duration_days = as.numeric(difftime(last_flowering, first_flowering, units = "days")),
     .groups = "drop"
   )
+
 
 # Calculate peak flowering (in case of ties, take middle date)
 peak_flowering <- polcam_data_species %>%
@@ -131,19 +133,165 @@ flowering_summary <- flowering_summary %>%
   mutate(last_flowering = as.Date(last_flowering)) %>%
   mutate(peak_flowering = as.Date(peak_flowering))
 
+QHI_temp_daily <- QHI_temp_daily %>%
+  mutate(datetime = as.Date(datetime))
 
-# Plot first flowering date
-ggplot(flowering_summary, aes(x = summer_temp, y = last_flowering)) +
+# Join first flowering dates to GDD data
+flowering_summary <- flowering_summary %>%
+  left_join(QHI_temp_daily %>%
+              select(location_id, datetime, cumulative_GDD0, cumulative_GDD5),
+            by = c("location_id" = "location_id", "first_flowering" = "datetime")) %>%
+  rename(
+    GDD0_first = cumulative_GDD0,
+    GDD5_first = cumulative_GDD5
+  )
+
+# Join last flowering dates to GDD data
+flowering_summary <- flowering_summary %>%
+  left_join(QHI_temp_daily %>%
+              select(location_id, datetime, cumulative_GDD0, cumulative_GDD5),
+            by = c("location_id" = "location_id", "last_flowering" = "datetime")) %>%
+  rename(
+    GDD0_last = cumulative_GDD0,
+    GDD5_last = cumulative_GDD5
+  )
+
+# Join peak flowering dates to GDD data
+flowering_summary <- flowering_summary %>%
+  left_join(QHI_temp_daily %>%
+              select(location_id, datetime, cumulative_GDD0, cumulative_GDD5),
+            by = c("location_id" = "location_id", "peak_flowering" = "datetime")) %>%
+  rename(
+    GDD0_peak = cumulative_GDD0,
+    GDD5_peak = cumulative_GDD5
+  )
+
+
+# Pivot longer for plotting
+flowering_long_GDD0 <- flowering_summary %>%
+  select(location_id, microclimate, 
+         GDD0_first, GDD0_peak, GDD0_last, summer_GDD0) %>%
+  pivot_longer(
+    cols = starts_with("GDD0"),
+    names_to = "phase",
+    values_to = "GDD0"
+  )
+
+
+# Clean and order phase labels
+flowering_long_GDD0$phase <- recode(flowering_long_GDD0$phase,
+                                    "GDD0_first" = "First Flowering",
+                                    "GDD0_peak"  = "Peak Flowering",
+                                    "GDD0_last"  = "Last Flowering")
+
+# Convert to ordered factor
+flowering_long_GDD0$phase <- factor(flowering_long_GDD0$phase,
+                                    levels = c("First Flowering", "Peak Flowering", "Last Flowering"))
+
+# Plot
+ggplot(flowering_long_GDD0, aes(x = microclimate, y = GDD0, fill = phase)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_point(aes(color = phase), 
+             position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8),
+             alpha = 0.7) +
+  labs(
+    x = "Microclimate",
+    y = "Cumulative GDD0",
+    title = "GDD Accumulation at Flowering Phases",
+    fill = "Phenology Phase",
+    color = "Phenology Phase"
+  ) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2")
+
+# Plot
+ggplot(flowering_long_GDD0, aes(x = summer_GDD0, y = GDD0, fill = phase)) +
+  geom_point(aes(color = phase), 
+             alpha = 0.9) +
+  geom_smooth(aes(color = phase), method ="lm") +
+  labs(
+    x = "Summer Total Growing Degree Days (T = 0°C)",
+    y = "Cumulative Growing Degree Days (T = 0°C)",
+    fill = "Phenology Phase",
+    color = "Phenology Phase"
+  ) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2")
+
+
+
+
+# Pivot longer for plotting
+flowering_long_GDD5 <- flowering_summary %>%
+  select(location_id, microclimate, 
+         GDD5_first, GDD5_peak, GDD5_last, summer_GDD5) %>%
+  pivot_longer(
+    cols = starts_with("GDD5"),
+    names_to = "phase",
+    values_to = "GDD5"
+  )
+
+
+# Clean and order phase labels
+flowering_long_GDD5$phase <- recode(flowering_long_GDD5$phase,
+                                    "GDD5_first" = "First Flowering",
+                                    "GDD5_peak"  = "Peak Flowering",
+                                    "GDD5_last"  = "Last Flowering")
+
+# Convert to ordered factor
+flowering_long_GDD5$phase <- factor(flowering_long_GDD5$phase,
+                                    levels = c("First Flowering", "Peak Flowering", "Last Flowering"))
+
+# Plot
+ggplot(flowering_long_GDD5, aes(x = microclimate, y = GDD5, fill = phase)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_point(aes(color = phase), 
+             position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8),
+             alpha = 0.7) +
+  labs(
+    x = "Microclimate",
+    y = "Cumulative GDD5",
+    title = "GDD Accumulation at Flowering Phases",
+    fill = "Phenology Phase",
+    color = "Phenology Phase"
+  ) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2")
+
+# Plot
+ggplot(flowering_long_GDD5, aes(x = summer_GDD5, y = GDD5, fill = phase)) +
+  geom_point(aes(color = phase), 
+             alpha = 0.9) +
+  geom_smooth(aes(color = phase), method ="lm") +
+  labs(
+    x = "Summer Total Growing Degree Days (T = 5°C)",
+    y = "Cumulative Growing Degree Days (T = 5°C)",
+    fill = "Phenology Phase",
+    color = "Phenology Phase"
+  ) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2")
+
+
+
+# Plot last flowering date
+ggplot(flowering_summary, aes(x = summer_GDD0, y = last_flowering)) +
   geom_point(aes(colour = microclimate), size = 3) +
   geom_smooth(method = "lm", se = TRUE, colour = "grey44") +
   scale_y_date(date_labels = "%b %d") +
   labs(
-    x = "Mean Summer Temperature (°C)",
+    x = "Cumulative Summer Degree Growing Days (T = 0°C)",
     y = "First Flowering Date",
     colour = "Microclimate"
   ) +
   theme_classic() +
   scale_colour_manual(values = c("#440154", "forestgreen","gold"))
+
+
 
 
 # Define common theme and color scale
@@ -161,32 +309,46 @@ flowering_bayes <- flowering_summary %>%
   )
 
 
+# Censoring dates with first flowering date before/= to installation date
+flowering_bayes <- flowering_bayes %>%
+  mutate(
+    first_flowering_num = as.numeric(first_flowering - origin_date),
+    censored = if_else(first_flowering == origin_date, "left", "none")  # assuming you have `first_obs_date`
+  )
+
+flowering_bayes$censored <- factor(flowering_bayes$censored, levels = c("none", "left"))
+
+
 
 #### FIT MODELS
 
-# First flowering model
-mod_first <- brm(first_flowering_num ~ summer_temp, 
-                 data = flowering_bayes, family = gaussian(), cores = 4)
+# First flowering model --> censored left given that there is uncertainty regarding start date prior to installation of camera
+mod_first <- brm(
+  first_flowering_num | cens(censored) ~ summer_GDD0,
+  data = flowering_bayes,
+  family = gaussian(),
+  cores = 4
+)
 summary(mod_first)
 plot(mod_first)
 pp_check(mod_first)
 
 # Last flowering model
-mod_last <- brm(last_flowering_num ~ summer_temp, 
+mod_last <- brm(last_flowering_num ~ summer_GDD0, 
                 data = flowering_bayes, family = gaussian(), cores = 4)
 summary(mod_last)
 plot(mod_last)
 pp_check(mod_last)
 
 # Peak flowering model
-mod_peak <- brm(peak_flowering_num ~ summer_temp, 
+mod_peak <- brm(peak_flowering_num ~ summer_GDD0, 
                 data = flowering_bayes, family = gaussian(), cores = 4)
 summary(mod_peak)
 plot(mod_peak)
 pp_check(mod_peak)
 
 # Duration (numeric so no conversion needed)
-mod_duration <- brm(duration_days ~ summer_temp, 
+mod_duration <- brm(duration_days ~ summer_GDD0, 
                     data = flowering_bayes, family = gaussian(), cores = 4)
 summary(mod_duration)
 plot(mod_duration)
