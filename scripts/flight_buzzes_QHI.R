@@ -21,6 +21,8 @@ library(visreg)
 library(patchwork)
 library(cowplot)
 library(viridis)
+library(brms)
+library(tidybayes)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -936,6 +938,8 @@ models_daily <- flight_buzz_daily %>%
   group_by(microclimate) %>%
   do(model = lm(log(daily_duration_above_threshold) ~ log(mean_temp), data = .))
 
+
+
 # Generate predictions for each location_id
 predictions <- flight_buzz_daily %>%
   group_by(microclimate) %>%
@@ -979,8 +983,142 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
 
 
 
+# Fit Bayesian model with group-specific slopes and intercepts for microclimate
+temp_flight_buzz_bayes <- brm(
+  formula = log(daily_duration_above_threshold) ~ log(mean_temp) * microclimate,
+  data = flight_buzz_daily,
+  family = gaussian(),
+  chains = 4,
+  cores = 4,
+  iter = 2000
+)
+
+summary(temp_flight_buzz_bayes)
+plot(temp_flight_buzz_bayes)
+pp_check(temp_flight_buzz_bayes)
+
+model_simple <- brm(
+  log(daily_duration_above_threshold) ~ log(mean_temp),
+  data = flight_buzz_daily,
+  family = gaussian()
+)
+summary(model_simple)
+plot(model_simple)
+pp_check(model_simple)
+
+loo_compare(loo(temp_flight_buzz_bayes), loo(model_simple))
+
+model_site_random <- brm(
+  log(daily_duration_above_threshold) ~ log(mean_temp) * microclimate +
+    (1 + log(mean_temp) | microclimate/location_id),
+  data = flight_buzz_daily,
+  family = gaussian(),
+  chains = 4, cores = 4
+)
+
+summary(model_site_random)
+plot(model_simple)
+pp_check(model_simple)
+
+# sites are the real sampling unit, microclimate is a post-hoc label
+model_site_replicate <- brm(
+  log(daily_duration_above_threshold) ~ log(mean_temp) + (1 + log(mean_temp) | location_id),
+  data = flight_buzz_daily,
+  family = gaussian(),
+  control = list(adapt_delta = 0.99)
+)
+
+summary(model_site_replicate)
+plot(model_site_replicate)
+pp_check(model_site_replicate)
 
 
+# Save last model as an RDS file
+saveRDS(model_site_replicate, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_randomsite_model.rds")
+
+# Plot conditional effects per site
+conditional_effects(model_site_replicate, 
+                    effects = "mean_temp", 
+                    re_formula = NULL,  # include random effects
+                    conditions = data.frame(location_id = unique(flight_buzz_daily$location_id)))
+# Correct way to use conditional_effects() given your model structure
+conditional_effects(model_site_replicate, 
+                    effects = "mean_temp", 
+                    re_formula = "~(1 + log(mean_temp)|location_id)")  # Include random slopes for location_id
+
+library(ggeffects)
+# Use ggeffects to generate predictions from your model
+predictions <- ggpredict(model_site_replicate, 
+                        terms = "mean_temp")
+
+# Plotting raw data and predictions
+ggplot(flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold)) +
+  geom_point(alpha = 0.4, colour = "grey") +  # Raw data points
+  geom_line(data = predictions, aes(x = x, y = predicted), colour = "steelblue", size = 1) +  # Predicted line
+  geom_ribbon(data = predictions, aes(x = x, ymin = conf.low, ymax = conf.high), fill = "steelblue", alpha = 0.1) +  # Confidence interval
+  labs(x = "Daily Mean Temperature (°C)",
+       y = "Flight Buzz Duration (s)",
+       title = "Flight Buzz Duration vs. Temperature with Predicted Values") +
+  theme_classic()
+
+
+# Plotting raw data and predictions
+ggplot(flight_buzz_daily, aes(x = mean_temp)) +
+  geom_point(aes(y = daily_duration_above_threshold), alpha = 0.7, colour = "grey") +  # Raw data points
+  geom_line(data = predictions, aes(x = x, y = predicted), colour = "steelblue", size = 1) +  # Predicted line
+  geom_ribbon(data = predictions, aes(x = x, ymin = conf.low, ymax = conf.high), fill = "steelblue", alpha = 0.1) +  # Confidence interval
+  labs(x = "Daily Mean Temperature (°C)",
+       y = "Flight Buzz Duration (s)") +
+  theme_classic() +
+  ylim(0,600)
+
+
+
+
+
+
+# Add predictions (on response scale)
+flight_buzz_daily_pred <- flight_buzz_daily %>%
+  add_fitted_draws(model_site_replicate, re_formula = NULL)  # Includes random effects
+
+# Summarize predictions, ignoring NA values in 'mean_temp'
+aggregated_predictions <- flight_buzz_daily_pred %>%
+  group_by(mean_temp) %>%
+  summarise(
+    predicted_median = exp(median(.value, na.rm = TRUE)),
+    lower_95 = exp(quantile(.value, probs = 0.025, na.rm = TRUE)),
+    upper_95 = exp(quantile(.value, probs = 0.975, na.rm = TRUE))
+  )
+
+# Plot: predicted lines with uncertainty per site
+ggplot(flight_buzz_daily_pred, aes(x = mean_temp, y = exp(.value), group = .draw)) +
+  geom_line(alpha = 0.1, colour = "grey40") +  # Posterior draws
+  stat_summary(fun = median, geom = "line", colour = "steelblue", size = 1) +  # Median prediction
+  geom_point(data = flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold), inherit.aes = FALSE, alpha = 0.4) +  # Raw data
+  labs(x = "Daily Mean Temperature (°C)",
+       y = "Flight Buzz Duration (s)") +
+  theme_classic()
+
+# Plot the predicted median and credible intervals with the raw data
+ggplot(aggregated_predictions, aes(x = mean_temp, y = predicted_median)) +
+  geom_line(colour = "steelblue", size = 1) +  # Median prediction
+  geom_ribbon(aes(ymin = lower_95, ymax = upper_95), fill = "steelblue", alpha = 0.2) +  # 95% CI
+  geom_point(data = flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold), 
+             inherit.aes = FALSE, alpha = 0.4, colour = "grey") +  # Raw data
+  labs(x = "Daily Mean Temperature (°C)",
+       y = "Flight Buzz Duration (s)") +
+  theme_classic()
+
+
+
+library(ggridges)
+
+ggplot(flight_buzz_daily_pred, aes(x = exp(.value), y = mean_temp, fill = ..x..)) +
+  geom_density_ridges(scale = 0.9, alpha = 0.6) +
+  labs(x = "Predicted Buzz Duration (s)",
+       y = "Daily Mean Temperature (°C)",
+       title = "Density of Predicted Buzz Duration vs. Temperature (All Sites)") +
+  theme_classic()
 
 
 
