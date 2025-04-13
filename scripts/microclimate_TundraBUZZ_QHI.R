@@ -418,7 +418,12 @@ GDD_by_temp <- ggplot(GDD_long, aes(x = summer_temp, y = GDD_value, colour = GDD
     y = "Cumulative Growing Degree Days"
   )
 
-GDD_by_temp
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/GDD_by_temp.pdf",
+  plot = GDD_by_temp,
+  width = 8,       # adjust based on layout
+  height = 10
+)
 
 # Get the slope for each GDD type
 slopes <- GDD_long %>%
