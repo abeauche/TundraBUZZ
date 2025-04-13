@@ -25,6 +25,8 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 location_mapping <- location_mapping %>%
   select(location_id, tomst_id, microclimate, microclimate2)
+location_mapping <- location_mapping %>%
+  mutate(localities = paste0("TOMST", tomst_id, "_QHI"))
 
 # Set file path
 tomst_file_path <- "/Volumes/TundraBUZZ/data/raw/QHI_TOMST_2024_fixed"
@@ -73,20 +75,23 @@ mc_info_clean(tms.f)       # Cleaning log
 # Optional: visualize data to identify unreliable loggers
 # mc_plot_raster(tms.f)
 
-# Remove unreliable sensors/localities
-tms.f <- mc_filter(tms.f, localities = c("TOMST14_QHI", "TOMST8_QHI"), reverse = TRUE)
+# Create localities vector
+localities_to_filter <- location_mapping$localities
+
+# Only filter for relevant locations
+tms.f <- mc_filter(tms.f, localities = localities_to_filter)
 
 # Crop data to start from installation date (adjust date as needed)
 tms.f <- mc_prep_crop(tms.f, start = as.POSIXct("2022-07-31", tz = "UTC"))
 
 # ---- Virtual Sensor Calculations ----
-
 # Volumetric Water Content (VWC) from raw soil moisture signal
-# `soiltype = "universal"` is a safe default
+# soiltype = "universal" is a safe default
 tms.calc <- mc_calc_vwc(tms.f, soiltype = "universal")
 
 # Growing Degree Days (GDD) from soil temperature at 3 cm depth
 tms.calc <- mc_calc_gdd(tms.calc, sensor = "TMS_T3")
+tms.calc <- mc_calc_gdd(tms.calc, sensor = "TMS_T3", t_base = 0)
 
 # Freezing Degree Days (FDD) from same sensor
 tms.calc <- mc_calc_fdd(tms.calc, sensor = "TMS_T3")
@@ -120,6 +125,18 @@ hourly_dt_T3 <- hourly_dt %>%
 hourly_dt_T3 <- hourly_dt_T3 %>%
   select(locality_id, value, datetime_local)
 
+# Select for GDD5
+hourly_dt_GDD5 <- hourly_dt %>%
+  filter(sensor_name == "GDD5_mean") ##only taking TMS_T3_mean
+hourly_dt_GDD5 <- hourly_dt_GDD5 %>%
+  select(locality_id, value, datetime_local)
+
+# Select for GDD0
+hourly_dt_GDD0 <- hourly_dt %>%
+  filter(sensor_name == "GDD0_mean") ##only taking TMS_T3_mean
+hourly_dt_GDD0 <- hourly_dt_GDD0 %>%
+  select(locality_id, value, datetime_local)
+
 # Export object
 hourly_dt_T3[, serial_number:=NULL] ##removing useless col
 hourly_dt_T3[, year := year(datetime_local)]
@@ -127,8 +144,22 @@ hourly_dt_T3[, month := month(datetime_local)]
 hourly_dt_T3[, day := day(datetime_local)]
 hourly_dt_T3[, week := week(datetime_local)]
 
+hourly_dt_GDD5[, serial_number:=NULL] ##removing useless col
+hourly_dt_GDD5[, year := year(datetime_local)]
+hourly_dt_GDD5[, month := month(datetime_local)]
+hourly_dt_GDD5[, day := day(datetime_local)]
+hourly_dt_GDD5[, week := week(datetime_local)]
+
+hourly_dt_GDD0[, serial_number:=NULL] ##removing useless col
+hourly_dt_GDD0[, year := year(datetime_local)]
+hourly_dt_GDD0[, month := month(datetime_local)]
+hourly_dt_GDD0[, day := day(datetime_local)]
+hourly_dt_GDD0[, week := week(datetime_local)]
+
 # Filter for only 2024
 hourly_dt_T3 <- hourly_dt_T3[year == 2024,]
+hourly_dt_GDD5 <- hourly_dt_GDD5[year == 2024,]
+hourly_dt_GDD0 <- hourly_dt_GDD0[year == 2024,]
 
 # Filter for summer months
 hourly_dt_T3_filtered <- hourly_dt_T3 %>%
@@ -141,8 +172,46 @@ hourly_temp_mapped <- location_mapping %>%
   mutate(datetime = datetime_local) %>%
   select(-tomst_id, -datetime_local)
 
-write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
+hourly_GDD5_mapped <- location_mapping %>%
+  mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
+  left_join(hourly_dt_GDD5, by = c("tomst_id" = "locality_id")) %>%
+  mutate(datetime = datetime_local) %>%
+  select(-tomst_id, -datetime_local)
 
+hourly_GDD0_mapped <- location_mapping %>%
+  mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
+  left_join(hourly_dt_GDD0, by = c("tomst_id" = "locality_id")) %>%
+  mutate(datetime = datetime_local) %>%
+  select(-tomst_id, -datetime_local)
+
+# Add cumulative GDD (based on mean hourly GDD)
+hourly_GDD5_mapped <- hourly_GDD5_mapped %>%
+  arrange(location_id, datetime) %>%
+  group_by(location_id) %>%
+  mutate(cumulative_GDD5 = cumsum(value)*4) %>%
+  ungroup()
+hourly_GDD0_mapped <- hourly_GDD0_mapped %>%
+  arrange(location_id, datetime) %>%
+  group_by(location_id) %>%
+  mutate(cumulative_GDD0 = cumsum(value)*4) %>%
+  ungroup()
+
+# Join cumulative GDD5 and GDD0 to daily_temp_mapped by location_id and datetime
+hourly_temp_mapped <- hourly_temp_mapped %>%
+  left_join(
+    hourly_GDD5_mapped %>%
+      select(location_id, datetime, cumulative_GDD5),  # Select only the necessary columns
+    by = c("location_id", "datetime")
+  ) %>%
+  left_join(
+    hourly_GDD0_mapped %>%
+      select(location_id, datetime, cumulative_GDD0),  # Select only the necessary columns
+    by = c("location_id", "datetime")
+  )
+
+write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
+write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly.csv")
+write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly.csv")
 
 
 #### Aggregate into daily data ----
@@ -169,11 +238,25 @@ daily_dt[, week := week(datetime)]
 daily_dt_T3 <- daily_dt %>%
   filter(sensor_name == "TMS_T3_mean") ##only taking TMS_T3_mean
 
+# Select for GDD5
+daily_dt_GDD5 <- daily_dt %>%
+  filter(sensor_name == "GDD5_mean") ##only taking TMS_T3_mean
+daily_dt_GDD5 <- daily_dt_GDD5 %>%
+  select(locality_id, datetime, value, year, month, day, week)
+
+# Select for GDD0
+daily_dt_GDD0 <- daily_dt %>%
+  filter(sensor_name == "GDD0_mean") ##only taking TMS_T3_mean
+daily_dt_GDD0 <- daily_dt_GDD0 %>%
+  select(locality_id, datetime, value, year, month, day, week)
+
 daily_dt_T3 <- daily_dt_T3 %>%
   select(locality_id, datetime, value, year, month, day, week)
 
 # Filter for only 2024
 daily_dt_T3 <- daily_dt_T3[year == 2024,]
+daily_dt_GDD5 <- daily_dt_GDD5[year == 2024,]
+daily_dt_GDD0 <- daily_dt_GDD0[year == 2024,]
 
 # Filter for summer months
 daily_dt_T3_filtered <- daily_dt_T3 %>%
@@ -185,16 +268,100 @@ daily_temp_mapped <- location_mapping %>%
   left_join(daily_dt_T3_filtered, by = c("tomst_id" = "locality_id")) %>%
   select(-tomst_id)
 
+daily_GDD5_mapped <- location_mapping %>%
+  mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
+  left_join(daily_dt_GDD5, by = c("tomst_id" = "locality_id")) %>%
+  select(-tomst_id)
+daily_GDD0_mapped <- location_mapping %>%
+  mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
+  left_join(daily_dt_GDD0, by = c("tomst_id" = "locality_id")) %>%
+  select(-tomst_id)
+
+# Add cumulative GDD (based on mean hourly GDD)
+daily_GDD5_mapped <- daily_GDD5_mapped %>%
+  arrange(location_id, datetime) %>%
+  group_by(location_id) %>%
+  mutate(cumulative_GDD5 = cumsum(value)*96) %>%
+  ungroup()
+daily_GDD0_mapped <- daily_GDD0_mapped %>%
+  arrange(location_id, datetime) %>%
+  group_by(location_id) %>%
+  mutate(cumulative_GDD0 = cumsum(value)*96) %>%
+  ungroup()
+
+# Join cumulative GDD5 and GDD0 to daily_temp_mapped by location_id and datetime
+daily_temp_mapped <- daily_temp_mapped %>%
+  left_join(
+    daily_GDD5_mapped %>%
+      select(location_id, datetime, cumulative_GDD5),  # Select only the necessary columns
+    by = c("location_id", "datetime")
+  ) %>%
+  left_join(
+    daily_GDD0_mapped %>%
+      select(location_id, datetime, cumulative_GDD0),  # Select only the necessary columns
+    by = c("location_id", "datetime")
+  )
+
 write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
+write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
 
 # Order sites by mean summer temperature based on daily temperatures
 ordered_site_temp_summer <- daily_temp_mapped %>%
   group_by(location_id) %>%
-  summarize(summer_temp = mean(value, na.rm = TRUE)) %>%
+  summarize(summer_temp = mean(value, na.rm = TRUE),
+            summer_GDD0 = max(cumulative_GDD0, na.rm = TRUE),
+            summer_GDD5 = max(cumulative_GDD5, na.rm = TRUE)) %>%
   arrange(desc(summer_temp))
 
 write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
+ordered_site_GDD0 <- daily_temp_mapped %>%
+  group_by(location_id, microclimate) %>%
+  summarize(summer_GDD0 = max(cumulative_GDD0, na.rm = TRUE)) %>%
+  arrange(desc(summer_GDD0))
+
+ordered_site_GDD5 <- daily_temp_mapped %>%
+  group_by(location_id, microclimate) %>%
+  summarize(summer_GDD5 = max(cumulative_GDD5, na.rm = TRUE)) %>%
+  arrange(desc(summer_GDD5))
+
+
+
+cumulative_GDD <- ggplot(daily_temp_mapped, aes(x = datetime, colour = microclimate, fill = microclimate)) +
+  # Points for GDD0 and GDD5 with different shapes
+  geom_point(aes(y = cumulative_GDD0, shape = "GDD0"), size = 2, alpha = 0.3) +
+  geom_point(aes(y = cumulative_GDD5, shape = "GDD5"), size = 2, alpha = 0.3) +
+  
+  geom_line(aes(y = cumulative_GDD0, linetype = "GDD0", group = location_id), linewidth = 1, alpha = 0.1) +
+  geom_line(aes(y = cumulative_GDD5, linetype = "GDD5", group = location_id), linewidth = 1, alpha = 0.1) +
+  
+  
+  # Smooth lines with different linetypes
+  geom_smooth(aes(y = cumulative_GDD0, linetype = "GDD0"), method = "loess", se = F) +
+  geom_smooth(aes(y = cumulative_GDD5, linetype = "GDD5"), method = "loess", se = F) +
+  
+  # Labels and themes
+  labs(x = "Date", 
+       y = "Cumulative Growing-Degree-Days",
+       colour = "Microclimate",
+       fill = "Microclimate",
+       shape = "GDD Threshold",
+       linetype = "GDD Threshold") +
+  
+  scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
+  scale_fill_manual(values = c("#440154", "forestgreen", "gold")) +
+  scale_shape_manual(values = c("GDD0" = 16, "GDD5" = 17)) +
+  scale_linetype_manual(values = c("GDD0" = "solid", "GDD5" = "dashed")) +
+  theme_classic()
+
+# Save figure
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/cumulative_GDD.pdf",
+  plot = cumulative_GDD,
+  width = 11,       # adjust based on layout
+  height = 8
+)
 
 #### PLOTTING ----
 #ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
