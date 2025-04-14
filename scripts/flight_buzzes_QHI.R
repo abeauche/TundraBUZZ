@@ -47,7 +47,7 @@ QHI_temp_hourly <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_tempera
 QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
-
+flowering_summary <- read_csv("./data/clean/QHI_flowering_season_2024.csv")
 
 
 #### Format datasets ----
@@ -109,7 +109,7 @@ flight_buzz_hourly <- hourly_summary_flightbuzzes_ARUQ_2024 %>%
 flight_buzz_hourly <- flight_buzz_hourly %>%
   mutate(time_hour = hms::as_hms(floor_date(datetime, unit = "hour")))
 
-write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
+# write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
 
 ## Daily datasets
 flight_buzz_daily <- daily_summary_flightbuzzes_ARUQ_2024 %>%
@@ -118,7 +118,7 @@ flight_buzz_daily <- daily_summary_flightbuzzes_ARUQ_2024 %>%
 flight_buzz_daily <- flight_buzz_daily %>%
   mutate(location_id = as.factor(location_id))
 
-write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
+# write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
 
 
 
@@ -175,12 +175,20 @@ ggplot(peak_temp_df, aes(x = summer_GDD0, y = peak_date)) +
 
 
 #### From flowering_QHI.R
+peak_flowering <- flowering_summary %>%
+  select(location_id, peak_flowering)
+
 peak_temp_flowering <- peak_temp_df %>%
   left_join(peak_flowering, by = "location_id")  # assuming env_summary has mean_summer_temp
 peak_temp_flowering <- peak_temp_flowering %>%
+  filter(!location_id == "BEEBOX") %>%
+  mutate(peak_flowering = as.Date(peak_flowering)
+  ) %>%
+  mutate(peak_date = as.Date(peak_date)
+  ) %>%
   mutate(difference_days = as.numeric(peak_date - peak_flowering)
-) %>%
-  filter(!location_id == "BEEBOX")
+) 
+  
 
 
 ggplot(peak_temp_flowering, aes(x = summer_temp, y = difference_days)) +
@@ -196,7 +204,7 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD0, y = difference_days)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
   labs(
-    x = "Cumulative Summer GDD0 (°C)",
+    x = "Cumulative Summer Growing Degree Days (T = 0°C)",
     y = "Phenological Mismatch"
   ) +
   theme_classic()
@@ -205,10 +213,23 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
   labs(
-    x = "Cumulative Summer GDD5 (°C)",
+    x = "Cumulative Summer Growing Degree Days (T = 5°C)",
     y = "Phenological Mismatch"
   ) +
   theme_classic()
+
+ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
+  geom_smooth(method="lm", colour = "grey20") +
+  geom_point(aes(colour = summer_temp), size = 3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "gray40") +  # 1:1 reference line
+  labs(
+    x = "Peak Flowering Date",
+    y = "Peak Bumblebee Activity Date",
+    colour = "Mean Summer Temperature"
+  ) +
+  scale_colour_viridis_c() +
+  theme_classic()
+
 
 
 # Convert peak_date and peak_flowering to Date class if they are not already
@@ -229,6 +250,105 @@ peak_temp_flowering <- peak_temp_flowering %>%
   mutate(
     peak_date_numeric = peak_date_numeric - 19913.5,
     peak_flowering_numeric = peak_flowering_numeric - 19913.5)
+
+
+# Fit the model
+model_peak <- lm(peak_date_numeric ~ peak_flowering_numeric + summer_temp, data = peak_temp_flowering)
+
+# Interaction model
+model_peak_inter <- lm(peak_date_numeric ~ peak_flowering_numeric * summer_temp, data = peak_temp_flowering)
+
+
+# Summary of model
+summary(model_peak)
+summary(model_peak_inter)
+
+peak_temp_flowering_clean <- peak_temp_flowering %>%
+  na.omit()  # Removes rows with any NA
+
+head(peak_temp_flowering_clean)
+
+# Scale
+library(caret)
+
+# Create a data frame with only the numeric columns that need to be scaled
+numeric_data <- peak_temp_flowering %>%
+  select(peak_date_numeric, peak_flowering_numeric, summer_temp)
+
+# Apply centering and scaling
+preprocessed_data <- preProcess(numeric_data, method = c("center", "scale"))
+
+# Extract the scaled values
+scaled_values <- predict(preprocessed_data, numeric_data)
+
+
+priors <- c(
+  prior(normal(0, 1), class = "b"),  # Main effects (coefficients for predictors)
+  prior(normal(0, 1), class = "b", coef = "peak_flowering_numeric:summer_temp"),  # Interaction
+  prior(normal(0, 5), class = "Intercept"),  # Prior for the intercept
+  prior(exponential(1), class = "sigma")  # Prior for the residual SD
+)
+
+
+model_bayes_scaled <- brm(
+  peak_date_numeric ~ peak_flowering_numeric * summer_temp,
+  data = scaled_values,
+  prior = priors,
+  chains = 4,
+  iter = 4000,
+  warmup = 1000,
+  seed = 123,
+  cores = 4,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(model_bayes_scaled)
+plot(model_bayes_scaled)
+pp_check(model_bayes_scaled)
+
+
+priors_2 <- c(
+  # Main effect priors (flowering and temperature)
+  prior(normal(1, 0.1), class = "b"),  # Expect a 1:1 baseline relationship of peak bumblebee activity according to peak flowering date
+  prior(normal(0, 0.25), class = "b", coef = "peak_flowering_numeric:summer_temp"),  # Expect summer temperature to shift this relationship
+  prior(normal(0, 1), class = "Intercept"), # Intercept prior: data scaled and centered to 0, stdev of 1
+  prior(exponential(1), class = "sigma")  # Residual SD: assuming a positive residual variability but with a rate constraint
+)
+
+
+
+model_bayes_scaled2 <- brm(
+  peak_date_numeric ~ peak_flowering_numeric * summer_temp,
+  data = scaled_values,
+  prior = priors_2,
+  chains = 4,
+  iter = 4000,
+  warmup = 1000,
+  seed = 123,
+  cores = 4,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(model_bayes_scaled2)
+plot(model_bayes_scaled2)
+pp_check(model_bayes_scaled2)
+
+saveRDS(model_bayes_scaled2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
+
+
+library(GGally)
+
+# Create a data frame with the variables of interest
+plot_data <- scaled_values[, c("peak_date_numeric", "peak_flowering_numeric", "summer_temp")]
+
+# Create pairwise scatter plots
+ggpairs(plot_data, 
+        upper = list(continuous = "cor"), 
+        lower = list(continuous = "smooth"), 
+        diag = list(continuous = "barDiag")) +
+  theme_minimal()
+
+
 
 # Now let's plot using ggplot with a separate y-axis for difference_days
 ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
