@@ -17,6 +17,7 @@ library(myClim) ## logger data reading
 library(foreach) ## efficient loop
 library(data.table) ## efficient data.frame  
 library(stringr) ## efficient character manipulation
+library(broom)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -213,6 +214,7 @@ hourly_temp_mapped <- hourly_temp_mapped %>%
 # write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly.csv")
 # write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly.csv")
 
+#### ----
 # hourly_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
 
 #### Aggregate into daily data ----
@@ -307,9 +309,10 @@ daily_temp_mapped <- daily_temp_mapped %>%
 # write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
 # write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
 
+#### ----
 # daily_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 
-# Order sites by mean summer temperature based on daily temperatures
+#### Order sites by mean summer temperature based on daily temperatures ----
 ordered_site_temp_summer <- daily_temp_mapped %>%
   group_by(location_id) %>%
   summarize(summer_temp = mean(value, na.rm = TRUE),
