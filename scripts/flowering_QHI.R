@@ -166,6 +166,16 @@ flowering_summary <- flowering_summary %>%
     GDD5_peak = cumulative_GDD5
   )
 
+# COOL1 has last flowering date on last date of recording, which is beyond last TOMST reading --> manually assign cumulative summmer GDD values
+flowering_summary <- flowering_summary %>%
+  mutate(
+    GDD0_last = if_else(is.na(GDD0_last), 586.919, GDD0_last),
+    GDD5_last = if_else(is.na(GDD5_last), 297.8602, GDD5_last)
+  )
+  
+
+# write_csv(flowering_summary, "./data/clean/QHI_flowering_season_2024.csv")
+
 
 # Pivot longer for plotting
 flowering_long_GDD0 <- flowering_summary %>%
