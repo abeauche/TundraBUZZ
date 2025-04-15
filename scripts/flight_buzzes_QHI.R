@@ -239,12 +239,12 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
 
 ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
   geom_smooth(method="lm", colour = "grey20") +
-  geom_point(aes(colour = summer_temp), size = 3) +
+  geom_point(aes(colour = summer_GDD0), size = 3) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "gray40") +  # 1:1 reference line
   labs(
     x = "Peak Flowering Date",
     y = "Peak Bumblebee Activity Date",
-    colour = "Mean Summer Temperature"
+    colour = "Cumul. GDD\n(T = 0°C)"
   ) +
   scale_colour_viridis_c() +
   theme_classic()
@@ -294,12 +294,17 @@ library(caret)
 numeric_data <- peak_temp_flowering %>%
   select(peak_date_numeric, peak_flowering_numeric, summer_temp)
 
+# Create a data frame with only the numeric columns that need to be scaled
+numeric_data_GDD0 <- peak_temp_flowering %>%
+  select(peak_date_numeric, peak_flowering_numeric, summer_GDD0)
+
 # Apply centering and scaling
 preprocessed_data <- preProcess(numeric_data, method = c("center", "scale"))
+preprocessed_data_GDD0 <- preProcess(numeric_data_GDD0, method = c("center", "scale"))
 
 # Extract the scaled values
 scaled_values <- predict(preprocessed_data, numeric_data)
-
+scaled_values_GDD0 <- predict(preprocessed_data_GDD0, numeric_data_GDD0)
 
 priors <- c(
   prior(normal(0, 1), class = "b"),  # Main effects (coefficients for predictors)
@@ -354,6 +359,54 @@ pp_check(model_bayes_scaled2)
 
 # saveRDS(model_bayes_scaled2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
 model_bayes_scaled2 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
+
+
+priors_GDD0 <- c(
+  prior(normal(1, 0.1), class = "b"),  # Main effects (coefficients for predictors)
+  prior(normal(0, 3), class = "b", coef = "peak_flowering_numeric:summer_GDD0"),  # Interaction
+  prior(normal(0, 1), class = "Intercept"),  # Prior for the intercept
+  prior(exponential(1), class = "sigma")  # Prior for the residual SD
+)
+
+
+model_bayes_GDD0 <- brm(
+  peak_date_numeric ~ peak_flowering_numeric * summer_GDD0,
+  data = scaled_values_GDD0,
+  prior = priors_GDD0,
+  chains = 4,
+  iter = 4000,
+  warmup = 1000,
+  seed = 123,
+  cores = 4,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(model_bayes_GDD0)
+plot(model_bayes_GDD0)
+pp_check(model_bayes_GDD0)
+
+
+conditional_effects(model_bayes_GDD0)
+
+
+# Get model summary
+model_bayes_GDD0_summary <- summary(model_bayes_GDD0)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+
+# View or export to CSV
+# write.csv(model_bayes_GDD0_summary, "outputs/effect_summary_bayes_floweringbuzz_GDD0.csv", row.names = FALSE)
+# saveRDS(model_bayes_GDD0_summary, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
+
+
 
 
 library(GGally)
