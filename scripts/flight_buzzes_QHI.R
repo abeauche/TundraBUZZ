@@ -1856,7 +1856,45 @@ ggplot(flight_buzz_hourly_centered, aes(x = time_hour_shifted, y = total_duratio
   ) +
   theme_classic() +
   ylim(0, 50) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(~location_id)
+
+
+flight_buzz_hourly_centered_beebox <- flight_buzz_hourly_centered %>%
+  filter(location_id == "BEEBOX")
+
+ggplot(flight_buzz_hourly_centered_beebox, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  geom_smooth(method = "loess", colour = "grey44") +
+  labs(x = "Time of Day", 
+       y = "Hourly Detections (s)") +
+  scale_x_continuous(
+    breaks = seq(0, 86400, by = 7200),
+    labels = function(x) format(as.POSIXct((x + 7200) %% 86400, origin = "1970-01-01", tz = "UTC"), "%H:%M")
+  ) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + facet_wrap(~location_id)
+
+
+# Convert 2:18 PM to seconds of the day (2:18 PM (shifted) is 12 * 3600 + 18 * 60 = 50400 + 1080 = 44480 seconds)
+solar_noon_seconds <- 44480
+
+ggplot(flight_buzz_hourly_centered_beebox, aes(x = time_hour_shifted, y = total_duration_above_threshold)) +
+  geom_point(alpha = 0.5) +  
+  geom_smooth(method = "loess", colour = "grey44") +
+  labs(x = "Time of Day", 
+       y = "Hourly Flight Buzz Detection (s)") +
+  scale_x_continuous(
+    breaks = seq(0, 86400, by = 3600),
+    labels = function(x) format(as.POSIXct((x + 7200) %% 86400, origin = "1970-01-01", tz = "UTC"), "%H:%M")
+  ) +
+  theme_classic() +
+  ylim(0, 50) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~location_id) +
+  # Add vertical line for solar noon (2:18 PM UTC)
+  geom_vline(xintercept = solar_noon_seconds, linetype = "dashed", color = "orange2", size = 1) +
+  annotate("text", x = solar_noon_seconds, y = 40, label = "Solar Noon", angle = 90, color = "orange2", vjust = - 0.7)
 
 
 # Prepare data
