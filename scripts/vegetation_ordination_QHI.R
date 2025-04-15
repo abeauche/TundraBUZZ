@@ -48,8 +48,8 @@ vegetation_aru_summary <- vegetation_raw %>%
   summarise(mean_percent_cover = mean(percent.cover, na.rm = TRUE)) %>%
   mutate(mean_percent_cover = ifelse(is.nan(mean_percent_cover), 0, mean_percent_cover))
 
-write.csv(vegetation_plot_summary, file = "./data/clean/QHI_vegetation_plot_2024.csv")
-write.csv(vegetation_aru_summary, file = "./data/clean/QHI_vegetation_aru_2024.csv")
+# write.csv(vegetation_plot_summary, file = "./data/clean/QHI_vegetation_plot_2024.csv")
+# write.csv(vegetation_aru_summary, file = "./data/clean/QHI_vegetation_aru_2024.csv")
 
 
 # Convert to wide format for NMDS
@@ -170,6 +170,23 @@ ordiplot(nmds_result_k2, display = c("species", "sites"), type = "n")
 points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
 legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
+
+
+nmds_data_k2 <- nmds_data_k2 %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+library(viridis)
+
+pdf("./outputs/figures/NMDS_summer_GDD0_k2.pdf", width = 8.2, height = 6)
+ordiplot(nmds_result_k2, display = "sites", type = "n")
+# Assign color based on summer_GDD0 using viridis_c
+points(nmds_result_k2$points, col = viridis(100)[as.numeric(cut(nmds_data_k2$summer_GDD0, breaks = 100))], pch = 19)
+text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
+# Add color legend
+colorbar <- viridis(100)
+legend("topleft", legend = round(seq(min(nmds_data_k2$summer_GDD0), max(nmds_data_k2$summer_GDD0), length.out = 5), 2), 
+       fill = colorbar[seq(1, 100, length.out = 5)], title = "Summer GDD0")
+dev.off()
 
 
 
@@ -317,3 +334,90 @@ legend("topright", legend = c("Core", "Averaged"), col = c("red", "blue"), pch =
 # Add labels for each site based on location_id 
 text(nmds_coords_combined[, 1], nmds_coords_combined[, 2], labels = rownames(nmds_coords_combined), pos = 3, cex = 0.8, col = "black")
 dev.off()
+
+
+
+#### PERMANOVA? ----
+# Running PERMANOVA to test if microclimate gradient significantly explains NMDS axes
+library(vegan)
+
+# Assuming 'nmds_result$points' contains the NMDS coordinates
+# Make sure the rows are in the same order as nmds_data_k2
+community_matrix <- veg_matrix %>%
+  filter(location_id %in% nmds_data_k2$location_id) %>%
+  column_to_rownames("location_id")  # Drop location_id into rownames
+
+# Double-check order consistency
+community_matrix <- community_matrix[match(nmds_data_k2$location_id, rownames(community_matrix)), ]
+
+# Run PERMANOVA (using Bray-Curtis by default)
+permanova_result <- adonis2(community_matrix ~ microclimate, data = nmds_data_k2, permutations = 999)
+
+# View results
+print(permanova_result)
+
+dispersion <- betadisper(vegdist(community_matrix), nmds_data_k2$microclimate)
+anova(dispersion)
+
+ordiplot(nmds_result_k2, display = "sites", type = "n")
+points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
+ordiellipse(nmds_result_k2, nmds_data_k2$microclimate, kind = "sd", label = TRUE, col = colors)
+legend("topright", legend = levels(nmds_data_k2$microclimate), col = colors, pch = 19)
+
+
+# Basic NMDS plot
+ordiplot(nmds_result_k2, display = c("sites"), type = "n")
+
+# Plot points using your custom colors
+points(nmds_result_k2$points,
+       col = colors[nmds_data_k2$microclimate],
+       pch = 19)
+
+text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
+
+# Convex hull function using custom colors
+draw_hull <- function(group) {
+  group_points <- nmds_result_k2$points[nmds_data_k2$microclimate == group, ]
+  hull_indices <- chull(group_points)
+  hull_indices <- c(hull_indices, hull_indices[1])  # close the hull
+  lines(group_points[hull_indices, ], col = colors[group], lwd = 2)
+}
+
+# Draw hulls for each microclimate group
+for (group in names(colors)) {
+  draw_hull(group)
+}
+
+# Add legend
+legend("topleft", legend = names(colors),
+       col = colors, pch = 19, title = "Microclimate")
+
+
+microclimates <- unique(nmds_data_k2$microclimate)
+pairwise_results <- combn(microclimates, 2, simplify = FALSE) %>%
+  purrr::map_df(function(pair) {
+    subset_data <- nmds_data_k2 %>% filter(microclimate %in% pair)
+    subset_matrix <- community_matrix[subset_data$location_id, ]
+    
+    result <- adonis2(subset_matrix ~ microclimate, data = subset_data, permutations = 999)
+    
+    tibble(
+      group1 = pair[1],
+      group2 = pair[2],
+      F_value = result$F[1],
+      R2 = result$R2[1],
+      p_value = result$`Pr(>F)`[1]
+    )
+  })
+
+write_csv(pairwise_results, "./outputs/pairwise_permanova_results.csv")
+
+# Test for homogeneity of dispersion
+dispersion <- betadisper(vegdist(community_matrix), nmds_data_k2$microclimate)
+
+# Test statistically
+anova(dispersion)
+
+# Optional: visualize
+plot(dispersion)
+boxplot(dispersion, main = "Multivariate Dispersion by Microclimate")
