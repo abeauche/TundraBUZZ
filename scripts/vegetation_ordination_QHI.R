@@ -370,7 +370,7 @@ ordiplot(nmds_result_k2, display = c("sites"), type = "n")
 
 # Plot points using your custom colors
 points(nmds_result_k2$points,
-       col = colors[nmds_data_k2$microclimate],
+       col = viridis(100)[as.numeric(cut(nmds_data_k2$summer_GDD0, breaks = 100))],
        pch = 19)
 
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
