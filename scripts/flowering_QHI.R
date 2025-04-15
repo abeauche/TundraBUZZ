@@ -427,9 +427,14 @@ pp_check(mod_duration)
 
 # Save each model as an RDS file
 saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
-saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
-saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
-saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
+# saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
+# saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
+# saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
+
+mod_first <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
+# mod_last <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
+# mod_peak <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
+# mod_duration <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
 
 
 #### Coding club code
@@ -578,7 +583,7 @@ flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate, y = (trait))) +
   geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
   labs(
-    x = "Effect Size and Credible Interval of Mean Summer Temperature",
+    x = "Effect Size and Credible Interval of Cumul. GDD (T = 0°C)",
     y = "Flowering Season Trait"
   ) +
   theme_classic()
