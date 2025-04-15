@@ -25,6 +25,7 @@ library(viridis)
 library(brms)
 library(tidybayes)
 library(slider)
+library(ggeffects)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -48,6 +49,8 @@ QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperat
 location_mapping <- read_csv("./data/raw/location_mapping_TundraBUZZ.csv")
 mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 flowering_summary <- read_csv("./data/clean/QHI_flowering_season_2024.csv")
+polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+daily_nectar_per_site <- read_csv("/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
 
 
 #### Format datasets ----
@@ -119,9 +122,6 @@ flight_buzz_daily <- flight_buzz_daily %>%
   mutate(location_id = as.factor(location_id))
 
 # write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
-
-polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
-daily_nectar_per_site <- read_csv("/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
 
 flower_counts <- polcam_data_long %>%
   group_by(date, location_id) %>%
@@ -351,7 +351,8 @@ summary(model_bayes_scaled2)
 plot(model_bayes_scaled2)
 pp_check(model_bayes_scaled2)
 
-saveRDS(model_bayes_scaled2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
+# saveRDS(model_bayes_scaled2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
+model_bayes_scaled2 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringtempinter.rds")
 
 
 library(GGally)
@@ -367,7 +368,8 @@ ggpairs(plot_data,
   theme_minimal()
 
 
-#### HERE
+#### LINEAR MODELS
+
 # Now let's plot using ggplot with a separate y-axis for difference_days
 ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
   # Plot Peak Date with distinct color
@@ -419,6 +421,163 @@ ggplot(slopes, aes(x = slope, y = variable)) +
   ) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
   theme_classic() 
+
+
+
+#### NOW IN BAYESIAN ----
+
+prior_peak_date <- c(
+  prior(normal(0, 5), class = "Intercept"),  # Intercept with a wide prior
+  prior(normal(-0.04, 0.15), class = "b", coef = "summer_GDD0")  # Negative slope for peak_date
+)
+
+prior_peak_flowering <- c(
+  prior(normal(0, 5), class = "Intercept"),  # Intercept with a wide prior
+  prior(normal(-0.05, 0.15), class = "b", coef = "summer_GDD0")  # Stronger negative slope for peak_flowering (expect greater sensitivity to warming in flowering phenology)
+)
+
+prior_difference_days <- c(
+  prior(normal(0, 5), class = "Intercept"),  # Intercept with a wide prior
+  prior(normal(0.02, 0.3), class = "b", coef = "summer_GDD0")  # Positive slope for difference_days
+)
+
+
+# Fit Bayesian models with informed priors (from your earlier code)
+model_peak_date_bayesian <- brm(
+  peak_date_numeric ~ summer_GDD0,
+  data = peak_temp_flowering,
+  prior = prior_peak_date,
+  chains = 4, cores = 4, iter = 2000
+)
+
+model_peak_flowering_bayesian <- brm(
+  peak_flowering_numeric ~ summer_GDD0,
+  data = peak_temp_flowering,
+  prior = prior_peak_flowering,
+  chains = 4, cores = 4, iter = 2000
+)
+
+model_difference_days_bayesian <- brm(
+  difference_days ~ summer_GDD0,
+  data = peak_temp_flowering,
+  prior = prior_difference_days,
+  chains = 4, cores = 4, iter = 2000
+)
+
+
+summary(model_peak_date_bayesian)
+plot(model_peak_date_bayesian)
+pp_check(model_peak_date_bayesian)
+# saveRDS(model_peak_date_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
+# model_peak_date_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
+
+summary(model_peak_flowering_bayesian)
+plot(model_peak_flowering_bayesian)
+pp_check(model_peak_flowering_bayesian)
+# saveRDS(model_peak_flowering_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
+# model_peak_flowering_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
+
+summary(model_difference_days_bayesian)
+plot(model_difference_days_bayesian)
+pp_check(model_difference_days_bayesian)
+# saveRDS(model_difference_days_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
+# model_difference_days_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
+
+
+# Generate predictions for each model
+pred_peak_date <- ggpredict(model_peak_date_bayesian, terms = "summer_GDD0")
+pred_peak_flowering <- ggpredict(model_peak_flowering_bayesian, terms = "summer_GDD0")
+pred_difference_days <- ggpredict(model_difference_days_bayesian, terms = "summer_GDD0")
+
+# Plot the predictions with confidence intervals using ggplot
+bayes_mismatch_plot <- ggplot() +
+  # Plot predictions for Peak Date
+  geom_line(data = pred_peak_date, aes(x = x, y = predicted, color = "Peak Bumblebee Activity"), size = 1.2) +
+  geom_ribbon(data = pred_peak_date, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Bumblebee Activity"), alpha = 0.2) +
+  geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = peak_date_numeric, color = "Peak Bumblebee Acticity")) +
+  
+  # Plot predictions for Peak Flowering
+  geom_line(data = pred_peak_flowering, aes(x = x, y = predicted, color = "Peak Flowering"), size = 1.2) +
+  geom_ribbon(data = pred_peak_flowering, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Flowering"), alpha = 0.2) +
+  geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = peak_flowering_numeric, color = "Peak Flowering")) +
+  
+  # Plot predictions for Mismatch
+  geom_line(data = pred_difference_days, aes(x = x, y = predicted, color = "Mismatch"), size = 1.2) +
+  geom_ribbon(data = pred_difference_days, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Mismatch"), alpha = 0.2) +
+  geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = difference_days, color = "Mismatch")) +
+  
+  # Customize the plot
+  labs(
+    x = "Cumulative Growing Degree Days (T = 0°C)",
+    y = "Phenological Timing / Mismatch",
+    color = "Phenological Metric",
+    fill = "Phenological Metric"
+  ) +
+  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  theme_classic() #+
+  # theme(legend.position = "bottom")
+
+
+# Save the combined plot
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/bayes_mismatch_plot.pdf",
+  plot = bayes_mismatch_plot,
+  width = 10,       # adjust based on layout
+  height = 8
+)
+
+
+
+
+# Extract posterior samples for the coefficient of summer_GDD0 (slope)
+posterior_peak_date <- posterior_samples(model_peak_date_bayesian, pars = "b_summer_GDD0")
+posterior_peak_flowering <- posterior_samples(model_peak_flowering_bayesian, pars = "b_summer_GDD0")
+posterior_difference_days <- posterior_samples(model_difference_days_bayesian, pars = "b_summer_GDD0")
+
+# Calculate the 95% credible intervals and the effect size (mean)
+summary_peak_date <- data.frame(
+  effect = "Peak Date",
+  mean = mean(posterior_peak_date$b_summer_GDD0),
+  lower = quantile(posterior_peak_date$b_summer_GDD0, 0.025),
+  upper = quantile(posterior_peak_date$b_summer_GDD0, 0.975)
+)
+
+summary_peak_flowering <- data.frame(
+  effect = "Peak Flowering",
+  mean = mean(posterior_peak_flowering$b_summer_GDD0),
+  lower = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025),
+  upper = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025)
+)
+
+summary_difference_days <- data.frame(
+  effect = "Mismatch",
+  mean = mean(posterior_difference_days$b_summer_GDD0),
+  lower = quantile(posterior_difference_days$b_summer_GDD0, 0.025),
+  upper = quantile(posterior_difference_days$b_summer_GDD0, 0.975)
+)
+
+# Combine all summaries into one dataframe
+summary_df <- bind_rows(summary_peak_date, summary_peak_flowering, summary_difference_days)
+
+# Plot the slopes with 95% credible intervals using ggplot
+ggplot(summary_df, aes(x = effect, y = mean, ymin = lower, ymax = upper)) +
+  geom_point(size = 3, color = "darkblue") +  # Effect size point (mean slope)
+  geom_errorbar(width = 0.1, color = "darkblue") +  # 95% credible intervals
+  labs(
+    x = "Phenological Metric",
+    y = "Slope (Effect Size) of summer_GDD0",
+    title = "Bayesian Slopes for summer_GDD0 with 95% Credible Intervals"
+  ) +
+  scale_color_manual(values = c("Peak Date" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  scale_fill_manual(values = c("Peak Date" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  theme_classic() +
+  theme(legend.position = "top")
+
+
+
+
+
 
 
 
