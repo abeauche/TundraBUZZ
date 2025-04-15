@@ -878,7 +878,21 @@ polcam_data_grouped$location_id <- factor(polcam_data_grouped$location_id,
 # Ridge plot
 flowering_temperature_ridgeplot <- ggplot(polcam_data_grouped, aes(x = date, y = location_id, height = total_flower_count, fill = summer_temp)) +
   geom_density_ridges(stat = "identity", scale = 2.5, alpha = 0.7) +
-  scale_fill_viridis_c(name = "Mean Summer Temp (°C)") +
+  scale_fill_viridis_c(name = "Mean Summer\nTemp (°C)") +
+  labs(
+    x = "2024 Growing Season",
+    y = "Total Flower Count per Site"
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right"
+  )
+
+# Ridge plot
+flowering_temperature_ridgeplot_GDD0 <- ggplot(polcam_data_grouped, aes(x = date, y = location_id, height = total_flower_count, fill = summer_GDD0)) +
+  geom_density_ridges(stat = "identity", scale = 2.5, alpha = 0.7) +
+  scale_fill_viridis_c(name = "Cumul. Summer\nGDD (T = 0°C)") +
   labs(
     x = "2024 Growing Season",
     y = "Total Flower Count per Site"
@@ -892,6 +906,13 @@ flowering_temperature_ridgeplot <- ggplot(polcam_data_grouped, aes(x = date, y =
 ggsave(
   filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flowering_temperature_ridgeplot.pdf",
   plot = flowering_temperature_ridgeplot,
+  width = 8,
+  height = 6
+)
+
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flowering_temperature_ridgeplot_GDD0.pdf",
+  plot = flowering_temperature_ridgeplot_GDD0,
   width = 8,
   height = 6
 )
