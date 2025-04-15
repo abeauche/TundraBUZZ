@@ -1267,7 +1267,10 @@ updated_combined_transformed <- updated_combined_transformed %>%
     summer_GDD0_z = (summer_GDD0 - summary_stats$summer_GDD0_mean) / summary_stats$summer_GDD0_sd
   )
 
-
+updated_combined_transformed <- updated_combined_transformed %>%
+  arrange(date) %>%
+  mutate(date_num = as.numeric(((date - min(date))/86400) +1)) %>%
+  ungroup()
 
 
 # Define the model formula with interaction terms
@@ -1281,28 +1284,41 @@ model_interaction_term <- brmsformula(
     night_length_hours_z +  # Main effect of night length
     flowering_present * summer_GDD0_z +  # Main effect of flowering presence
     night_absent +  # Main effect of night absence
-    (1 | location_id) + ar(gr = location_id, cov = TRUE) # Random intercept for location_id and temporal autocorrelation
+    (1 | location_id) + ar(time = date_num, gr = location_id, cov = TRUE) # Random intercept for location_id and temporal autocorrelation
 )
 
-env_model <- brm(
+summary(updated_combined_transformed$flowering_present)
+summary(updated_combined_transformed$daily_nectar_sugar_mg_z)
+summary(updated_combined_transformed$summer_GDD0_z)
+
+get_prior(
+  formula = model_interaction_term,
+  data = updated_combined_transformed,
+  family = negbinomial()
+)
+
+env_model2 <- brm(
   formula = model_interaction_term,
   data = updated_combined_transformed,
   family = negbinomial(),
   prior = c(
     # Priors for fixed effects
-    prior(normal(1, 0.5), class = "b", coef = "mean_temp_z"),  
-    prior(normal(1, 0.5), class = "b", coef = "daily_nectar_sugar_mg_z"),  
-    prior(normal(-1, 0.5), class = "b", coef = "mean_wind_speed_z"),  
+    prior(normal(0.5, 0.5), class = "b", coef = "mean_temp_z"),  
+    prior(normal(0.5, 0.5), class = "b", coef = "daily_nectar_sugar_mg_z"),  
+    prior(normal(-0.5, 0.5), class = "b", coef = "mean_wind_speed_z"),  
     prior(normal(0, 1), class = "b", coef = "mean_stn_press_k_pa_z"),  
-    prior(normal(-1, 0.5), class = "b", coef = "avg_air_rh_1m_z"),  
-    prior(normal(-1, 0.5), class = "b", coef = "night_length_hours_z"), 
+    prior(normal(-0.5, 0.5), class = "b", coef = "avg_air_rh_1m_z"),  
+    prior(normal(-0.5, 0.5), class = "b", coef = "night_length_hours_z"), 
     prior(normal(0.5, 0.5), class = "b", coef = "flowering_present"),
-    prior(normal(0.2, 1), class = "b", coef = "night_absent"),
+    prior(normal(0.5, 1), class = "b", coef = "night_absent"),
+    prior(normal(-0.3, 0.5), class = "b", coef = "mean_temp_z:summer_GDD0_z"),
+    prior(normal(-0.3, 0.5), class = "b", coef = "summer_GDD0_z:daily_nectar_sugar_mg_z"),
+    prior(normal(-0.3, 0.5), class = "b", coef = "summer_GDD0_z:flowering_present"),
     
     
     
     # Intercept
-    prior(normal(0, 1), class = "Intercept"),
+    prior(normal(0, 5), class = "Intercept"),
     
     # Random effects
     prior(exponential(1), class = "sd", group = "location_id")
@@ -1311,12 +1327,31 @@ env_model <- brm(
   iter = 4000,
   warmup = 2000,
   control = list(adapt_delta = 0.999, max_treedepth = 15),
-  file = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_env_model_updated.rds"
+  file = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_env_model_updated2.rds"
 )
+
+summary(env_model2)
+plot(env_model2)
+pp_check(env_model2)
 
 
 summary(env_model)
 pp_check(env_model)
+
+
+# Run loo for both models
+loo_env <- loo(env_model)
+loo_env2 <- loo(env_model2)
+loo_nb_model <- loo(nb_model)
+
+nrow(loo_env$data)  # Check the number of rows for the data used in loo_env
+nrow(loo_env2$data) # Check the number of rows for the data used in loo_env2
+nrow(loo_nb_model$data) # Check the number of rows for the data used in loo_nb_model
+
+# Compare the LOO results
+library(loo)
+loo_compare(loo_env, loo_env2)
+
 
 
 
@@ -2305,12 +2340,70 @@ summary(temp_flight_buzz_bayes2)
 plot(temp_flight_buzz_bayes2)
 pp_check(temp_flight_buzz_bayes2)
 
+flight_buzz_daily <- flight_buzz_daily %>%
+  left_join(mean_summer_temp, by = "location_id")
+  
+
+flight_buzz_daily <- flight_buzz_daily %>%
+  arrange(date) %>%
+  mutate(date_num = as.numeric(((date - min(date))/86400) +1)) %>%
+  ungroup()
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(mean_temp_center = scale(mean_temp, center = TRUE, scale = FALSE))  # Center only
+
+hist(flight_buzz_daily$duration_rounded)
+hist(flight_buzz_daily$mean_temp)
+hist(flight_buzz_daily$mean_temp_center)
+
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(
+    summer_GDD0_100s_c = (summer_GDD0 / 100) - mean(summer_GDD0 / 100, na.rm = TRUE)
+  )
+
+hist(flight_buzz_daily$summer_GDD0_100s_c)
+
+prior <- c(
+  # Fixed effects
+  prior(normal(0.5, 0.3), class = "b", coef = "mean_temp_center"),
+  prior(normal(0, 0.3), class = "b", coef = "summer_GDD0_100s_c"),
+  prior(normal(-0.3, 0.3), class = "b", coef = "mean_temp_center:summer_GDD0_100s_c"),
+  
+  # Intercept
+  prior(normal(4, 3), class = "Intercept"),  # log-scale; covers durations ~50–400
+  
+  # Random effects
+  prior(exponential(1), class = "sd", group = "location_id"),
+  prior(lkj(2), class = "cor"),
+  
+  # AR(1) term
+  prior(lkj(2), class = "ar")
+)
+
+temp_flight_buzz_bayes3 <- brm(
+  formula = duration_rounded ~ mean_temp_center * summer_GDD0_100s_c +
+    (1 + mean_temp_center | location_id) + ar(time = date_num, gr = location_id, cov = TRUE),
+  data = flight_buzz_daily,
+  family = negbinomial(),
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(temp_flight_buzz_bayes3)
+plot(temp_flight_buzz_bayes3)
+pp_check(temp_flight_buzz_bayes3)
+
 # sites are the real sampling unit, microclimate is a post-hoc label
 
 
 
 # Save last model as an RDS file
 saveRDS(temp_flight_buzz_bayes2, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_negbinomial_model.rds")
+temp_flight_buzz_bayes2 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_negbinomial_model.rds")
+
+saveRDS(temp_flight_buzz_bayes3, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/temp_activity_negbinomial_model_3.rds")
+
 
 # Plot conditional effects per site
 conditional_effects(temp_flight_buzz_bayes2, 
@@ -2379,7 +2472,7 @@ ggplot(flight_buzz_daily, aes(x = mean_temp)) +
 
 # Add predictions (on response scale)
 flight_buzz_daily_pred <- flight_buzz_daily %>%
-  add_fitted_draws(model_site_replicate, re_formula = NULL)  # Includes random effects
+  add_fitted_draws(temp_flight_buzz_bayes2, re_formula = NULL)  # Includes random effects
 
 # Summarize predictions, ignoring NA values in 'mean_temp'
 aggregated_predictions <- flight_buzz_daily_pred %>%
