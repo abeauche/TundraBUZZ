@@ -120,6 +120,24 @@ flight_buzz_daily <- flight_buzz_daily %>%
 
 # write_csv(flight_buzz_daily, "/Volumes/TundraBUZZ/data/clean/flight_buzz_daily.csv")
 
+polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
+daily_nectar_per_site <- read_csv("/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
+
+flower_counts <- polcam_data_long %>%
+  group_by(date, location_id) %>%
+  summarize(total_flower_count = sum(count, na.rm = TRUE), .groups = "drop") %>%
+  filter(total_flower_count > 0)
+
+flower_counts <- flower_counts %>%
+  left_join(daily_nectar_per_site, by = c("location_id", "date"))
+
+
+# Merge the two datasets
+combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "location_id", "microclimate"))
+
+combined_data_filtered <- combined_data %>%
+  filter(!location_id == "BEEBOX")
+
 
 
 #### Obtain 3-day moving average with the highest bumblebee activity per site
@@ -349,7 +367,7 @@ ggpairs(plot_data,
   theme_minimal()
 
 
-
+#### HERE
 # Now let's plot using ggplot with a separate y-axis for difference_days
 ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
   # Plot Peak Date with distinct color
@@ -414,14 +432,14 @@ flight_buzz_daily_beebox <- flight_buzz_daily %>%
 # Plot flight buzzes over time
 ggplot(flight_buzz_daily_sites, aes(x = date, y = daily_duration_above_threshold)) +
   geom_point() +  
-  geom_smooth(method="loess", aes(colour = microclimate)) +
+  geom_smooth(method="loess", aes(colour = microclimate, group = location_id), se = F) +
   labs(x = "2024 Growing Season", 
        y = "Daily Bumblebee Flight Buzz Detections (s)",
        colour = "Microclimate") +
   ylim(0, 600) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_wrap(~location_id) +
+  facet_wrap(~microclimate, ncol = 1) +
   scale_colour_manual(values = c("#440154", "forestgreen","gold"))
 
 # Plot flight buzzes at BEEBOX over time
@@ -510,9 +528,19 @@ ggplot(flight_buzz_daily_beebox, aes(x = mean_temp, y = daily_duration_above_thr
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~location_id) 
 
+#### ----
+
+#### ACROSS ALL SITES ----
+ggplot(combined_data_filtered, aes(x = daily_nectar_sugar_mg, y = daily_duration_above_threshold)) +
+  geom_point() +  
+  geom_smooth(method="lm", colour = "grey44") +
+  labs(x = "Daily Nectar Sugar Availability (mg)", 
+       y = "Daily Bumblebee Flight Buzz Detections (s)") +
+  ylim(0, 600) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-### ACROSS ALL SITES
 ggplot(flight_buzz_daily, aes(x = mean_wind_speed, y = daily_duration_above_threshold)) +
   geom_point() +  
   geom_smooth(method="lm", colour = "grey44") +
@@ -576,22 +604,302 @@ ggplot(flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold)
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+#### ----
+
+#### Preparing climate variables for Bayesian model ----
+combined_data_filtered 
+
+hist(combined_data_filtered$mean_temp) # normal ish
+hist(log(combined_data_filtered$daily_nectar_sugar_mg)) # zero inflated
+hist(combined_data_filtered$mean_wind_speed) # normal ish, right skew
+hist(combined_data_filtered$mean_stn_press_k_pa) # normal
+hist(combined_data_filtered$predominant_wind_dir) # bimodal
+hist(combined_data_filtered$avg_air_rh_1m) # normal ish? left skewed
+hist(combined_data_filtered$day_length_hours) # super 24 inflated, maybe do log(night length)?
+hist(combined_data_filtered$cloud_cover_pct) # flat
+
+
+library(corrplot)
+numeric_vars <- combined_data_filtered %>%
+  select(mean_temp, daily_nectar_sugar_mg, mean_wind_speed,
+         mean_stn_press_k_pa, predominant_wind_dir, avg_air_rh_1m, day_length_hours,
+         cloud_cover_pct)
+
+corrplot(cor(na.omit(numeric_vars)), method = "color", type = "upper")
+
+cor_matrix <- cor(numeric_vars, use = "complete.obs")
+
+cor_df <- as.data.frame(as.table(cor_matrix)) %>%
+  filter(Var1 != Var2) %>%                        # remove self-correlations
+  filter(abs(Freq) > 0.7) %>%                     # filter for high correlations
+  arrange(desc(abs(Freq)))                        # sort by correlation strength
+
+# 4. View the results
+cor_df
+
+
+# Scale/standardize predictors if needed to help with convergence
+combined_data_filtered_transformed2 <- combined_data_filtered %>%
+  mutate(
+    # Replace zeros with NA for nectar sugar
+    daily_nectar_sugar_mg = ifelse(daily_nectar_sugar_mg == 0, NA, daily_nectar_sugar_mg),
+    
+    # Log-transform nectar sugar with +1 to avoid issues with zero values
+    daily_nectar_sugar_mg = log(daily_nectar_sugar_mg + 1),
+    
+    # Apply other transformations and scaling to other variables
+    mean_wind_speed = log(mean_wind_speed + 1),
+    avg_air_rh_1m = log(avg_air_rh_1m + 1),
+    day_length_hours = 24 - day_length_hours)
+    
+
+combined_data_filtered_transformed <- combined_data_filtered_transformed2 %>%
+  mutate(
+        # Scale and center continuous predictors
+    across(
+      c(mean_temp, daily_nectar_sugar_mg, mean_wind_speed, mean_stn_press_k_pa, predominant_wind_dir, avg_air_rh_1m, day_length_hours, cloud_cover_pct),
+    ~ as.numeric(scale(.)),
+    .names = "{.col}_z"
+  )) %>%
+  mutate(daily_duration_above_threshold = daily_duration_above_threshold / 0.15) %>%
+  select(
+    location_id, date, microclimate, daily_duration_above_threshold,
+    ends_with("_z")
+  )
+
+combined_data_filtered_transformed$daily_duration_above_threshold <- 
+  as.integer(combined_data_filtered_transformed$daily_duration_above_threshold)
+hist(combined_data_filtered_transformed$mean_temp_z) # normal ish
+hist(log(combined_data_filtered_transformed$daily_nectar_sugar_mg_z)) # zero inflated
+hist(combined_data_filtered_transformed$mean_wind_speed_z) # normal ish, right skew
+hist(combined_data_filtered_transformed$mean_stn_press_k_pa_z) # normal
+hist(combined_data_filtered_transformed$predominant_wind_dir_z) # bimodal
+hist(combined_data_filtered_transformed$avg_air_rh_1m_z) # normal ish? left skewed
+hist(combined_data_filtered_transformed$day_length_hours_z) # super 24 inflated, maybe do log(night length)?
+hist(combined_data_filtered_transformed$cloud_cover_pct_z) # flat
+ 
+
+# Convert date to numeric (e.g., number of days since the start)
+combined_data_filtered_transformed <- combined_data_filtered_transformed %>%
+  mutate(date_numeric = as.numeric(difftime(date, min(date), units = "days")))
+acf(combined_data_filtered_transformed$daily_duration_above_threshold)
+
+# Check the proportion of zeros in your data
+mean(combined_data_filtered$daily_duration_above_threshold == 0)
+
+# Fit a negative binomial model
+
+# Step 1: Define the formula correctly using brmsformula()
+my_formula <- brmsformula(
+  daily_duration_above_threshold ~ 
+    mean_temp_z + 
+    daily_nectar_sugar_mg_z + 
+    mean_wind_speed_z + 
+    mean_stn_press_k_pa_z + 
+    avg_air_rh_1m_z + 
+    day_length_hours_z + 
+    cloud_cover_pct_z + 
+    (mean_temp_z + daily_nectar_sugar_mg_z | location_id) + ar(gr = location_id, cov = TRUE)
+)
+
+# Then pass the AR(1) separately with grouping via the main brm() call:
+nb_model <- brm(
+  formula = my_formula,
+  data = combined_data_filtered_transformed,
+  family = negbinomial(),
+  prior = c(
+    # Priors for fixed effects
+    prior(normal(1, 0.5), class = "b", coef = "mean_temp_z"),  
+    prior(normal(1, 0.5), class = "b", coef = "daily_nectar_sugar_mg_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "mean_wind_speed_z"),  
+    prior(normal(0, 1), class = "b", coef = "mean_stn_press_k_pa_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "avg_air_rh_1m_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "day_length_hours_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "cloud_cover_pct_z"),  
+    
+    # Intercept
+    prior(normal(0, 1), class = "Intercept"),
+    
+    # Random effects
+    prior(exponential(1), class = "sd", group = "location_id")
+  ),
+  chains = 4,
+  iter = 4000,
+  warmup = 2000,
+  control = list(adapt_delta = 0.999, max_treedepth = 15)
+)
+
+# Check the summary of the model
+summary(nb_model)
+plot(nb_model)
+pp_check(nb_model)
+
+saveRDS(nb_model, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
+
+# Use ggpredict to generate predictions for each predictor
+# Replace 'nb_model' with the name of your fitted model
+library(ggeffects)
+predictions <- ggpredict(nb_model, terms = c("mean_temp_z", "daily_nectar_sugar_mg_z", "mean_wind_speed_z", "mean_stn_press_k_pa_z", "avg_air_rh_1m_z", "day_length_hours_z", "cloud_cover_pct_z"), bias_correction = TRUE)
+
+
+
+
+# 1. List of variables that were z-transformed
+vars_to_detransform <- c("mean_temp", "daily_nectar_sugar_mg", 
+                         "mean_wind_speed", "mean_stn_press_k_pa", 
+                         "avg_air_rh_1m", "day_length_hours", 
+                         "cloud_cover_pct")
+
+# 2. Calculate the means and standard deviations for each variable
+means <- sapply(vars_to_detransform, function(var) mean(combined_data_filtered_transformed2[[var]], na.rm = TRUE))
+sds <- sapply(vars_to_detransform, function(var) sd(combined_data_filtered_transformed2[[var]], na.rm = TRUE))
+
+# 3. Detransform the z-scored variables using the calculated means and sds
+vars_to_detransform_z <- paste0(vars_to_detransform, "_z")  # Create corresponding z-scored variable names
+
+for (i in seq_along(vars_to_detransform_z)) {
+  var_name <- vars_to_detransform[i]  # Original variable name
+  var_z_name <- vars_to_detransform_z[i]  # Z-scored variable name
+  
+  # Detransform the z-scored variable using its mean and standard deviation
+  combined_data_filtered_transformed[[var_name]] <- 
+    combined_data_filtered_transformed[[var_z_name]] * sds[var_name] + means[var_name]
+}
+
+
+
+
+
+
+
+##########
+
+combined_data_filtered_transformed2 <- combined_data_filtered %>%
+  mutate(
+    # Replace zeros with NA for nectar sugar
+    daily_nectar_sugar_mg = ifelse(daily_nectar_sugar_mg == 0, NA, daily_nectar_sugar_mg),
+    
+    # Log-transform nectar sugar with +1 to avoid issues with zero values
+    daily_nectar_sugar_mg = log(daily_nectar_sugar_mg + 1),
+    
+    # Apply other transformations and scaling to other variables
+    mean_wind_speed = log(mean_wind_speed + 1),
+    avg_air_rh_1m = log(avg_air_rh_1m + 1),
+    day_length_hours = 24 - day_length_hours)
+
+
+
+
+# Plot for 'mean_temp_z'
+pred_temp <- ggpredict(nb_model, terms = "mean_temp_z")
+plot(pred_temp) +
+  labs(title = "Predicted Relationship: Mean Temperature vs. Duration Above Threshold",
+       x = "Mean Temperature (z-scored)",
+       y = "Predicted Duration Above Threshold") +
+  theme_minimal()
+
+# Plot for 'daily_nectar_sugar_mg_z'
+pred_nectar <- ggpredict(nb_model, terms = "daily_nectar_sugar_mg_z")
+plot(pred_nectar) +
+  labs(title = "Predicted Relationship: Nectar Sugar vs. Duration Above Threshold",
+       x = "Daily Nectar Sugar (z-scored)",
+       y = "Predicted Duration Above Threshold") +
+  theme_minimal()
+
+
+
+
+
+# Logistic regression model for flower presence
+logistic_model <- brm(
+  formula = flower_present ~ daily_nectar_sugar_mg + mean_temp + mean_wind_speed + 
+    mean_stn_press_k_pa + avg_air_rh_1m + day_length_hours + cloud_cover_pct,
+  family = bernoulli(),  # Logistic regression for binary outcome (presence/absence)
+  data = combined_data_filtered,
+  prior = c(
+    prior(normal(0, 5), class = "b"),  # Priors for coefficients
+    prior(normal(0, 5), class = "Intercept")
+  ),
+  chains = 4, 
+  iter = 2000, 
+  warmup = 1000
+)
+
+# Check the summary of the logistic model
+summary(logistic_model)
+
+
+# Negative Binomial model for activity given flower presence
+count_model <- brm(
+  formula = daily_duration_above_threshold ~ daily_nectar_sugar_mg + mean_temp + mean_wind_speed + 
+    mean_stn_press_k_pa + avg_air_rh_1m + day_length_hours + cloud_cover_pct + 
+    (1 | location_id),
+  family = negbinomial(),  # Negative Binomial distribution for count data
+  data = combined_data_filtered,
+  prior = c(
+    prior(normal(0, 5), class = "b"),  # Priors for coefficients
+    prior(normal(0, 5), class = "Intercept"),
+    prior(exponential(1), class = "sd")  # Prior for random effects
+  ),
+  chains = 4, 
+  iter = 2000, 
+  warmup = 1000
+)
+
+# Check the summary of the count model
+summary(count_model)
+
+
+
+#### BAYESIAN
+# Bayesian Linear Model using brms
+model_bumblebee_activity <- brm(
+  daily_duration_above_threshold ~ mean_temp + daily_nectar_sugar_mg + 
+    mean_wind_speed + 
+    mean_stn_press_k_pa + 
+    predominant_wind_dir + 
+    avg_air_rh_1m + 
+    day_length_hours + 
+    cloud_cover_pct, 
+  data = flight_buzz_daily,
+  family = gaussian(),
+  prior = c(
+    prior(normal(0, 5), class = "b"),  # Priors for coefficients
+    prior(normal(0, 10), class = "sigma")  # Prior for residual error
+  ),
+  iter = 2000,  # Number of iterations
+  warmup = 1000,  # Warmup period
+  chains = 4,  # Number of chains
+  cores = 4,  # Number of cores
+  control = list(adapt_delta = 0.95)  # Control for convergence
+)
+
+
+# Check the model summary
+summary(model_bumblebee_activity)
+
+# Plot the diagnostics (trace plots)
+plot(model_bumblebee_activity)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 #### Testing POLCAM data ----
 
-polcam_data_long <- read_csv("/Volumes/TundraBUZZ/data/clean/polcam_data_long.csv")
-daily_nectar_per_site <- read_csv("/Volumes/TundraBUZZ/data/clean/nectar_sugar_daily.csv")
-
-
-flower_counts <- polcam_data_long %>%
-  group_by(date, location_id) %>%
-  summarize(total_flower_count = sum(count, na.rm = TRUE), .groups = "drop") %>%
-  filter(total_flower_count > 0)
-
-flower_counts <- flower_counts %>%
-  left_join(daily_nectar_per_site, by = c("location_id", "date"))
 
 ggplot(flower_counts, aes(x = date, y = total_flower_count)) +
   geom_point(color = "pink") +
@@ -630,13 +938,7 @@ ggplot(flower_counts, aes(x = date)) +
   facet_wrap(~location_id, scales = "free_y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Merge the two datasets
-combined_data <- left_join(flight_buzz_daily, flower_counts, by = c("date", "location_id", "microclimate"))
-
 scale_factor <- 10
-
-combined_data_filtered <- combined_data %>%
-  filter(!location_id == "BEEBOX")
 
 ggplot(combined_data_filtered, aes(x = cumulative_GDD0)) +
   geom_point(aes(y = daily_duration_above_threshold)) +
@@ -689,6 +991,122 @@ p2 <- ggplot(filtered_data, aes(x = date, y = 1, fill = total_flower_count)) +
   )
 
 p1 / p2  + plot_layout(heights = c(6, 1))
+
+
+
+
+
+# get top 10% dates of activity per site
+top_10_by_site <- combined_data_filtered %>%
+group_by(location_id) %>%
+  filter(daily_duration_above_threshold >= quantile(daily_duration_above_threshold, 0.9, na.rm = TRUE)) %>%
+  ungroup()
+
+# View the result
+top_10_by_site 
+
+# Step 1: Calculate mean and standard deviation of daily_duration_above_threshold for each site
+top_by_stdev_site <- combined_data_filtered %>%
+  group_by(location_id) %>%
+  mutate(
+    mean_activity = mean(daily_duration_above_threshold, na.rm = TRUE),
+    sd_activity = sd(daily_duration_above_threshold, na.rm = TRUE)
+  ) %>%
+  filter(daily_duration_above_threshold >= (mean_activity + 1 * sd_activity)) %>%  # Adjust the multiplier for the number of standard deviations
+  ungroup()
+
+# View the result
+top_by_stdev_site
+
+
+proportion_by_site <- top_by_stdev_site %>%
+  group_by(location_id) %>%
+  summarise(
+    total_days = n(),
+    mean_temp = mean(mean_temp, na.rm = TRUE),
+    days_with_flowers = sum(total_flower_count > 0, na.rm = TRUE),
+    proportion_with_flowers = days_with_flowers / total_days
+  )
+
+proportion_by_site <- proportion_by_site %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+ggplot(proportion_by_site, aes(x = summer_GDD0, y = proportion_with_flowers)) +
+  geom_point(size = 3, color = "forestgreen") +
+  geom_smooth(method = "lm", se = TRUE, color = "grey30") +
+  labs(
+    x = "Cumulative Summer Growing Degree Days (T = 0°C)",
+    y = "Overlap Between Peak Bumblebee Activity and Flowering"
+  ) +
+  theme_classic()
+
+
+
+
+
+
+
+
+
+
+library(zoo)
+
+# Ensure date is in Date format
+combined_data <- combined_data %>%
+  arrange(location_id, date)
+
+# Compute 5-day rolling sums of activity
+rolling_activity <- combined_data %>%
+  group_by(location_id) %>%
+  arrange(date) %>%
+  mutate(rolling_sum = zoo::rollapply(
+    daily_duration_above_threshold, 
+    width = 10, 
+    FUN = sum, 
+    align = "left", 
+    fill = NA
+  )) %>%
+  ungroup()
+
+top_5day_window <- rolling_activity %>%
+  group_by(location_id) %>%
+  filter(rolling_sum == max(rolling_sum, na.rm = TRUE)) %>%
+  slice(1) %>%  # In case of ties, pick the first occurrence
+  ungroup()
+
+# For each selected window, get the 5 dates starting from the start date
+top_5day_periods <- top_5day_window %>%
+  select(location_id, start_date = date) %>%
+  rowwise() %>%
+  mutate(date_seq = list(seq(start_date, by = "day", length.out = 10))) %>%
+  unnest(cols = c(date_seq)) %>%
+  rename(date = date_seq)
+
+top_5day_with_flowers <- left_join(top_5day_periods, combined_data, by = c("location_id", "date"))
+top_5day_with_flowers <- left_join(top_5day_with_flowers, mean_summer_temp, by = "location_id")
+
+overlap_summary <- top_5day_with_flowers %>%
+  group_by(location_id) %>%
+  summarise(
+    mean_temp = mean(mean_temp, na.rm = TRUE),
+    summer_temp = mean(summer_temp, na.rm = TRUE),
+    summer_GDD0 = mean(summer_GDD0, na.rm = TRUE),
+    flowering_days = sum(total_flower_count > 0, na.rm = TRUE),
+    overlap_proportion = flowering_days / 10
+  )
+
+ggplot(overlap_summary, aes(x = summer_temp, y = overlap_proportion)) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_smooth(method = "lm", se = TRUE, color = "grey40") +
+  labs(
+    title = "Flowering Overlap During Peak 5-Day Bumblebee Activity",
+    x = "Mean Summer Temperature (°C)",
+    y = "Proportion of Peak Activity Period with Flowers"
+  ) +
+  theme_classic()
+
+
+
 
 
 
