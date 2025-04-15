@@ -26,6 +26,7 @@ library(brms)
 library(tidybayes)
 library(slider)
 library(ggeffects)
+library(corrplot)
 
 # Set working directory
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
@@ -368,10 +369,10 @@ ggpairs(plot_data,
   theme_minimal()
 
 
-#### LINEAR MODELS
+#### LINEAR MODELS ----
 
 # Now let's plot using ggplot with a separate y-axis for difference_days
-ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
+ggplot(peak_temp_flowering, aes(x = summer_GDD0)) +
   # Plot Peak Date with distinct color
   geom_point(aes(y = peak_date_numeric), size = 3, color = "goldenrod", alpha = 0.6) +
   # Plot Peak Flowering Date with distinct color
@@ -394,9 +395,9 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD5)) +
   theme_classic()
 
 # Fit the linear models
-model_peak_date <- lm(peak_date_numeric ~ summer_GDD5, data = peak_temp_flowering)
-model_peak_flowering <- lm(peak_flowering_numeric ~ summer_GDD5, data = peak_temp_flowering)
-model_difference_days <- lm(difference_days ~ summer_GDD5, data = peak_temp_flowering)
+model_peak_date <- lm(peak_date_numeric ~ summer_GDD0, data = peak_temp_flowering)
+model_peak_flowering <- lm(peak_flowering_numeric ~ summer_GDD0, data = peak_temp_flowering)
+model_difference_days <- lm(difference_days ~ summer_GDD0, data = peak_temp_flowering)
 
 summary(model_peak_date)
 summary(model_peak_flowering)
@@ -941,23 +942,30 @@ ggplot(flight_buzz_daily, aes(x = mean_temp, y = daily_duration_above_threshold)
 #### Preparing climate variables for Bayesian model ----
 combined_data_filtered 
 
+?hist()
+
 hist(combined_data_filtered$mean_temp) # normal ish
-hist(log(combined_data_filtered$daily_nectar_sugar_mg)) # zero inflated
+hist((combined_data_filtered$daily_nectar_sugar_mg), breaks = 20) # zero inflated
 hist(combined_data_filtered$mean_wind_speed) # normal ish, right skew
 hist(combined_data_filtered$mean_stn_press_k_pa) # normal
-hist(combined_data_filtered$predominant_wind_dir) # bimodal
-hist(combined_data_filtered$avg_air_rh_1m) # normal ish? left skewed
+hist(combined_data_filtered$predominant_wind_dir, breaks = 20) # bimodal --> remove
+hist(combined_data_filtered$avg_air_rh_1m, breaks = 20) # normal ish? left skewed
 hist(combined_data_filtered$day_length_hours) # super 24 inflated, maybe do log(night length)?
-hist(combined_data_filtered$cloud_cover_pct) # flat
+hist(combined_data_filtered$cloud_cover_pct) # flat --> remove
 
 
-library(corrplot)
+
 numeric_vars <- combined_data_filtered %>%
   select(mean_temp, daily_nectar_sugar_mg, mean_wind_speed,
          mean_stn_press_k_pa, predominant_wind_dir, avg_air_rh_1m, day_length_hours,
          cloud_cover_pct)
 
+numeric_vars_short <- combined_data_filtered %>%
+  select(mean_temp, daily_nectar_sugar_mg, mean_wind_speed,
+         mean_stn_press_k_pa, avg_air_rh_1m, day_length_hours)
+
 corrplot(cor(na.omit(numeric_vars)), method = "color", type = "upper")
+corrplot(cor(na.omit(numeric_vars_short)), method = "color", type = "lower")
 
 cor_matrix <- cor(numeric_vars, use = "complete.obs")
 
@@ -1197,19 +1205,118 @@ model_summary %>%
 
 ##########
 
-combined_data_filtered_transformed2 <- combined_data_filtered %>%
+### MODEL ITERATION 2
+updated_combined_transformed <- combined_data_filtered %>%
   mutate(
-    # Replace zeros with NA for nectar sugar
-    daily_nectar_sugar_mg = ifelse(daily_nectar_sugar_mg == 0, NA, daily_nectar_sugar_mg),
+    # Create column for presence/absence of flowering
+    flowering_present = if_else(total_flower_count > 0, 1, 0),
+    flowering_present = replace_na(flowering_present, 0),
     
+    daily_nectar_sugar_mg = replace_na(daily_nectar_sugar_mg, 0),
     # Log-transform nectar sugar with +1 to avoid issues with zero values
-    daily_nectar_sugar_mg = log(daily_nectar_sugar_mg + 1),
+    daily_nectar_sugar_mg = log(daily_nectar_sugar_mg +1),
     
     # Apply other transformations and scaling to other variables
-    mean_wind_speed = log(mean_wind_speed + 1),
-    avg_air_rh_1m = log(avg_air_rh_1m + 1),
-    day_length_hours = 24 - day_length_hours)
+    mean_wind_speed = log(mean_wind_speed),
+    avg_air_rh_1m = log(avg_air_rh_1m),
+    night_length_hours = 24 - day_length_hours, 
+    night_absent = if_else((24 - day_length_hours) == 0, 1, 0)
+)
 
+updated_combined_transformed <- updated_combined_transformed %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+hist(updated_combined_transformed$mean_temp) # normal, centered on about 11, ranges from 4 to 22
+hist(updated_combined_transformed$daily_nectar_sugar_mg) # log-transformed, zero inflated, right skewed
+hist(updated_combined_transformed$flowering_present) # relatively even, 0 or 1
+hist(updated_combined_transformed$mean_wind_speed) # quite normal, centered on 2.6, ranges from 1.5 to 3.7
+hist(updated_combined_transformed$mean_stn_press_k_pa) # quite normal, centered on 101.0, ranges from 99.5 to 102
+hist(updated_combined_transformed$avg_air_rh_1m) # decently normal, centered on 4.3
+hist(updated_combined_transformed$night_length_hours) # zero inflated (maybe just remove to NA?)
+hist(updated_combined_transformed$night_absent) # binary (presence absence)
+hist(updated_combined_transformed$summer_GDD0, breaks = 20) # not a very continuous distribution, not very centered, ranges from 550 to 775
+
+# Compute mean and standard deviation for continuous variables
+summary_stats <- updated_combined_transformed %>%
+  summarise(
+    mean_temp_mean = mean(mean_temp, na.rm = TRUE),
+    mean_temp_sd = sd(mean_temp, na.rm = TRUE),
+    daily_nectar_sugar_mean = mean(daily_nectar_sugar_mg, na.rm = TRUE),
+    daily_nectar_sugar_sd = sd(daily_nectar_sugar_mg, na.rm = TRUE),
+    mean_wind_speed_mean = mean(mean_wind_speed, na.rm = TRUE),
+    mean_wind_speed_sd = sd(mean_wind_speed, na.rm = TRUE),
+    mean_stn_press_mean = mean(mean_stn_press_k_pa, na.rm = TRUE),
+    mean_stn_press_sd = sd(mean_stn_press_k_pa, na.rm = TRUE),
+    avg_air_rh_1m_mean = mean(avg_air_rh_1m, na.rm = TRUE),
+    avg_air_rh_1m_sd = sd(avg_air_rh_1m, na.rm = TRUE),
+    night_length_hours_mean = mean(night_length_hours, na.rm = TRUE),
+    night_length_hours_sd = sd(night_length_hours, na.rm = TRUE),
+    summer_GDD0_mean = mean(summer_GDD0, na.rm = TRUE),
+    summer_GDD0_sd = sd(summer_GDD0, na.rm = TRUE)
+  )
+
+updated_combined_transformed <- updated_combined_transformed %>%
+  mutate(
+    mean_temp_z = (mean_temp - summary_stats$mean_temp_mean) / summary_stats$mean_temp_sd,
+    daily_duration_above_threshold = as.integer(daily_duration_above_threshold/0.15),
+    daily_nectar_sugar_mg_z = (daily_nectar_sugar_mg - summary_stats$daily_nectar_sugar_mean) / summary_stats$daily_nectar_sugar_sd,
+    mean_wind_speed_z = (mean_wind_speed - summary_stats$mean_wind_speed_mean) / summary_stats$mean_wind_speed_sd,
+    mean_stn_press_k_pa_z = (mean_stn_press_k_pa - summary_stats$mean_stn_press_mean) / summary_stats$mean_stn_press_sd,
+    avg_air_rh_1m_z = (avg_air_rh_1m - summary_stats$avg_air_rh_1m_mean) / summary_stats$avg_air_rh_1m_sd,
+    night_length_hours_z = (night_length_hours - summary_stats$night_length_hours_mean) / summary_stats$night_length_hours_sd,
+    summer_GDD0_z = (summer_GDD0 - summary_stats$summer_GDD0_mean) / summary_stats$summer_GDD0_sd
+  )
+
+
+
+
+# Define the model formula with interaction terms
+model_interaction_term <- brmsformula(
+  daily_duration_above_threshold ~ 
+    mean_temp_z * summer_GDD0_z +  # Interaction between mean_temp_z and summer_GDD0_z
+    daily_nectar_sugar_mg_z * summer_GDD0_z +  # Interaction between nectar and summer_GDD0_z
+    mean_wind_speed_z +  # Main effect of wind speed
+    mean_stn_press_k_pa_z +  # Main effect of pressure
+    avg_air_rh_1m_z +  # Main effect of RH
+    night_length_hours_z +  # Main effect of night length
+    flowering_present * summer_GDD0_z +  # Main effect of flowering presence
+    night_absent +  # Main effect of night absence
+    (1 | location_id) + ar(gr = location_id, cov = TRUE) # Random intercept for location_id and temporal autocorrelation
+)
+
+env_model <- brm(
+  formula = model_interaction_term,
+  data = updated_combined_transformed,
+  family = negbinomial(),
+  prior = c(
+    # Priors for fixed effects
+    prior(normal(1, 0.5), class = "b", coef = "mean_temp_z"),  
+    prior(normal(1, 0.5), class = "b", coef = "daily_nectar_sugar_mg_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "mean_wind_speed_z"),  
+    prior(normal(0, 1), class = "b", coef = "mean_stn_press_k_pa_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "avg_air_rh_1m_z"),  
+    prior(normal(-1, 0.5), class = "b", coef = "night_length_hours_z"), 
+    prior(normal(0.5, 0.5), class = "b", coef = "flowering_present"),
+    prior(normal(0.2, 1), class = "b", coef = "night_absent"),
+    
+    
+    
+    # Intercept
+    prior(normal(0, 1), class = "Intercept"),
+    
+    # Random effects
+    prior(exponential(1), class = "sd", group = "location_id")
+  ),
+  chains = 4,
+  iter = 4000,
+  warmup = 2000,
+  control = list(adapt_delta = 0.999, max_treedepth = 15),
+  file = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_env_model_updated.rds"
+)
+
+
+summary(env_model)
+pp_check(env_model)
 
 
 
