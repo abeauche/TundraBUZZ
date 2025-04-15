@@ -513,8 +513,8 @@ bayes_mismatch_plot <- ggplot() +
     color = "Phenological Metric",
     fill = "Phenological Metric"
   ) +
-  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
-  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
+  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
   theme_classic() #+
   # theme(legend.position = "bottom")
 
@@ -537,7 +537,7 @@ posterior_difference_days <- posterior_samples(model_difference_days_bayesian, p
 
 # Calculate the 95% credible intervals and the effect size (mean)
 summary_peak_date <- data.frame(
-  effect = "Peak Date",
+  effect = "Peak Bumblebee Activity",
   mean = mean(posterior_peak_date$b_summer_GDD0),
   lower = quantile(posterior_peak_date$b_summer_GDD0, 0.025),
   upper = quantile(posterior_peak_date$b_summer_GDD0, 0.975)
@@ -547,7 +547,7 @@ summary_peak_flowering <- data.frame(
   effect = "Peak Flowering",
   mean = mean(posterior_peak_flowering$b_summer_GDD0),
   lower = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025),
-  upper = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025)
+  upper = quantile(posterior_peak_flowering$b_summer_GDD0, 0.975)
 )
 
 summary_difference_days <- data.frame(
@@ -561,20 +561,26 @@ summary_difference_days <- data.frame(
 summary_df <- bind_rows(summary_peak_date, summary_peak_flowering, summary_difference_days)
 
 # Plot the slopes with 95% credible intervals using ggplot
-ggplot(summary_df, aes(x = effect, y = mean, ymin = lower, ymax = upper)) +
-  geom_point(size = 3, color = "darkblue") +  # Effect size point (mean slope)
-  geom_errorbar(width = 0.1, color = "darkblue") +  # 95% credible intervals
+bayesian_slopes_mismatch <- ggplot(summary_df, aes(y = effect, x = mean, xmin = lower, xmax = upper, colour = effect, fill = effect)) +
+  geom_point(size = 3) +  # Effect size point (mean slope)
+  geom_errorbar(width = 0.1) +  # 95% credible intervals
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +  # Vertical dashed grey line
   labs(
-    x = "Phenological Metric",
-    y = "Slope (Effect Size) of summer_GDD0",
-    title = "Bayesian Slopes for summer_GDD0 with 95% Credible Intervals"
+    y = "Phenological Metric",
+    x = "Effect Size and Credible Intervals of Summer GGD (T = 0°C)"
   ) +
-  scale_color_manual(values = c("Peak Date" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
-  scale_fill_manual(values = c("Peak Date" = "goldenrod", "Peak Flowering" = "pink", "Mismatch" = "steelblue")) +
+  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
+  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
   theme_classic() +
-  theme(legend.position = "top")
+  theme(legend.position = "none")
 
 
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/bayesian_slopes_mismatch.pdf",
+  plot = bayesian_slopes_mismatch,
+  width = 8,       # adjust based on layout
+  height = 4
+)
 
 
 
