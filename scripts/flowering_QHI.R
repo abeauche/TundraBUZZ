@@ -892,7 +892,7 @@ flowering_temperature_ridgeplot <- ggplot(polcam_data_grouped, aes(x = date, y =
 # Ridge plot
 flowering_temperature_ridgeplot_GDD0 <- ggplot(polcam_data_grouped, aes(x = date, y = location_id, height = total_flower_count, fill = summer_GDD0)) +
   geom_density_ridges(stat = "identity", scale = 2.5, alpha = 0.7) +
-  scale_fill_viridis_c(name = "Cumul. Summer\nGDD (T = 0°C)") +
+  scale_fill_viridis_c(name = "Total GDD\n(T = 0°C)") +
   labs(
     x = "2024 Growing Season",
     y = "Total Flower Count per Site"
