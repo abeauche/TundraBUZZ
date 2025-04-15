@@ -342,71 +342,94 @@ head(flowering_bayes)
 
 #### FIT MODELS
 hist(flowering_bayes$first_flowering_num)
+
 # First flowering model --> censored left given that there is uncertainty regarding start date prior to installation of camera
 mod_first <- brm(
   first_flowering_num | cens(censored) ~ summer_GDD0,
   data = flowering_bayes,
   family = gaussian(),
-  cores = 4
+  prior = c(
+    prior(normal(0, 5), class = "Intercept"),
+    prior(normal(-0.05, 0.15), class = "b", coef = "summer_GDD0"),
+    prior(exponential(1), class = "sigma")
+  ),
+  cores = 4,
+  chains = 4,
+  iter = 4000,
+  warmup = 2000,
+  control = list(adapt_delta = 0.95)
 )
 summary(mod_first)
 plot(mod_first)
 pp_check(mod_first)
 
+hist(flowering_bayes$last_flowering_num)
+
 # Last flowering model
 mod_last <- brm(last_flowering_num ~ summer_GDD0, 
-                data = flowering_bayes, family = gaussian(), cores = 4)
+                data = flowering_bayes, 
+                family = gaussian(),
+                prior = c(
+                  prior(normal(50, 10), class = "Intercept"),
+                  prior(normal(-0.06, 0.15), class = "b", coef = "summer_GDD0"),
+                  prior(exponential(1), class = "sigma")
+                ),
+                cores = 4,
+                chains = 4,
+                iter = 4000,
+                warmup = 2000,
+                control = list(adapt_delta = 0.95)
+)
 summary(mod_last)
 plot(mod_last)
 pp_check(mod_last)
 
 # Peak flowering model
 mod_peak <- brm(peak_flowering_num ~ summer_GDD0, 
-                data = flowering_bayes, family = gaussian(), cores = 4)
+                data = flowering_bayes, 
+                family = gaussian(),
+                prior = c(
+                  prior(normal(20, 10), class = "Intercept"),
+                  prior(normal(-0.05, 0.15), class = "b", coef = "summer_GDD0"),
+                  prior(exponential(1), class = "sigma")
+                ),
+                cores = 4,
+                chains = 4,
+                iter = 4000,
+                warmup = 2000,
+                control = list(adapt_delta = 0.95)
+)
 summary(mod_peak)
 plot(mod_peak)
 pp_check(mod_peak)
 
 # Duration (numeric so no conversion needed)
-mod_duration <- brm(duration_days ~ summer_GDD0, 
-                data = flowering_bayes, family = gaussian(), cores = 4)
+mod_duration <- brm(
+  duration_days ~ summer_GDD0, 
+                data = flowering_bayes, family = gaussian(),
+                prior = c(
+                  prior(normal(40, 10), class = "Intercept"),
+                  prior(normal(-0.02, 0.15), class = "b", coef = "summer_GDD0"),
+                  prior(exponential(1), class = "sigma")
+                ),
+                cores = 4,
+                chains = 4,
+                iter = 4000,
+                warmup = 2000,
+                control = list(adapt_delta = 0.999)
+                )
 summary(mod_duration)
 plot(mod_duration)
 pp_check(mod_duration)
-# Manually specify initial values for the parameters
-init_values <- function() {
-  list(
-    b = c(rnorm(1, 0, 1)),         # ✅ wrap in c() to make it a vector
-    Intercept = rnorm(1, 30, 5),
-    sigma = runif(1, 0.1, 5)
-  )
-}
 
-mod_duration_cens <- brm(
-  bf(duration_days | cens(cens_duration) ~ summer_GDD0),
-  data = flowering_bayes,
-  family = gaussian(),
-  prior = c(
-    prior(normal(0, 5), class = "b"), # maybe -1, 3?
-    prior(normal(30, 10), class = "Intercept"),
-    prior(exponential(1), class = "sigma")
-  ),
-  chains = 4,
-  cores = 4,
-  control = list(adapt_delta = 0.999),
-  init = init_values,  # Set initial values manually,
-  seed = 123
-)
 
-summary(mod_duration)
-plot(mod_duration)
-pp_check(mod_duration)
 
 
 # Save each model as an RDS file
-saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_last.rds")
-saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_peak.rds")
-saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_duration.rds")
+saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
+saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
+saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
+saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
 
 
 #### Coding club code
@@ -442,7 +465,7 @@ mod_first_plot <- ggplot(preds_first, aes(x = x, y = predicted_date)) +
   scale_y_date(date_labels = "%b %d") +
   labs(
     x = "Total Growing Degree Days (T = 0°C)",
-    y = "First Flowering Date",
+    y = "Onset of Flowering",
     colour = "Microclimate"
   ) +
   theme_classic()
@@ -467,7 +490,7 @@ mod_last_plot <- ggplot(preds_last, aes(x = x, y = predicted_date)) +
   scale_y_date(date_labels = "%b %d") +
   labs(
     x = "Total Growing Degree Days (T = 0°C)",
-    y = "Last Flowering Date",
+    y = "End of Flowering",
     colour = "Microclimate"
   ) +
   theme_classic() 
@@ -532,25 +555,25 @@ ggsave(
 
 # Extract and label slopes
 slopes <- bind_rows(
-  tidy(mod_first, effects = "fixed", parameters = "summer_temp") %>% mutate(trait = "First flowering date"),
-  tidy(mod_last, effects = "fixed", parameters = "summer_temp") %>% mutate(trait = "Last flowering date"),
-  tidy(mod_peak, effects = "fixed", parameters = "summer_temp") %>% mutate(trait = "Peak flowering date"),
-  tidy(mod_duration, effects = "fixed", parameters = "summer_temp") %>% mutate(trait = "Flowering duration")
+  tidy(mod_first, effects = "fixed", parameters = "summer_GDD0") %>% mutate(trait = "Onset of flowering"),
+  tidy(mod_last, effects = "fixed", parameters = "summer_GDD0") %>% mutate(trait = "End of flowering"),
+  tidy(mod_peak, effects = "fixed", parameters = "summer_GDD0") %>% mutate(trait = "Peak flowering date"),
+  tidy(mod_duration, effects = "fixed", parameters = "summer_GDD0") %>% mutate(trait = "Flowering duration")
 ) %>%
   select(trait, estimate, std.error, conf.low, conf.high)
 
 # Set the order of traits
 slopes <- slopes %>%
-  mutate(trait = factor(trait, levels = c(
-    "First flowering date",
-    "Last flowering date",
+  mutate(trait = factor(trait, levels = rev(c(
+    "Onset of flowering",
+    "End of flowering",
     "Peak flowering date",
     "Flowering duration"
-  )))
+  ))))
 
 
 # Plot
-flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate, y = trait)) +
+flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate, y = (trait))) +
   geom_point(size = 3) +
   geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +

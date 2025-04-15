@@ -471,17 +471,62 @@ pp_check(model_peak_date_bayesian)
 # saveRDS(model_peak_date_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
 # model_peak_date_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
 
+model_peak_date_bayesian_summary <- summary(model_peak_date_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+
+# View or export to CSV
+write.csv(model_peak_date_bayesian_summary, "outputs/model_peak_date_bayesian_summary.csv", row.names = FALSE)
+
 summary(model_peak_flowering_bayesian)
 plot(model_peak_flowering_bayesian)
 pp_check(model_peak_flowering_bayesian)
 # saveRDS(model_peak_flowering_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
 # model_peak_flowering_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
 
+model_peak_flowering_bayesian_summary <- summary(model_peak_flowering_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+
+# View or export to CSV
+write.csv(model_peak_flowering_bayesian_summary, "outputs/model_peak_flowering_bayesian_summary.csv", row.names = FALSE)
+
 summary(model_difference_days_bayesian)
 plot(model_difference_days_bayesian)
 pp_check(model_difference_days_bayesian)
 # saveRDS(model_difference_days_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
 # model_difference_days_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
+
+model_difference_days_bayesian_summary <- summary(model_difference_days_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+
+# View or export to CSV
+write.csv(model_difference_days_bayesian_summary, "outputs/model_difference_days_bayesian_summary.csv", row.names = FALSE)
 
 
 # Generate predictions for each model
@@ -526,8 +571,6 @@ ggsave(
   width = 10,       # adjust based on layout
   height = 8
 )
-
-
 
 
 # Extract posterior samples for the coefficient of summer_GDD0 (slope)
@@ -619,6 +662,130 @@ ggplot(flight_buzz_daily_beebox, aes(x = date, y = daily_duration_above_threshol
   facet_wrap(~location_id) 
 
 
+# Fit LOESS on BEEBOX site
+loess_beebox <- loess(daily_duration_above_threshold ~ as.numeric(date), data = flight_buzz_daily_beebox, span = 0.5)
+
+# Add predictions from BEEBOX LOESS to all data
+flight_buzz_daily_with_beebox_loess <- flight_buzz_daily %>%
+  mutate(beebox_loess_pred = predict(loess_beebox, newdata = data.frame(date = as.numeric(date))))
+
+# Difference from BEEBOX prediction
+flight_buzz_daily_with_beebox_loess <- flight_buzz_daily_with_beebox_loess %>%
+  mutate(diff_from_beebox = daily_duration_above_threshold - beebox_loess_pred)
+
+ggplot(flight_buzz_daily_with_beebox_loess, aes(x = date, y = diff_from_beebox, color = microclimate)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_point(size = 1.5, alpha = 0.8) +
+  geom_smooth(method = "loess", se = FALSE) +
+  #facet_wrap(~microclimate, ncol = 1) +
+  labs(
+    x = "2024 Growing Season",
+    y = "Difference from BEEBOX LOESS (s)",
+    title = "Deviation in Flight Buzz Detections from BEEBOX LOESS Trend"
+  ) +
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold")) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+flight_buzz_scaled <- flight_buzz_daily %>%
+  group_by(location_id) %>%
+  mutate(scaled_buzz = daily_duration_above_threshold / mean(daily_duration_above_threshold, na.rm = TRUE)) %>%
+  ungroup()
+
+ggplot(flight_buzz_scaled, aes(x = date, y = scaled_buzz, colour = location_id)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(se = FALSE) +
+  theme_classic() +
+  labs(x = "Date", y = "Relative Buzz Intensity (Scaled)",
+       colour = "Site") +
+  scale_colour_viridis_d()
+
+# First filter BEEBOX and fit loess
+beebox_loess <- flight_buzz_scaled %>%
+  filter(location_id == "BEEBOX") %>%
+  loess(scaled_buzz ~ as.numeric(date), data = ., span = 0.3)
+
+# Predict LOESS values for all dates
+loess_preds <- tibble(
+  date = unique(flight_buzz_scaled$date),
+  beebox_loess = predict(beebox_loess, newdata = data.frame(date = as.numeric(unique(flight_buzz_scaled$date))))
+)
+
+flight_buzz_with_diff <- flight_buzz_scaled %>%
+  left_join(loess_preds, by = "date") %>%
+  mutate(diff_from_beebox_loess = scaled_buzz - beebox_loess)
+
+ggplot(flight_buzz_with_diff %>% filter(location_id != "BEEBOX"), 
+       aes(x = date, y = diff_from_beebox_loess, colour = location_id)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_point(alpha = 0.7) +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~microclimate, ncol = 1) +
+  labs(
+    x = "Date",
+    y = "Difference from BEEBOX LOESS (scaled buzz)",
+    colour = "Site"
+  ) +
+  theme_classic() +
+  scale_colour_viridis_d()
+
+daily_summary <- flight_buzz_daily %>%
+  group_by(date) %>%
+  summarise(
+    mean_daily_buzz = mean(daily_duration_above_threshold, na.rm = TRUE),
+    sd_daily_buzz = sd(daily_duration_above_threshold, na.rm = TRUE),
+    n_sites = n()
+  )
+
+site_avg_activity <- site_summary %>%
+  group_by(location_id) %>%
+  summarise(
+    avg_daily_buzz = mean(mean_daily_buzz, na.rm = TRUE)
+  ) %>%
+  arrange(desc(avg_daily_buzz)) %>%
+  left_join(mean_summer_temp, by = "location_id")
+
+
+site_avg_activity_nobeebox <- site_avg_activity %>%
+  filter(!location_id == "BEEBOX")
+
+# View the site with the highest average activity
+ggplot(site_avg_activity_nobeebox, aes(x = summer_GDD0, y = avg_daily_buzz)) +
+  geom_point(aes(colour = summer_GDD0)) +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Date",
+    y = "Mean Daily Flight Buzz Duration (s)",
+    color = "Site"
+  ) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+microclimate_summary <- flight_buzz_daily %>%
+  group_by(microclimate, location_id, date) %>%
+  summarise(
+    mean_daily_buzz = mean(daily_duration_above_threshold, na.rm = TRUE)
+  )
+
+microclimate_avg_activity <- microclimate_summary %>%
+  group_by(microclimate) %>%
+  summarise(
+    avg_daily_buzz = mean(mean_daily_buzz, na.rm = TRUE),
+    sd_activity = sd(mean_daily_buzz, na.rm = TRUE)
+  ) %>%
+  arrange(desc(avg_daily_buzz))
+
+ggplot(microclimate_summary, aes(x = microclimate, y = mean_daily_buzz)) +
+  geom_boxplot(aes(fill = microclimate)) +
+  labs(
+    x = "Microclimate",
+    y = "Daily Flight Buzz Duration (s)",
+    title = "Comparison of Bumblebee Activity Across Microclimates"
+  ) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 #### CONTINUE IN BAYESIAN FRAMEWORK ####
 #### CLIMATE VARIABLES
@@ -891,7 +1058,8 @@ nb_model <- brm(
   chains = 4,
   iter = 4000,
   warmup = 2000,
-  control = list(adapt_delta = 0.999, max_treedepth = 15)
+  control = list(adapt_delta = 0.999, max_treedepth = 15),
+  file = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds"
 )
 
 # Check the summary of the model
@@ -899,13 +1067,30 @@ summary(nb_model)
 plot(nb_model)
 pp_check(nb_model)
 
-saveRDS(nb_model, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
+# Get model summary
+model_summary <- summary(nb_model)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+
+# View or export to CSV
+write.csv(model_summary, "outputs/effect_summary_bayes_flight_buzzes_env_pred.csv", row.names = FALSE)
+
+# saveRDS(nb_model, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
+# nb_model <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
 
 # Use ggpredict to generate predictions for each predictor
-# Replace 'nb_model' with the name of your fitted model
-library(ggeffects)
-predictions <- ggpredict(nb_model, terms = c("mean_temp_z", "daily_nectar_sugar_mg_z", "mean_wind_speed_z", "mean_stn_press_k_pa_z", "avg_air_rh_1m_z", "day_length_hours_z", "cloud_cover_pct_z"), bias_correction = TRUE)
 
+pred_temp <- ggpredict(nb_model, terms = "mean_temp_z", bias_correction = TRUE)
+pred_nectar <- ggpredict(nb_model, terms = "daily_nectar_sugar_mg_z", bias_correction = TRUE)
+pred_nectar <- ggpredict(nb_model, terms = "mean_wind_speed_z", bias_correction = TRUE)
 
 
 
@@ -931,9 +1116,82 @@ for (i in seq_along(vars_to_detransform_z)) {
     combined_data_filtered_transformed[[var_z_name]] * sds[var_name] + means[var_name]
 }
 
+### UNDO THESE TRANSFORMATIONS
+combined_data_filtered_transformed2 <- combined_data_filtered %>%
+  mutate(
+    # Replace zeros with NA for nectar sugar
+    daily_nectar_sugar_mg = ifelse(daily_nectar_sugar_mg == 0, NA, daily_nectar_sugar_mg),
+    
+    # Log-transform nectar sugar with +1 to avoid issues with zero values
+    daily_nectar_sugar_mg = log(daily_nectar_sugar_mg + 1),
+    
+    # Apply other transformations and scaling to other variables
+    mean_wind_speed = log(mean_wind_speed + 1),
+    avg_air_rh_1m = log(avg_air_rh_1m + 1),
+    day_length_hours = 24 - day_length_hours)
 
 
 
+# Create nicer labels for plotting
+model_summary_clean <- model_summary %>%
+  filter(term != "Intercept") %>%
+  mutate(
+    term_label = recode(term,
+                        "mean_temp_z" = "Mean Temperature (°C)",
+                        "daily_nectar_sugar_mg_z" = "Nectar Sugar (mg)",
+                        "mean_wind_speed_z" = "Wind Speed (m/s)",
+                        "mean_stn_press_k_pa_z" = "Station Pressure (kPa)",
+                        "avg_air_rh_1m_z" = "Relative Humidity (%)",
+                        "day_length_hours_z" = "Night Length (hrs)",
+                        "cloud_cover_pct_z" = "Cloud Cover (%)"
+    )
+  )
+
+model_summary_clean <- model_summary_clean %>%
+  mutate(significant = ifelse(lower_95 > 0 | upper_95 < 0, "Yes", "No"))
+model_summary_clean <- model_summary_clean %>%
+  mutate(direction = case_when(
+    lower_95 > 0 ~ "Positive",
+    upper_95 < 0 ~ "Negative",
+    TRUE ~ "Uncertain"
+  ))
+
+environmental_summary_plot <- ggplot(model_summary_clean, aes(x = estimate, y = reorder(term_label, estimate))) +
+  geom_point(aes(color = direction), size = 3) +
+  geom_errorbarh(aes(xmin = lower_95, xmax = upper_95, color = direction), height = 0.2) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
+  scale_color_manual(values = c(
+    "Positive" = "darkgreen",
+    "Negative" = "firebrick",
+    "Uncertain" = "black"
+  )) +
+  labs(
+    x = "Effect Size (Estimate ± 95% CI)",
+    y = "Predictor",
+    color = "Effect Direction"
+  ) +
+  theme_classic() +
+  theme(legend.position = "bottom")
+
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/bayesian_slopes_environmental_pred.pdf",
+  plot = environmental_summary_plot,
+  width = 8,       # adjust based on layout
+  height = 4
+)
+
+# Plot (excluding Intercept for clarity if desired)
+model_summary %>%
+  filter(term != "Intercept") %>%
+  ggplot(aes(x = estimate, y = reorder(term, estimate))) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = lower_95, xmax = upper_95), height = 0.2) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
+  labs(
+    x = "Effect Size (Estimate ± 95% CI)",
+    y = "Predictor"
+  ) +
+  theme_classic()
 
 
 
