@@ -237,7 +237,10 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
   ) +
   theme_classic()
 
-ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
+
+
+
+bumblebee_activity_vs_flowering_plot <- ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
   geom_smooth(method="lm", colour = "grey20") +
   geom_point(aes(colour = summer_GDD0), size = 3) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "gray40") +  # 1:1 reference line
@@ -250,6 +253,13 @@ ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
   theme_classic()
 
 
+# Save the combined plot
+ggsave(
+  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/bumblebee_activity_vs_flowering_plot.pdf",
+  plot = bumblebee_activity_vs_flowering_plot,
+  width = 10,       # adjust based on layout
+  height = 8
+)
 
 # Convert peak_date and peak_flowering to Date class if they are not already
 peak_temp_flowering <- peak_temp_flowering %>%
@@ -592,17 +602,17 @@ pred_difference_days <- ggpredict(model_difference_days_bayesian, terms = "summe
 bayes_mismatch_plot <- ggplot() +
   # Plot predictions for Peak Date
   geom_line(data = pred_peak_date, aes(x = x, y = predicted, color = "Peak Bumblebee Activity"), size = 1.2) +
-  geom_ribbon(data = pred_peak_date, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Bumblebee Activity"), alpha = 0.2) +
-  geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = peak_date_numeric, color = "Peak Bumblebee Acticity")) +
+  geom_ribbon(data = pred_peak_date, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Bumblebee Activity"), alpha = 0.1) +
+  geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = peak_date_numeric, color = "Peak Bumblebee Activity")) +
   
   # Plot predictions for Peak Flowering
   geom_line(data = pred_peak_flowering, aes(x = x, y = predicted, color = "Peak Flowering"), size = 1.2) +
-  geom_ribbon(data = pred_peak_flowering, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Flowering"), alpha = 0.2) +
+  geom_ribbon(data = pred_peak_flowering, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Peak Flowering"), alpha = 0.1) +
   geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = peak_flowering_numeric, color = "Peak Flowering")) +
   
   # Plot predictions for Mismatch
   geom_line(data = pred_difference_days, aes(x = x, y = predicted, color = "Mismatch"), size = 1.2) +
-  geom_ribbon(data = pred_difference_days, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Mismatch"), alpha = 0.2) +
+  geom_ribbon(data = pred_difference_days, aes(x = x, ymin = conf.low, ymax = conf.high, fill = "Mismatch"), alpha = 0.1) +
   geom_point(data = peak_temp_flowering, aes(x = summer_GDD0, y = difference_days, color = "Mismatch")) +
   
   # Customize the plot
@@ -612,10 +622,19 @@ bayes_mismatch_plot <- ggplot() +
     color = "Phenological Metric",
     fill = "Phenological Metric"
   ) +
-  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
-  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
-  theme_classic() #+
-  # theme(legend.position = "bottom")
+  scale_color_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen3", "Peak Flowering" = "forestgreen", "Mismatch" = "orange2")) +
+  scale_fill_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen3", "Peak Flowering" = "forestgreen", "Mismatch" = "orange2")) +
+  theme_classic() + 
+  # Add horizontal line at y = 0
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  
+  # Add arrows showing mismatch direction (example)
+  geom_segment(data = data.frame(x = c(745, 750, 755), xend = c(745, 750, 755),
+                                 y = 0, yend = c(-4.65, 4.15, -9.5)),
+               aes(x = x, xend = xend, y = y, yend = yend),
+               arrow = arrow(length = unit(0.25, "cm")),
+               color = c("darkolivegreen4", "orange3", "darkgreen"), size = 1) +
+  theme(legend.position = "top")
 
 
 # Save the combined plot
@@ -664,10 +683,10 @@ bayesian_slopes_mismatch <- ggplot(summary_df, aes(y = effect, x = mean, xmin = 
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +  # Vertical dashed grey line
   labs(
     y = "Phenological Metric",
-    x = "Effect Size and Credible Intervals of Summer GGD (T = 0°C)"
+    x = "Effect Size and Credible Intervals of Cumul. GDD (T = 0°C)"
   ) +
-  scale_color_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
-  scale_fill_manual(values = c("Peak Bumblebee Activity" = "goldenrod", "Peak Flowering" = "pink3", "Mismatch" = "steelblue")) +
+  scale_color_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen4", "Peak Flowering" = "darkgreen", "Mismatch" = "orange3")) +
+  scale_fill_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen4", "Peak Flowering" = "darkgreen", "Mismatch" = "orange3")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -1201,7 +1220,7 @@ model_summary_clean <- model_summary %>%
                         "mean_temp_z" = "Mean Temperature (°C)",
                         "daily_nectar_sugar_mg_z" = "Nectar Sugar (mg)",
                         "mean_wind_speed_z" = "Wind Speed (m/s)",
-                        "mean_stn_press_k_pa_z" = "Station Pressure (kPa)",
+                        "mean_stn_press_k_pa_z" = "Air Pressure (kPa)",
                         "avg_air_rh_1m_z" = "Relative Humidity (%)",
                         "day_length_hours_z" = "Night Length (hrs)",
                         "cloud_cover_pct_z" = "Cloud Cover (%)"
@@ -1216,23 +1235,25 @@ model_summary_clean <- model_summary_clean %>%
     upper_95 < 0 ~ "Negative",
     TRUE ~ "Uncertain"
   ))
+model_summary_clean <- model_summary_clean %>%
+  mutate(direction = factor(direction, levels = c("Positive", "Negative", "Uncertain")))
 
 environmental_summary_plot <- ggplot(model_summary_clean, aes(x = estimate, y = reorder(term_label, estimate))) +
-  geom_point(aes(color = direction), size = 3) +
+  geom_point(aes(color = direction), size = 2) +
   geom_errorbarh(aes(xmin = lower_95, xmax = upper_95, color = direction), height = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
   scale_color_manual(values = c(
     "Positive" = "darkgreen",
-    "Negative" = "firebrick",
-    "Uncertain" = "black"
+    "Negative" = "orange2",
+    "Uncertain" = "grey44"
   )) +
   labs(
-    x = "Effect Size (Estimate ± 95% CI)",
+    x = "Effect Size and Credible Intervals",
     y = "Predictor",
     color = "Effect Direction"
   ) +
   theme_classic() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "right")
 
 ggsave(
   filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/bayesian_slopes_environmental_pred.pdf",
@@ -1698,7 +1719,7 @@ plot(model_binomial)
 pp_check(model_binomial)
 
 # Get model summary
-model_summary <- summary(nb_model)$fixed %>%
+model_summary_binomial <- summary(model_binomial)$fixed %>%
   as_tibble(rownames = "term") %>%
   rename(
     estimate = Estimate,
@@ -1711,8 +1732,9 @@ model_summary <- summary(nb_model)$fixed %>%
   )
 
 # View or export to CSV
-write.csv(model_summary, "outputs/effect_summary_bayes_flight_buzzes_env_pred.csv", row.names = FALSE)
+# write.csv(model_summary_binomial, "outputs/model_summary_overlap.csv", row.names = FALSE)
 
+         
 # Load the necessary library
 library(ggeffects)
 
@@ -1745,7 +1767,7 @@ ggplot(predicted, aes(x = x)) +
   theme_classic()
 
 
-saveRDS(model_binomial, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_proportion_flowering.rds")
+# saveRDS(model_binomial, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_proportion_flowering.rds")
 
 
 
@@ -2874,16 +2896,26 @@ flight_buzz_daily_clean$ci_upper <- flight_buzz_daily_clean$pred + 1.96 * flight
 # Plot data with error lines (CI)
 ggplot(flight_buzz_daily_clean, aes(x = mean_temp_center + mean_temp_raw_mean, y = duration_rounded)) +
   geom_point(alpha = 0.6) +  # raw data points
-  geom_line(aes(y = pred, group = location_id), size = 1.2) +  # fitted line
-  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper, fill = microclimate, group = location_id), alpha = 0.3) +  # CI ribbon
+  geom_line(aes(y = pred, colour = microclimate, group = location_id), size = 1.2) +  # fitted line
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper, colour = microclimate, fill = microclimate, group = location_id), alpha = 0.3) +  # CI ribbon
+  geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
+  geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
+  annotate("text", x = 6, y = max(flight_buzz_daily_clean$duration_rounded, na.rm = TRUE) * 0.5, 
+           label = "B. frigidus (Q)", color = "orange", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
+  annotate("text", x = 12.6, y = max(flight_buzz_daily_clean$duration_rounded, na.rm = TRUE) * 0.5, 
+           label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   labs(
     x = "Mean Temperature (°C)",
-    y = "Flight Buzz Duration (s)"
+    y = "Flight Buzz Duration (s)",
+    colour = "Microclimate",
+    fill = "Microclimate"
   ) +
   ylim(0,750) +
-  theme_classic(base_size = 14) +
+  theme_classic() +
   facet_wrap(~microclimate) +
-  scale_fill_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
+  scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))+
+  scale_fill_manual(values = c("grey44", "#440154", "forestgreen", "gold"))+
+  theme(legend.position = "none")
 
 
 
@@ -2925,8 +2957,8 @@ results_joined %>%
   summarize(mean_temp_threshold = mean(temp_threshold))
 
 ggplot(results_joined, aes(x = summer_GDD0, y = temp_threshold)) +
-  geom_point(aes(colour = microclimate), size = 3) +  # raw data points
   geom_smooth(method = "lm", size = 1.2, colour = "grey44") +  # fitted line
+  geom_point(aes(colour = microclimate), size = 3) +  # raw data points
   labs(
     x = "Cumul. GDD (T = 0°C)",
     y = "Estimated Threshold Temperature (°C)",
@@ -2979,7 +3011,7 @@ temp_flight_buzz_bayes_spline <- brm(
   cores = 4, chains = 4
 )
 
-### Not good ---> 4000 diverhent transitions
+### Not good ---> 4000 divergent transitions
 
 
 microclim_avg_preds <- flight_buzz_preds %>%
