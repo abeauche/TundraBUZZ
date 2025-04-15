@@ -404,7 +404,6 @@ pp_check(mod_duration)
 
 
 # Save each model as an RDS file
-saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_first.rds")
 saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_last.rds")
 saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_peak.rds")
 saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_duration.rds")
