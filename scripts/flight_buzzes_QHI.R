@@ -143,7 +143,7 @@ combined_data_filtered <- combined_data %>%
 
 
 
-#### Obtain 3-day moving average with the highest bumblebee activity per site
+#### Obtain 3-day moving average with the highest bumblebee activity per site ----
 # Calculate centered 3-day moving average and assign to middle date
 moving_avg_df <- flight_buzz_daily %>%
   arrange(location_id, date) %>%
@@ -174,7 +174,7 @@ peak_dates %>%
 peak_temp_df <- peak_dates %>%
   left_join(mean_summer_temp, by = "location_id")  # assuming env_summary has mean_summer_temp
 
-
+# Peak date vs summer temp
 ggplot(peak_temp_df, aes(x = summer_temp, y = peak_date)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
@@ -184,6 +184,7 @@ ggplot(peak_temp_df, aes(x = summer_temp, y = peak_date)) +
   ) +
   theme_classic()
 
+# Peak date vs GDD0
 ggplot(peak_temp_df, aes(x = summer_GDD0, y = peak_date)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
@@ -195,7 +196,7 @@ ggplot(peak_temp_df, aes(x = summer_GDD0, y = peak_date)) +
 
 
 
-#### From flowering_QHI.R
+#### From flowering_QHI.R ----
 peak_flowering <- flowering_summary %>%
   select(location_id, peak_flowering)
 
@@ -211,7 +212,7 @@ peak_temp_flowering <- peak_temp_flowering %>%
 ) 
   
 
-
+# Mismatch vs summer temp
 ggplot(peak_temp_flowering, aes(x = summer_temp, y = difference_days)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
@@ -221,6 +222,7 @@ ggplot(peak_temp_flowering, aes(x = summer_temp, y = difference_days)) +
   ) +
   theme_classic()
 
+# Mismatch vs summer GDD0
 ggplot(peak_temp_flowering, aes(x = summer_GDD0, y = difference_days)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
@@ -230,6 +232,7 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD0, y = difference_days)) +
   ) +
   theme_classic()
 
+# Mismatch vs summer GDD5
 ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
   geom_point(size = 3, color = "darkorange") +
   geom_smooth(method="lm") +
@@ -241,7 +244,7 @@ ggplot(peak_temp_flowering, aes(x = summer_GDD5, y = difference_days)) +
 
 
 
-
+#### Peak activity vs peak flowering plot ----
 bumblebee_activity_vs_flowering_plot <- ggplot(peak_temp_flowering, aes(x = peak_flowering, y = peak_date)) +
   geom_smooth(method="lm", colour = "grey20") +
   geom_point(aes(colour = summer_GDD0), size = 3) +
@@ -433,7 +436,7 @@ ggpairs(plot_data,
   theme_minimal()
 
 
-#### LINEAR MODELS ----
+#### LINEAR MODELS MISMATCH ----
 
 # Now let's plot using ggplot with a separate y-axis for difference_days
 ggplot(peak_temp_flowering, aes(x = summer_GDD0)) +
@@ -489,7 +492,7 @@ ggplot(slopes, aes(x = slope, y = variable)) +
 
 
 
-#### NOW IN BAYESIAN ----
+#### BAYESIAN MISMATCH ----
 
 prior_peak_date <- c(
   prior(normal(0, 5), class = "Intercept"),  # Intercept with a wide prior
@@ -837,6 +840,8 @@ ggplot(site_avg_activity_nobeebox, aes(x = summer_GDD0, y = avg_daily_buzz)) +
 
 
 
+#### Activity per microclimate ----
+
 microclimate_summary <- flight_buzz_daily %>%
   group_by(microclimate, location_id, date) %>%
   summarise(
@@ -851,18 +856,41 @@ microclimate_avg_activity <- microclimate_summary %>%
   ) %>%
   arrange(desc(avg_daily_buzz))
 
+
+kruskal.test(mean_daily_buzz ~ microclimate, data = microclimate_summary)
+library(FSA)
+dunnTest(mean_daily_buzz ~ microclimate, data = microclimate_summary, method = "bh")
+
+library(ggpubr)
+
+sig_results <- data.frame(
+  group1 = c("BEEBOX", "BEEBOX", "BEEBOX"),
+  group2 = c("Cool", "Moderate", "Warm"),
+  p.adj = c(1.107502e-04, 6.769086e-04, 2.969826e-05),
+  y.position = c(750, 780, 810),  # adjust based on your y-axis range
+  label = c("***", "**", "***") # You can use stars or paste0("p = ", format(p.adj, ...))
+)
+
 ggplot(microclimate_summary, aes(x = microclimate, y = mean_daily_buzz)) +
   geom_boxplot(aes(fill = microclimate)) +
   labs(
     x = "Microclimate",
-    y = "Daily Flight Buzz Duration (s)",
-    title = "Comparison of Bumblebee Activity Across Microclimates"
+    y = "Daily Flight Buzz Detections (s)"
   ) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("grey44", "#440154", "forestgreen", "gold")) +
+  stat_pvalue_manual(sig_results, 
+                     label = "label", 
+                     tip.length = 0.01, 
+                     bracket.size = 0.5, 
+                     size = 4)
+
+
+
 
 #### CONTINUE IN BAYESIAN FRAMEWORK ####
-#### CLIMATE VARIABLES
+#### CLIMATE VARIABLES ----
 
 ggplot(flight_buzz_daily_beebox, aes(x = mean_wind_speed, y = daily_duration_above_threshold)) +
   geom_point() +  
@@ -1322,7 +1350,7 @@ model_summary %>%
 
 ##########
 
-### MODEL ITERATION 2
+### MODEL ITERATION 2 ----
 updated_combined_transformed <- combined_data_filtered %>%
   mutate(
     # Create column for presence/absence of flowering
@@ -1533,7 +1561,7 @@ summary(count_model)
 
 
 
-#### BAYESIAN
+#### BAYESIAN 
 # Bayesian Linear Model using brms
 model_bumblebee_activity <- brm(
   daily_duration_above_threshold ~ mean_temp + daily_nectar_sugar_mg + 
@@ -1676,7 +1704,7 @@ p1 / p2  + plot_layout(heights = c(6, 1))
 
 
 
-
+#### Define top days of activity ----
 
 # get top 10% dates of activity per site
 top_10_by_site <- combined_data_filtered %>%
@@ -1818,7 +1846,7 @@ ggplot(predicted, aes(x = x)) +
 
 
 
-
+#####
 
 library(zoo)
 
