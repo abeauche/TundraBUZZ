@@ -1037,6 +1037,48 @@ numeric_vars_short <- combined_data_filtered %>%
          mean_stn_press_k_pa, avg_air_rh_1m, day_length_hours)
 
 corrplot(cor(na.omit(numeric_vars)), method = "color", type = "upper")
+
+# Define the custom color gradient from orange2 to grey44 to darkgreen
+my_colors <- colorRampPalette(c("orange2", "cornsilk", "darkgreen"))(200)
+
+# You can specify your own custom labels here, for example:
+custom_labels <- c("mean_temp" = "Mean Temperature (°C)", "daily_nectar_sugar_mg" = "Nectar Sugar Availability (mg)", "mean_wind_speed" = "Wind Speed", "mean_stn_press_k_pa" = "Atmospheric Pressure (kPa)", "predominant_wind_dir" = "Predominant Wind Dir.", "avg_air_rh_1m" = "Relative Humidity (%)", "day_length_hours" = "Day Length", "cloud_cover_pct" = "Cloud Cover (Pct)")
+
+# Edit the correlation plot with custom labels
+corrplot(cor(na.omit(numeric_vars)), 
+         method = "color", 
+         type = "lower", 
+         col = my_colors,  # Apply Viridis color scale
+         tl.col = "black",    # Text label color
+         tl.srt = 45,         # Label text rotation
+         tl.cex = 0.8,        # Label text size
+         col.lab = "black",     # Label color (optional)
+         # Use custom labels for x and y axes
+         addCoef.col = "black", # Add correlation coefficient values (optional)
+         tl.labels = custom_labels)  # Applying custom labels
+
+
+
+
+# Export to PDF
+pdf("outputs/figures/env_predictors_corrplot.pdf", width = 7, height = 6)
+
+# Create the corrplot
+corrplot(corr_matrix, 
+         method = "color", 
+         type = "lower", 
+         col = my_colors,
+         tl.col = "black",    
+         tl.srt = 45,         
+         tl.cex = 0.8,        
+         addCoef.col = "black")  
+
+dev.off()
+
+
+# Plot using Viridis color palette
+corrplot(cor(na.omit(numeric_vars)), method = "color", type = "upper", col = viridis(200))
+
 corrplot(cor(na.omit(numeric_vars_short)), method = "color", type = "lower")
 
 cor_matrix <- cor(numeric_vars, use = "complete.obs")
