@@ -79,9 +79,9 @@ NMDS.scree <- function(x) { #where x is the name of the data frame variable
 }
 
 # Choose the optimal nr of dimensions
-pdf("./outputs/figures/NMDS_scree.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_scree.pdf", width = 7, height = 6)
 NMDS.scree(dist)
-dev.off()
+# dev.off()
 # k = 3 is a good inflexion point
 
 # Increase trymax to 200 for more iterations
@@ -89,9 +89,9 @@ nmds_result <- metaMDS(veg_comm_matrix, k = 3, trymax = 200, distance = "bray")
 
 # Check stress and plot results
 print(nmds_result$stress)
-pdf("./outputs/figures/NMDS_stress_k3.pdf", width = 7, height = 6)
+#pdf("./outputs/figures/NMDS_stress_k3.pdf", width = 7, height = 6)
 stressplot(nmds_result)
-dev.off()
+#dev.off()
 
 # Merge the 'microclimate' classification with the NMDS data
 nmds_data <- data.frame(location_id = rownames(nmds_result$points), points = nmds_result$points) %>%
@@ -133,14 +133,14 @@ nmds_result_k2 <- metaMDS(veg_comm_matrix, distance = "bray", k = 2, trymax = 10
 
 # Check stress and plot results
 print(nmds_result_k2$stress)
-pdf("./outputs/figures/NMDS_stress_k2.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_stress_k2.pdf", width = 7, height = 6)
 stressplot(nmds_result_k2)
-dev.off()
+# dev.off()
 
 # Basic NMDS plot
-pdf("./outputs/figures/NMDS_result_k2.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_result_k2.pdf", width = 7, height = 6)
 plot(nmds_result_k2, type = "t")
-dev.off()
+# dev.off()
 
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 points(nmds_result_k2$points, col = "blue", pch = 19)
@@ -159,12 +159,12 @@ nmds_data_k2 <- nmds_data_k2 %>%
   ))
 
 # NMDS plot with microclimate classification
-pdf("./outputs/figures/NMDS_microclim_k2.pdf", width = 8.2, height = 6)
+# pdf("./outputs/figures/NMDS_microclim_k2.pdf", width = 8.2, height = 6)
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
 text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, cex = 0.8)
 legend("topleft", legend = unique(microclimate_factor), col = colors, pch = 19, title = "Microclimate")
-dev.off()
+# dev.off()
 
 ordiplot(nmds_result_k2, display = c("species", "sites"), type = "n")
 points(nmds_result_k2$points, col = colors[microclimate_factor], pch = 19)
@@ -177,7 +177,7 @@ nmds_data_k2 <- nmds_data_k2 %>%
 
 library(viridis)
 
-pdf("./outputs/figures/NMDS_summer_GDD0_k2.pdf", width = 8.2, height = 6)
+# pdf("./outputs/figures/NMDS_summer_GDD0_k2.pdf", width = 8.2, height = 6)
 ordiplot(nmds_result_k2, display = "sites", type = "n")
 # Assign color based on summer_GDD0 using viridis_c
 points(nmds_result_k2$points, col = viridis(100)[as.numeric(cut(nmds_data_k2$summer_GDD0, breaks = 100))], pch = 19)
@@ -186,7 +186,7 @@ text(nmds_result_k2$points, labels = rownames(nmds_result_k2$points), pos = 3, c
 colorbar <- viridis(100)
 legend("topleft", legend = round(seq(min(nmds_data_k2$summer_GDD0), max(nmds_data_k2$summer_GDD0), length.out = 5), 2), 
        fill = colorbar[seq(1, 100, length.out = 5)], title = "Summer GDD0")
-dev.off()
+# dev.off()
 
 
 
@@ -207,9 +207,9 @@ rownames(veg_comm_matrix_plot) <- veg_matrix_plot$location_plot
 dist_plot <- vegdist(veg_comm_matrix_plot,  method = "bray")
 
 # Choose the optimal nr of dimensions
-pdf("./outputs/figures/NMDS_scree_plot.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_scree_plot.pdf", width = 7, height = 6)
 NMDS.scree(dist_plot)
-dev.off()
+# dev.off()
 # k = 3-4 could be okay
 
 # Run NMDS ordination
@@ -217,9 +217,9 @@ nmds_result_plot_k3 <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 3, t
 
 # Check stress and plot results
 print(nmds_result_plot_k3$stress)
-pdf("./outputs/figures/NMDS_stress_plot_k3.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_stress_plot_k3.pdf", width = 7, height = 6)
 stressplot(nmds_result_plot_k3)
-dev.off()
+# dev.off()
 
 # Create colour vector
 plot_colors <- rainbow(length(unique(veg_matrix_plot$location_id)))[as.factor(veg_matrix_plot$location_id)]
@@ -244,18 +244,18 @@ nmds_result_plot_k2 <- metaMDS(veg_comm_matrix_plot, distance = "bray", k = 2, t
 
 # Check stress and plot results
 print(nmds_result_plot_k2$stress)
-pdf("./outputs/figures/NMDS_stress_plot_k2.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_stress_plot_k2.pdf", width = 7, height = 6)
 stressplot(nmds_result_plot_k2)
-dev.off()
+# dev.off()
 
 # Create 2D NMDS plot with color coding by site
 plot(nmds_result_plot_k2, type = "t")
 
-pdf("./outputs/figures/NMDS_plot_k2.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_plot_k2.pdf", width = 7, height = 6)
 ordiplot(nmds_result_plot_k2, display = "sites", type = "n")
 points(nmds_result_plot_k2$points, col = plot_colors, pch = 19)
 text(nmds_result_plot_k2$points, labels = rownames(nmds_result_plot_k2$points), pos = 3, cex = 0.8)
-dev.off()
+# dev.off()
 
 
 
@@ -298,9 +298,9 @@ nmds_result_combined <- metaMDS(veg_comm_matrix_combined, distance = "bray", k =
 
 # Check stress and plot results
 print(nmds_result_combined$stress)
-pdf("./outputs/figures/NMDS_stress_combined_k2.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_stress_combined_k2.pdf", width = 7, height = 6)
 stressplot(nmds_result_combined)
-dev.off()
+# dev.off()
 
 # Extract the MDS coordinates from the NMDS result
 nmds_coords_combined <- as.data.frame(nmds_result_combined$points)
@@ -319,7 +319,7 @@ averaged_data <- averaged_data %>%
   select(site_id, location_id, MDS1, MDS2)
 
 # Create the plot with adjusted xlim and ylim
-pdf("./outputs/figures/NMDS_combined_scaling.pdf", width = 7, height = 6)
+# pdf("./outputs/figures/NMDS_combined_scaling.pdf", width = 7, height = 6)
 plot(nmds_coords_combined[, 1], nmds_coords_combined[, 2], type = "n", xlim = c(min(nmds_coords_combined[, 1]) - 0.25, max(nmds_coords_combined[, 1]) + 0.25), 
      ylim = c(min(nmds_coords_combined[, 2]) - 0.25, max(nmds_coords_combined[, 2]) + 0.25))
 # Plot core and averaged sites
@@ -333,7 +333,7 @@ for(i in 1:nrow(core_data)) {
 legend("topright", legend = c("Core", "Averaged"), col = c("red", "blue"), pch = 19, cex = 0.8)
 # Add labels for each site based on location_id 
 text(nmds_coords_combined[, 1], nmds_coords_combined[, 2], labels = rownames(nmds_coords_combined), pos = 3, cex = 0.8, col = "black")
-dev.off()
+# dev.off()
 
 
 # Combine and prepare your community matrix with group labels
