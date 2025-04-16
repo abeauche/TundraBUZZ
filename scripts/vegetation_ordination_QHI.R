@@ -336,6 +336,43 @@ text(nmds_coords_combined[, 1], nmds_coords_combined[, 2], labels = rownames(nmd
 dev.off()
 
 
+# Combine and prepare your community matrix with group labels
+combined_matrix <- rbind(veg_matrix_core, veg_matrix_averaged)
+combined_matrix_numeric <- combined_matrix %>%
+  select(!site_id)
+group <- factor(c(rep("core", nrow(veg_matrix_core)), rep("average", nrow(veg_matrix_averaged))))
+
+
+# Run PERMANOVA
+adonis2_result <- adonis2(combined_matrix_numeric ~ group, method = "bray", permutations = 999)
+print(adonis2_result)
+
+# 1. Calculate Bray-Curtis distances
+bray_dist <- vegdist(combined_matrix_numeric, method = "bray")
+
+# 2. Create group factor
+group <- factor(c(rep("core", nrow(veg_matrix_core)), rep("average", nrow(veg_matrix_averaged))))
+
+# 3. Run the dispersion test
+dispersion <- betadisper(bray_dist, group)
+
+# 4. Test for significance
+dispersion_test <- permutest(dispersion)
+print(dispersion_test)
+
+# 5. Optional: visualize the dispersion
+plot(dispersion, hull = FALSE)
+boxplot(dispersion, main = "Multivariate Dispersion by Group")
+
+
+# Convert adonis2 result to a data frame
+adonis_df <- as.data.frame(adonis2_result)
+
+# Write to CSV
+write.csv(adonis_df, "./outputs/permanova_results_corevssite.csv", row.names = TRUE)
+
+
+
 
 #### PERMANOVA? ----
 # Running PERMANOVA to test if microclimate gradient significantly explains NMDS axes
