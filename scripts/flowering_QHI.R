@@ -432,9 +432,9 @@ saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_mo
 # saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
 
 mod_first <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
-# mod_last <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
-# mod_peak <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
-# mod_duration <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
+mod_last <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
+mod_peak <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
+mod_duration <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
 
 
 #### Coding club code
