@@ -1704,6 +1704,41 @@ p1 / p2  + plot_layout(heights = c(6, 1))
 
 
 
+# Total nectar per microclimate
+
+combined_data_filtered_noNA <- combined_data_filtered %>%
+  mutate(
+    daily_nectar_sugar_mg = ifelse(is.na(daily_nectar_sugar_mg), 0, daily_nectar_sugar_mg)
+  ) 
+
+microclimate_nectar <- combined_data_filtered_noNA %>%
+  group_by(microclimate) %>%
+  summarise(
+    avg_daily_nectar = mean(daily_nectar_sugar_mg),
+    sd_nectar = sd(daily_nectar_sugar_mg),
+    n = n(),
+    se_nectar = sd_nectar / sqrt(n)
+  )
+
+library(car)
+leveneTest(daily_nectar_sugar_mg ~ as.factor(microclimate), data = combined_data_filtered_noNA)
+
+kruskal.test(daily_nectar_sugar_mg ~ as.factor(microclimate), data = combined_data_filtered_noNA)
+
+ggplot(combined_data_filtered_noNA, aes(x = microclimate, y = daily_nectar_sugar_mg)) +
+  geom_boxplot(aes(fill = microclimate)) +
+  labs(
+    x = "Microclimate",
+    y = "Daily Nectar Sugar (mg)"
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  ) +
+  scale_fill_manual(values = c("#440154", "forestgreen", "gold"))
+
+
 #### Define top days of activity ----
 
 # get top 10% dates of activity per site
