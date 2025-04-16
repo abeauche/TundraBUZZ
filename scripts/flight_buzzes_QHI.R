@@ -68,6 +68,8 @@ table(summary_flightbuzzes_ARUQ_2024$location_id)
 levels(summary_flightbuzzes_ARUQ_2024$microclimate)
 table(summary_flightbuzzes_ARUQ_2024$microclimate)
 
+table(daily_summary_flightbuzzes_ARUQ_2024$location_id)
+
 # Check timezone
 attr(summary_flightbuzzes_ARUQ_2024$datetime, "tzone")
 
@@ -112,7 +114,7 @@ flight_buzz_hourly <- hourly_summary_flightbuzzes_ARUQ_2024 %>%
 
 flight_buzz_hourly <- flight_buzz_hourly %>%
   mutate(time_hour = hms::as_hms(floor_date(datetime, unit = "hour")))
-
+table(flight_buzz_hourly$location_id)
 # write_csv(flight_buzz_hourly, "/Volumes/TundraBUZZ/data/clean/flight_buzz_hourly.csv")
 
 ## Daily datasets
@@ -2518,6 +2520,22 @@ ggplot(slope_temp_df, aes(x = summer_temp, y = slope)) +
 
 ##### SOON: MAKE THIS IN BAYESIAN FRAMEWORK
 
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(duration_rounded = round(daily_duration_above_threshold))
+flight_buzz_daily <- flight_buzz_daily %>%
+  left_join(mean_summer_temp, by = "location_id")
+flight_buzz_daily <- flight_buzz_daily %>%
+  arrange(date) %>%
+  mutate(date_num = as.numeric(((date - min(date))/86400) +1)) %>%
+  ungroup()
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(mean_temp_center = scale(mean_temp, center = TRUE, scale = FALSE))  # Center only
+flight_buzz_daily <- flight_buzz_daily %>%
+  mutate(
+    summer_GDD0_100s_c = (summer_GDD0 / 100) - mean(summer_GDD0 / 100, na.rm = TRUE)
+  )
+mean_temp_raw_mean <- mean(flight_buzz_daily$mean_temp, na.rm = TRUE)
+
 # Plot total flight buzz duration vs. mean temperature
 ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   geom_point() +
@@ -2539,12 +2557,7 @@ ggplot(predictions, aes(x = mean_temp, y = daily_duration_above_threshold)) +
   facet_wrap(~microclimate) +
   scale_colour_manual(values = c("grey44", "#440154", "forestgreen", "gold"))
 
-
-
-
 # Fit Bayesian model with group-specific slopes and intercepts for microclimate
-flight_buzz_daily <- flight_buzz_daily %>%
-  mutate(duration_rounded = round(daily_duration_above_threshold))
 
 hist(flight_buzz_daily$duration_rounded)
 hist(flight_buzz_daily$mean_temp)
@@ -2582,26 +2595,10 @@ summary(temp_flight_buzz_bayes2)
 plot(temp_flight_buzz_bayes2)
 pp_check(temp_flight_buzz_bayes2)
 
-flight_buzz_daily <- flight_buzz_daily %>%
-  left_join(mean_summer_temp, by = "location_id")
-  
-
-flight_buzz_daily <- flight_buzz_daily %>%
-  arrange(date) %>%
-  mutate(date_num = as.numeric(((date - min(date))/86400) +1)) %>%
-  ungroup()
-flight_buzz_daily <- flight_buzz_daily %>%
-  mutate(mean_temp_center = scale(mean_temp, center = TRUE, scale = FALSE))  # Center only
 
 hist(flight_buzz_daily$duration_rounded)
 hist(flight_buzz_daily$mean_temp)
 hist(flight_buzz_daily$mean_temp_center)
-
-flight_buzz_daily <- flight_buzz_daily %>%
-  mutate(
-    summer_GDD0_100s_c = (summer_GDD0 / 100) - mean(summer_GDD0 / 100, na.rm = TRUE)
-  )
-
 hist(flight_buzz_daily$summer_GDD0_100s_c)
 
 prior <- c(
@@ -2717,7 +2714,6 @@ preds <- fitted(temp_flight_buzz_bayes_microclim,
 
 str(preds)
 
-mean_temp_raw_mean <- mean(flight_buzz_daily$mean_temp, na.rm = TRUE)
 
 # Combine predictions with original data
 flight_buzz_preds <- flight_buzz_daily %>%
@@ -2915,7 +2911,7 @@ flight_buzz_daily_clean$pred <- predict(model_lmer_spline, newdata = flight_buzz
 # Plot data with model predictions
 ggplot(flight_buzz_daily_clean, aes(x = mean_temp_center + mean_temp_raw_mean, y = duration_rounded)) +
   geom_point(alpha = 0.6) +  # raw data points
-  geom_line(aes(y = pred, group = location_id), size = 1.2) +  # fitted line
+  geom_line(aes(y = pred, group = location_id), linewidth = 1.2) +  # fitted line
   labs(
     x = "Mean Temperature (°C)",
     y = "Flight Buzz Duration (s)"
@@ -2939,7 +2935,7 @@ flight_buzz_daily_clean$ci_upper <- flight_buzz_daily_clean$pred + 1.96 * flight
 ggplot(flight_buzz_daily_clean, aes(x = mean_temp_center + mean_temp_raw_mean, y = duration_rounded)) +
   geom_point(alpha = 0.6) +  # raw data points
   geom_line(aes(y = pred, colour = microclimate, group = location_id), size = 1.2) +  # fitted line
-  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper, colour = microclimate, fill = microclimate, group = location_id), alpha = 0.3) +  # CI ribbon
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper, fill = microclimate, group = location_id), alpha = 0.3) +  # CI ribbon
   geom_vline(xintercept = 6, color = "orange", linetype = "dashed", size = 1, alpha = 0.7) +
   geom_vline(xintercept = 12.6, color = "orange4", linetype = "dashed", size = 1, alpha = 0.7) +
   annotate("text", x = 6, y = max(flight_buzz_daily_clean$duration_rounded, na.rm = TRUE) * 0.5, 
@@ -2947,8 +2943,8 @@ ggplot(flight_buzz_daily_clean, aes(x = mean_temp_center + mean_temp_raw_mean, y
   annotate("text", x = 12.6, y = max(flight_buzz_daily_clean$duration_rounded, na.rm = TRUE) * 0.5, 
            label = "B. frigidus (W)", color = "orange4", angle = 90, hjust = 0.5, vjust = -1, fontface = "italic") +
   labs(
-    x = "Mean Temperature (°C)",
-    y = "Flight Buzz Duration (s)",
+    x = "Daily Mean Temperature (°C)",
+    y = "Daily Bumblebee Flight Buzz Detections (s)",
     colour = "Microclimate",
     fill = "Microclimate"
   ) +
@@ -2997,6 +2993,15 @@ results_joined <- results %>%
 results_joined %>%
   group_by(microclimate) %>%
   summarize(mean_temp_threshold = mean(temp_threshold))
+
+results_joined %>%
+  summarize(
+    mean_temp_threshold = mean(temp_threshold),
+    sd_temp_threshold = sd(temp_threshold),
+    n = n(),
+    se_temp_threshold = sd_temp_threshold / sqrt(n)
+  )
+
 
 ggplot(results_joined, aes(x = summer_GDD0, y = temp_threshold)) +
   geom_smooth(method = "lm", size = 1.2, colour = "grey44") +  # fitted line
