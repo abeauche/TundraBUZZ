@@ -416,9 +416,8 @@ model_bayes_GDD0_summary <- summary(model_bayes_GDD0)$fixed %>%
 
 # View or export to CSV
 # write.csv(model_bayes_GDD0_summary, "outputs/effect_summary_bayes_floweringbuzz_GDD0.csv", row.names = FALSE)
-# saveRDS(model_bayes_GDD0_summary, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
-
-
+# saveRDS(model_bayes_GDD0, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
+# model_bayes_GDD0 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
 
 
 library(GGally)
@@ -1263,7 +1262,7 @@ model_summary_clean <- model_summary %>%
     term_label = recode(term,
                         "mean_temp_z" = "Mean Temperature (°C)",
                         "daily_nectar_sugar_mg_z" = "Nectar Sugar (mg)",
-                        "mean_wind_speed_z" = "Wind Speed (m/s)",
+                        "mean_wind_speed_z" = "Wind Speed (km/h)",
                         "mean_stn_press_k_pa_z" = "Air Pressure (kPa)",
                         "avg_air_rh_1m_z" = "Relative Humidity (%)",
                         "day_length_hours_z" = "Night Length (hrs)",
@@ -1289,7 +1288,7 @@ environmental_summary_plot <- ggplot(model_summary_clean, aes(x = estimate, y = 
   scale_color_manual(values = c(
     "Positive" = "darkgreen",
     "Negative" = "orange2",
-    "Uncertain" = "grey44"
+    "Uncertain" = "black"
   )) +
   labs(
     x = "Effect Size and Credible Intervals",
@@ -1777,7 +1776,7 @@ model_summary_binomial <- summary(model_binomial)$fixed %>%
 
 # View or export to CSV
 # write.csv(model_summary_binomial, "outputs/model_summary_overlap.csv", row.names = FALSE)
-
+# model_summary_binomial <- read_csv("outputs/model_summary_overlap.csv")
          
 # Load the necessary library
 library(ggeffects)
@@ -1812,6 +1811,7 @@ ggplot(predicted, aes(x = x)) +
 
 
 # saveRDS(model_binomial, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_proportion_flowering.rds")
+# model_binomial <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_proportion_flowering.rds")
 
 
 
