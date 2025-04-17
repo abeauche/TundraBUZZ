@@ -92,6 +92,7 @@ tms.calc <- mc_calc_vwc(tms.f, soiltype = "universal")
 
 # Growing Degree Days (GDD) from soil temperature at 3 cm depth
 tms.calc <- mc_calc_gdd(tms.calc, sensor = "TMS_T3")
+tms.calc <- mc_calc_gdd(tms.calc, sensor = "TMS_T3", t_base = 4)
 tms.calc <- mc_calc_gdd(tms.calc, sensor = "TMS_T3", t_base = 0)
 
 # Freezing Degree Days (FDD) from same sensor
@@ -136,6 +137,12 @@ hourly_dt_GDD5 <- hourly_dt_GDD5 %>%
 hourly_dt_GDD0 <- hourly_dt %>%
   filter(sensor_name == "GDD0_mean") ##only taking TMS_T3_mean
 hourly_dt_GDD0 <- hourly_dt_GDD0 %>%
+  select(locality_id, value, datetime_local)
+
+# Select for GDD0
+hourly_dt_BDD <- hourly_dt %>%
+  filter(sensor_name == "GDD4_mean") ##only taking TMS_T3_mean
+hourly_dt_BDD <- hourly_dt_BDD %>%
   select(locality_id, value, datetime_local)
 
 # Export object
@@ -253,6 +260,13 @@ daily_dt_GDD0 <- daily_dt %>%
 daily_dt_GDD0 <- daily_dt_GDD0 %>%
   select(locality_id, datetime, value, year, month, day, week)
 
+# Select for GDD4 --> Bumblebee Degree Days
+daily_dt_BDD <- daily_dt %>%
+  filter(sensor_name == "GDD4_mean") ##only taking TMS_T3_mean
+daily_dt_BDD <- daily_dt_BDD %>%
+  select(locality_id, datetime, value, year, month, day, week)
+
+
 daily_dt_T3 <- daily_dt_T3 %>%
   select(locality_id, datetime, value, year, month, day, week)
 
@@ -260,6 +274,7 @@ daily_dt_T3 <- daily_dt_T3 %>%
 daily_dt_T3 <- daily_dt_T3[year == 2024,]
 daily_dt_GDD5 <- daily_dt_GDD5[year == 2024,]
 daily_dt_GDD0 <- daily_dt_GDD0[year == 2024,]
+daily_dt_BDD <- daily_dt_BDD[year == 2024,]
 
 # Filter for summer months
 daily_dt_T3_filtered <- daily_dt_T3 %>%
@@ -279,6 +294,10 @@ daily_GDD0_mapped <- location_mapping %>%
   mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
   left_join(daily_dt_GDD0, by = c("tomst_id" = "locality_id")) %>%
   select(-tomst_id)
+daily_BDD_mapped <- location_mapping %>%
+  mutate(tomst_id = paste0("TOMST", tomst_id, "_QHI")) %>%
+  left_join(daily_dt_BDD, by = c("tomst_id" = "locality_id")) %>%
+  select(-tomst_id)
 
 # Add cumulative GDD (based on mean hourly GDD)
 daily_GDD5_mapped <- daily_GDD5_mapped %>%
@@ -290,6 +309,11 @@ daily_GDD0_mapped <- daily_GDD0_mapped %>%
   arrange(location_id, datetime) %>%
   group_by(location_id) %>%
   mutate(cumulative_GDD0 = cumsum(value)*96) %>%
+  ungroup()
+daily_BDD_mapped <- daily_BDD_mapped %>%
+  arrange(location_id, datetime) %>%
+  group_by(location_id) %>%
+  mutate(cumulative_BDD = cumsum(value)*96) %>%
   ungroup()
 
 # Join cumulative GDD5 and GDD0 to daily_temp_mapped by location_id and datetime
@@ -303,11 +327,19 @@ daily_temp_mapped <- daily_temp_mapped %>%
     daily_GDD0_mapped %>%
       select(location_id, datetime, cumulative_GDD0),  # Select only the necessary columns
     by = c("location_id", "datetime")
+  ) %>%
+  left_join(
+    daily_BDD_mapped %>%
+      select(location_id, datetime, cumulative_BDD),  # Select only the necessary columns
+    by = c("location_id", "datetime")
   )
 
 # write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 # write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
 # write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
+
+# daily_GDD5_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
+# daily_GDD0_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
 
 #### ----
 # daily_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
@@ -317,7 +349,8 @@ ordered_site_temp_summer <- daily_temp_mapped %>%
   group_by(location_id) %>%
   summarize(summer_temp = mean(value, na.rm = TRUE),
             summer_GDD0 = max(cumulative_GDD0, na.rm = TRUE),
-            summer_GDD5 = max(cumulative_GDD5, na.rm = TRUE)) %>%
+            summer_GDD5 = max(cumulative_GDD5, na.rm = TRUE),
+            summer_BDD = max(cumulative_BDD, na.rm = TRUE)) %>%
   arrange(desc(summer_temp))
 
 # write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
@@ -339,15 +372,15 @@ ordered_site_GDD5 <- daily_temp_mapped %>%
 cumulative_GDD <- ggplot(daily_temp_mapped, aes(x = datetime, colour = microclimate, fill = microclimate)) +
   # Points for GDD0 and GDD5 with different shapes
   geom_point(aes(y = cumulative_GDD0, shape = "GDD0"), size = 2, alpha = 0.3) +
-  geom_point(aes(y = cumulative_GDD5, shape = "GDD5"), size = 2, alpha = 0.3) +
+  geom_point(aes(y = cumulative_BDD, shape = "BDD"), size = 2, alpha = 0.3) +
   
   geom_line(aes(y = cumulative_GDD0, linetype = "GDD0", group = location_id), linewidth = 1, alpha = 0.1) +
-  geom_line(aes(y = cumulative_GDD5, linetype = "GDD5", group = location_id), linewidth = 1, alpha = 0.1) +
+  geom_line(aes(y = cumulative_BDD, linetype = "BDD", group = location_id), linewidth = 1, alpha = 0.1) +
   
   
   # Smooth lines with different linetypes
   geom_smooth(aes(y = cumulative_GDD0, linetype = "GDD0"), method = "loess", se = F) +
-  geom_smooth(aes(y = cumulative_GDD5, linetype = "GDD5"), method = "loess", se = F) +
+  geom_smooth(aes(y = cumulative_BDD, linetype = "BDD"), method = "loess", se = F) +
   
   # Labels and themes
   labs(x = "Date", 
@@ -359,8 +392,8 @@ cumulative_GDD <- ggplot(daily_temp_mapped, aes(x = datetime, colour = microclim
   
   scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
   scale_fill_manual(values = c("#440154", "forestgreen", "gold")) +
-  scale_shape_manual(values = c("GDD0" = 16, "GDD5" = 17)) +
-  scale_linetype_manual(values = c("GDD0" = "solid", "GDD5" = "dashed")) +
+  scale_shape_manual(values = c("GDD0" = 16, "BDD" = 17)) +
+  scale_linetype_manual(values = c("GDD0" = "solid", "BDD" = "dashed")) +
   theme_classic()
 
 # Save figure
@@ -402,7 +435,7 @@ clean_summer_temp_per_microclimate <- ggplot(ordered_site_temp_summer, aes(x = m
 
 # Convert to long format
 GDD_long <- ordered_site_temp_summer %>%
-  pivot_longer(cols = c(summer_GDD0, summer_GDD5),
+  pivot_longer(cols = c(summer_GDD0, summer_BDD),
                names_to = "GDD_type",
                values_to = "GDD_value")
 
@@ -412,8 +445,8 @@ GDD_by_temp <- ggplot(GDD_long, aes(x = summer_temp, y = GDD_value, colour = GDD
   geom_smooth(method = "lm") +
   theme_classic() +
   scale_colour_manual(
-    values = c("summer_GDD0" = "steelblue", "summer_GDD5" = "orange3"),
-    labels = c("GDD (0°C base)", "GDD (5°C base)"),
+    values = c("summer_GDD0" = "steelblue", "summer_BDD" = "orange3"),
+    labels = c("GDD (0°C base)", "BDD (4°C base)"),
     name = "GDD Type"
   ) +
   labs(
@@ -436,3 +469,17 @@ slopes <- GDD_long %>%
   select(GDD_type, estimate, std.error, statistic, p.value)
 
 print(slopes)
+
+
+# Plot
+BDD_to_GDD <- ggplot(ordered_site_temp_summer, aes(x = summer_GDD0, y = (summer_GDD0 - summer_BDD), color = summer_temp)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, colour = "grey40") +
+  scale_color_viridis_c(name = "Mean Summer\nTemp (°C)") +
+  theme_classic() +
+  labs(
+    x = "Cumulative Growing Degree Days per Site (T = 0°C)",
+    y = "Difference in BDD per Site Rel. To GDD (T = 4°C)"
+  )
+
