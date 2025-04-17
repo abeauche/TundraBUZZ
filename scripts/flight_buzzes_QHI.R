@@ -285,6 +285,13 @@ peak_temp_flowering <- peak_temp_flowering %>%
     peak_date_numeric = peak_date_numeric - 19913.5,
     peak_flowering_numeric = peak_flowering_numeric - 19913.5)
 
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(
+    summer_GDD0_100 = summer_GDD0 / 100,
+    summer_temp_centered = summer_temp - mean(summer_temp, na.rm = TRUE)
+  )
+peak_temp_flowering <- peak_temp_flowering %>%
+  mutate(summer_GDD0_100_c = summer_GDD0_100 - mean(summer_GDD0_100))
 
 # Fit the model
 model_peak <- lm(peak_date_numeric ~ peak_flowering_numeric + summer_temp, data = peak_temp_flowering)
@@ -313,13 +320,6 @@ numeric_data <- peak_temp_flowering %>%
 numeric_data_GDD0 <- peak_temp_flowering %>%
   select(peak_date_numeric, peak_flowering_numeric, summer_GDD0)
 
-# Apply centering and scaling
-preprocessed_data <- preProcess(numeric_data, method = c("center", "scale"))
-preprocessed_data_GDD0 <- preProcess(numeric_data_GDD0, method = c("center", "scale"))
-
-# Extract the scaled values
-scaled_values <- predict(preprocessed_data, numeric_data)
-scaled_values_GDD0 <- predict(preprocessed_data_GDD0, numeric_data_GDD0)
 
 priors <- c(
   prior(normal(0, 1), class = "b"),  # Main effects (coefficients for predictors)
@@ -377,16 +377,16 @@ model_bayes_scaled2 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/out
 
 
 priors_GDD0 <- c(
-  prior(normal(1, 0.1), class = "b"),  # Main effects (coefficients for predictors)
-  prior(normal(0, 3), class = "b", coef = "peak_flowering_numeric:summer_GDD0"),  # Interaction
+  prior(normal(0, 1), class = "b"),  # Main effects (coefficients for predictors)
+  prior(normal(0, 3), class = "b", coef = "peak_flowering_numeric:summer_GDD0_100_c"),  # Interaction
   prior(normal(0, 1), class = "Intercept"),  # Prior for the intercept
   prior(exponential(1), class = "sigma")  # Prior for the residual SD
 )
 
 
-model_bayes_GDD0 <- brm(
-  peak_date_numeric ~ peak_flowering_numeric * summer_GDD0,
-  data = scaled_values_GDD0,
+model_bayes_GDD0_100_c <- brm(
+  peak_date_numeric ~ peak_flowering_numeric * summer_GDD0_100_c,
+  data = peak_temp_flowering,
   prior = priors_GDD0,
   chains = 4,
   iter = 4000,
@@ -396,16 +396,16 @@ model_bayes_GDD0 <- brm(
   control = list(adapt_delta = 0.999)
 )
 
-summary(model_bayes_GDD0)
-plot(model_bayes_GDD0)
-pp_check(model_bayes_GDD0)
+summary(model_bayes_GDD0_100_c)
+plot(model_bayes_GDD0_100_c)
+pp_check(model_bayes_GDD0_100_c)
 
 
-conditional_effects(model_bayes_GDD0)
+conditional_effects(model_bayes_GDD0_100_c)
 
 
 # Get model summary
-model_bayes_GDD0_summary <- summary(model_bayes_GDD0)$fixed %>%
+model_bayes_GDD0_100_c_summary <- summary(model_bayes_GDD0_100_c)$fixed %>%
   as_tibble(rownames = "term") %>%
   rename(
     estimate = Estimate,
@@ -418,10 +418,74 @@ model_bayes_GDD0_summary <- summary(model_bayes_GDD0)$fixed %>%
   )
 
 # View or export to CSV
-# write.csv(model_bayes_GDD0_summary, "outputs/effect_summary_bayes_floweringbuzz_GDD0.csv", row.names = FALSE)
-# saveRDS(model_bayes_GDD0, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
+# write.csv(model_bayes_GDD0_100_c_summary, "outputs/effect_summary_bayes_floweringbuzz_GDD0_100_c.csv", row.names = FALSE)
+# saveRDS(model_bayes_GDD0_100_c, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter_100_c.rds")
 # model_bayes_GDD0 <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
 
+priors_GDD0_interaction <- c(
+  prior(normal(0, 1), class = "b"),  # Main effects for predictors (fixed coefficients)
+  prior(normal(0, 3), class = "b", coef = "peak_flowering_numeric:summer_GDD0_100_c"),  # Interaction term
+  prior(normal(0, 1), class = "Intercept"),  # Intercept prior
+  prior(exponential(1), class = "sigma")  # Residual SD prior
+)
+
+model_bayes_GDD0_interaction <- brm(
+  peak_date_numeric ~ peak_flowering_numeric + summer_GDD0_100_c + peak_flowering_numeric:summer_GDD0_100_c,  # Interaction included
+  data = peak_temp_flowering,
+  prior = priors_GDD0_interaction,
+  chains = 4,
+  iter = 4000,
+  warmup = 1000,
+  seed = 123,
+  cores = 4,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(model_bayes_GDD0_interaction)
+plot(model_bayes_GDD0_interaction)
+pp_check(model_bayes_GDD0_interaction)
+
+# Get model summary
+model_bayes_GDD0_100_interaction_summary <- summary(model_bayes_GDD0_interaction)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  )
+# write.csv(model_bayes_GDD0_100_interaction_summary, "outputs/effect_summary_bayes_floweringbuzz_GDD0_interaction_100_c.csv", row.names = FALSE)
+# saveRDS(model_bayes_GDD0_interaction, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter.rds")
+
+priors_GDD0_informed <- c(
+  prior(normal(1.1, 0.1), class = "b", coef = "peak_flowering_numeric"),  # strong positive
+  prior(normal(-0.3, 0.3), class = "b", coef = "summer_GDD0_100_c"),      # weak negative
+  prior(normal(0.3, 0.5), class = "b", coef = "peak_flowering_numeric:summer_GDD0_100_c"),  # weak positive
+  prior(normal(0, 1), class = "Intercept"),
+  prior(exponential(1), class = "sigma")
+)
+
+model_bayes_GDD0_interaction_informed <- brm(
+  peak_date_numeric ~ peak_flowering_numeric + summer_GDD0_100_c + peak_flowering_numeric:summer_GDD0_100_c,  # Interaction included
+  data = peak_temp_flowering,
+  prior = priors_GDD0_informed,
+  chains = 4,
+  iter = 4000,
+  warmup = 1000,
+  seed = 123,
+  cores = 4,
+  control = list(adapt_delta = 0.999)
+)
+
+summary(model_bayes_GDD0_interaction_informed)
+plot(model_bayes_GDD0_interaction_informed)
+pp_check(model_bayes_GDD0_interaction_informed)
+
+# write.csv(model_bayes_GDD0_interaction_informed, "outputs/effect_summary_bayes_floweringbuzz_GDD0inter_informed.csv", row.names = FALSE)
+# saveRDS(model_bayes_GDD0_interaction_informed, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/buzz_to_floweringGDD0inter_informed.rds")
 
 library(GGally)
 
@@ -537,7 +601,7 @@ summary(model_peak_date_bayesian)
 plot(model_peak_date_bayesian)
 pp_check(model_peak_date_bayesian)
 # saveRDS(model_peak_date_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
-# model_peak_date_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
+model_peak_date_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_activitydate_GDD0_bayesian.rds")
 
 model_peak_date_bayesian_summary <- summary(model_peak_date_bayesian)$fixed %>%
   as_tibble(rownames = "term") %>%
@@ -551,8 +615,28 @@ model_peak_date_bayesian_summary <- summary(model_peak_date_bayesian)$fixed %>%
     Tail_ESS = Tail_ESS
   )
 
+model_peak_date_bayesian_summary_scaled <- summary(model_peak_date_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
 # View or export to CSV
 write.csv(model_peak_date_bayesian_summary, "outputs/model_peak_date_bayesian_summary.csv", row.names = FALSE)
+# View or export to CSV
+write.csv(model_peak_date_bayesian_summary_scaled, "outputs/model_peak_date_bayesian_summary_scaled.csv", row.names = FALSE)
 
 summary(model_peak_flowering_bayesian)
 plot(model_peak_flowering_bayesian)
@@ -572,14 +656,33 @@ model_peak_flowering_bayesian_summary <- summary(model_peak_flowering_bayesian)$
     Tail_ESS = Tail_ESS
   )
 
+model_peak_flowering_bayesian_summary_scaled <- summary(model_peak_flowering_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
 # View or export to CSV
 write.csv(model_peak_flowering_bayesian_summary, "outputs/model_peak_flowering_bayesian_summary.csv", row.names = FALSE)
+write.csv(model_peak_flowering_bayesian_summary_scaled, "outputs/model_peak_flowering_bayesian_summary_scaled.csv", row.names = FALSE)
 
 summary(model_difference_days_bayesian)
 plot(model_difference_days_bayesian)
 pp_check(model_difference_days_bayesian)
 # saveRDS(model_difference_days_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
-# model_difference_days_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
+model_difference_days_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_diff_peak_activity_flowering_GDD0_bayesian.rds")
 
 model_difference_days_bayesian_summary <- summary(model_difference_days_bayesian)$fixed %>%
   as_tibble(rownames = "term") %>%
@@ -593,8 +696,27 @@ model_difference_days_bayesian_summary <- summary(model_difference_days_bayesian
     Tail_ESS = Tail_ESS
   )
 
+model_difference_days_bayesian_summary_scaled <- summary(model_difference_days_bayesian)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
 # View or export to CSV
 write.csv(model_difference_days_bayesian_summary, "outputs/model_difference_days_bayesian_summary.csv", row.names = FALSE)
+write.csv(model_difference_days_bayesian_summary_scaled, "outputs/model_difference_days_bayesian_summary_scaled.csv", row.names = FALSE)
 
 
 # Generate predictions for each model
