@@ -349,7 +349,7 @@ mod_first <- brm(
   data = flowering_bayes,
   family = gaussian(),
   prior = c(
-    prior(normal(0, 5), class = "Intercept"),
+    prior(normal(2, 5), class = "Intercept"),
     prior(normal(-0.05, 0.15), class = "b", coef = "summer_GDD0"),
     prior(exponential(1), class = "sigma")
   ),
@@ -357,7 +357,7 @@ mod_first <- brm(
   chains = 4,
   iter = 4000,
   warmup = 2000,
-  control = list(adapt_delta = 0.95)
+  control = list(adapt_delta = 0.999, max_treedepth = 15)
 )
 summary(mod_first)
 plot(mod_first)
@@ -426,7 +426,7 @@ pp_check(mod_duration)
 
 
 # Save each model as an RDS file
-saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
+# saveRDS(mod_first, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_first.rds")
 # saveRDS(mod_last, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
 # saveRDS(mod_peak, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
 # saveRDS(mod_duration, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
