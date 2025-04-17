@@ -1738,6 +1738,14 @@ ggplot(combined_data_filtered_noNA, aes(x = microclimate, y = daily_nectar_sugar
   ) +
   scale_fill_manual(values = c("#440154", "forestgreen", "gold"))
 
+combined_data_filtered_noNA %>%
+  summarise(
+    avg_daily_nectar = mean(daily_nectar_sugar_mg),
+    sd_nectar = sd(daily_nectar_sugar_mg),
+    n = n(),
+    se_nectar = sd_nectar / sqrt(n)
+  )
+
 
 #### Define top days of activity ----
 
