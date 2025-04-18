@@ -1,0 +1,87 @@
+---
+title: "TundraBUZZ Model Reports"
+author: "Alexandre Beauchemin"
+date: "2025-04-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+## Mismatch models
+
+
+## 3.1.2. 
+
+#### **Regression Coefficients**
+
+| **Parameter**                     | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:----------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| **Intercept**                      |     4.69     |      0.96     | [2.86, 6.62]    |     1.00 |     10274     |      8099     |
+| **peak_flowering_numeric**         |     1.12     |      0.09     | [0.95, 1.29]    |     1.00 |     11216     |      7944     |
+| summer_GDD0_100_c              |    -0.30     |      0.30     | [-0.88, 0.29]   |     1.00 |     11224     |      8264     |
+| peak_flowering_numeric:summer_GDD0_100_c |  0.31  |      0.50     | [-0.65, 1.28]   |     1.00 |     11783     |      8333     |
+
+#### **Further Distributional Parameters**
+
+| **Parameter**                     | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:----------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| **sigma**                          |     4.76     |      0.95     | [3.27, 6.99]    |     1.00 |      9706     |      8238     |
+
+
+
+## 3.1.3. Binomial model of overlap probability
+
+#### **Regression Coefficients**
+
+| **Parameter**               | **Estimate** | **Est.Error** | **95% CI**       | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:----------------------------|-------------:|--------------:|:----------------:|---------:|-------------:|-------------:|
+| **Intercept**                |     1.20     |      0.32     | [0.59, 1.88]     |     1.00 |      8914     |      7848     |
+| summer_GDD0_scaled       |    -0.66     |      0.38     | [-1.41, 0.08]    |     1.00 |      8473     |      7423     |
+
+
+
+## 3.2. Drivers of bumblebee activity
+
+
+#### **Correlation Structures**
+
+| **Parameter**        | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:---------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| ar[1]            |     0.44     |      0.35     | [-0.42, 0.91]   |     1.00 |       908     |       2337    |
+| **sderr**            |     0.52     |      0.21     | [0.13, 0.98]    |     1.00 |       633     |       443     |
+
+#### **Multilevel Hyperparameters** (Location-specific effects, number of levels: 9)
+
+| **Parameter**                   | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:---------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| **sd(Intercept)**                |     0.37     |      0.35     | [0.02, 1.18]    |     1.00 |      1674     |      1532     |
+| **sd(mean_temp_z)**              |     0.25     |      0.20     | [0.01, 0.73]    |     1.00 |      2348     |      3564     |
+| **sd(daily_nectar_sugar_mg_z)**  |     0.45     |      0.30     | [0.02, 1.15]    |     1.00 |      1587     |      2852     |
+| cor(Intercept, mean_temp_z)  |    -0.04     |      0.49     | [-0.88, 0.85]   |     1.00 |      4978     |      5592     |
+| cor(Intercept, daily_nectar_sugar_mg_z) |    -0.37 |      0.47     | [-0.96, 0.71]   |     1.00 |      1982     |      3261     |
+| cor(mean_temp_z, daily_nectar_sugar_mg_z) |  0.13  |      0.48     | [-0.82, 0.90]   |     1.00 |      4601     |      5560     |
+
+#### **Regression Coefficients**
+
+| **Parameter**                     | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:----------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| **Intercept**                     |     5.00     |      0.42     | [4.08, 5.60]    |     1.00 |      2293     |      1389     |
+| **mean_temp_z**                   |     0.57     |      0.19     | [0.22, 0.98]    |     1.00 |      4669     |      3687     |
+| daily_nectar_sugar_mg_z      |     0.27     |      0.24     | [-0.15, 0.81]   |     1.00 |      2965     |      3345     |
+| **mean_wind_speed_z**             |    -1.15     |      0.13     | [-1.41, -0.89]  |     1.00 |      3230     |      4533     |
+| mean_stn_press_k_pa_z         |     0.18     |      0.13     | [-0.08, 0.44]   |     1.00 |      6536     |      6351     |
+| avg_air_rh_1m_z               |     0.28     |      0.17     | [-0.06, 0.61]   |     1.00 |      6987     |      5953     |
+| **day_length_hours_z**            |    -1.14     |      0.37     | [-1.84, -0.40]  |     1.00 |      7677     |      6044     |
+| cloud_cover_pct_z             |     0.03     |      0.15     | [-0.26, 0.31]   |     1.00 |      5835     |      5122     |
+
+#### **Further Distributional Parameters**
+
+| **Parameter**                     | **Estimate** | **Est.Error** | **95% CI**      | **Rhat** | **Bulk_ESS** | **Tail_ESS** |
+|:----------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
+| **shape**                         |     1.02     |      0.32     | [0.72, 1.60]    |     1.00 |       776     |       550     |
+
+
