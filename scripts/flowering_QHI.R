@@ -349,7 +349,7 @@ mod_first <- brm(
   data = flowering_bayes,
   family = gaussian(),
   prior = c(
-    prior(normal(2, 5), class = "Intercept"),
+    prior(normal(3, 5), class = "Intercept"),
     prior(normal(-0.05, 0.15), class = "b", coef = "summer_GDD0"),
     prior(exponential(1), class = "sigma")
   ),
@@ -435,6 +435,79 @@ mod_first <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_
 mod_last <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
 mod_peak <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
 mod_duration <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
+
+mod_first_summary_scaled <- summary(mod_first)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
+
+mod_last_summary_scaled <- summary(mod_last)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
+mod_peak_summary_scaled <- summary(mod_peak)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
+
+mod_duration_summary_scaled <- summary(mod_duration)$fixed %>%
+  as_tibble(rownames = "term") %>%
+  rename(
+    estimate = Estimate,
+    est_error = Est.Error,
+    lower_95 = 'l-95% CI',
+    upper_95 = 'u-95% CI',
+    rhat = Rhat,
+    Bulk_ESS = Bulk_ESS,
+    Tail_ESS = Tail_ESS
+  ) %>%
+  mutate(
+    estimate = (estimate * 100),
+    est_error = (est_error * 100),
+    lower_95 = (lower_95 * 100),
+    upper_95 = (upper_95 * 100)
+  )
 
 
 #### Coding club code
@@ -578,15 +651,16 @@ slopes <- slopes %>%
 
 
 # Plot
-flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate, y = (trait))) +
+flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate*100, y = (trait))) +
   geom_point(size = 3) +
-  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2) +
+  geom_errorbarh(aes(xmin = conf.low*100, xmax = conf.high*100), height = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
   labs(
-    x = "Effect Size and Credible Interval of Cumul. GDD (T = 0°C)",
+    x = "Effect Size and Credible Intervals of 100-GDD Increase on Phenological Timing (T = 0°C)",
     y = "Flowering Season Trait"
   ) +
   theme_classic()
+
 
 # Save plot
 ggsave(

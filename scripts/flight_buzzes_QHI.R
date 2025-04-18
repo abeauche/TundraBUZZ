@@ -780,23 +780,23 @@ posterior_difference_days <- posterior_samples(model_difference_days_bayesian, p
 # Calculate the 95% credible intervals and the effect size (mean)
 summary_peak_date <- data.frame(
   effect = "Peak Bumblebee Activity",
-  mean = mean(posterior_peak_date$b_summer_GDD0),
-  lower = quantile(posterior_peak_date$b_summer_GDD0, 0.025),
-  upper = quantile(posterior_peak_date$b_summer_GDD0, 0.975)
+  mean = mean(posterior_peak_date$b_summer_GDD0)*100,
+  lower = quantile(posterior_peak_date$b_summer_GDD0, 0.025)*100,
+  upper = quantile(posterior_peak_date$b_summer_GDD0, 0.975)*100
 )
 
 summary_peak_flowering <- data.frame(
   effect = "Peak Flowering",
-  mean = mean(posterior_peak_flowering$b_summer_GDD0),
-  lower = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025),
-  upper = quantile(posterior_peak_flowering$b_summer_GDD0, 0.975)
+  mean = mean(posterior_peak_flowering$b_summer_GDD0)*100,
+  lower = quantile(posterior_peak_flowering$b_summer_GDD0, 0.025)*100,
+  upper = quantile(posterior_peak_flowering$b_summer_GDD0, 0.975)*100
 )
 
 summary_difference_days <- data.frame(
   effect = "Mismatch",
-  mean = mean(posterior_difference_days$b_summer_GDD0),
-  lower = quantile(posterior_difference_days$b_summer_GDD0, 0.025),
-  upper = quantile(posterior_difference_days$b_summer_GDD0, 0.975)
+  mean = mean(posterior_difference_days$b_summer_GDD0)*100,
+  lower = quantile(posterior_difference_days$b_summer_GDD0, 0.025)*100,
+  upper = quantile(posterior_difference_days$b_summer_GDD0, 0.975)*100
 )
 
 # Combine all summaries into one dataframe
@@ -809,7 +809,7 @@ bayesian_slopes_mismatch <- ggplot(summary_df, aes(y = effect, x = mean, xmin = 
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +  # Vertical dashed grey line
   labs(
     y = "Phenological Metric",
-    x = "Effect Size and Credible Intervals of Cumul. GDD (T = 0°C)"
+    x = "Effect Size and Credible Intervals of 100-GDD Increase on Phenological Timing (T = 0°C)"
   ) +
   scale_color_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen4", "Peak Flowering" = "darkgreen", "Mismatch" = "orange3")) +
   scale_fill_manual(values = c("Peak Bumblebee Activity" = "darkolivegreen4", "Peak Flowering" = "darkgreen", "Mismatch" = "orange3")) +
