@@ -67,7 +67,7 @@ ggplot(summary_pred_duration_0725, aes(x = datetime, y = total_duration_above_th
 
 
 ### PREDICTIONS 2024-07-02 ### ----
-ARUQ0_20240702_pred <- read_csv("/Users/alexandrebeauchemin/Desktop/ARUQ0/ARUQ0_20240702/predict_score_20240702.csv")
+ARUQ0_20240702_pred <- read_csv("/Volumes/TundraBUZZ/outputs/predict_score_20240702.csv")
 
 # Adjust the regular expression to capture the date (yyyymmdd) and time (hhmmss)
 ARUQ0_20240702_pred <- ARUQ0_20240702_pred %>%

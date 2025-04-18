@@ -642,7 +642,7 @@ summary(model_peak_flowering_bayesian)
 plot(model_peak_flowering_bayesian)
 pp_check(model_peak_flowering_bayesian)
 # saveRDS(model_peak_flowering_bayesian, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
-# model_peak_flowering_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
+model_peak_flowering_bayesian <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/model_peak_floweringdate_GDD0_bayesian.rds")
 
 model_peak_flowering_bayesian_summary <- summary(model_peak_flowering_bayesian)$fixed %>%
   as_tibble(rownames = "term") %>%
@@ -1357,7 +1357,11 @@ model_summary <- summary(nb_model)$fixed %>%
 write.csv(model_summary, "outputs/effect_summary_bayes_flight_buzzes_env_pred.csv", row.names = FALSE)
 
 # saveRDS(nb_model, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
-# nb_model <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
+nb_model <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayes_flight_buzzes_env_pred.rds")
+
+
+
+
 
 # Use ggpredict to generate predictions for each predictor
 
