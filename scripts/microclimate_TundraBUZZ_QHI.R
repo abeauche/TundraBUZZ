@@ -472,14 +472,14 @@ print(slopes)
 
 
 # Plot
-BDD_to_GDD <- ggplot(ordered_site_temp_summer, aes(x = summer_GDD0, y = (summer_GDD0 - summer_BDD), color = summer_temp)) +
+BDD_to_GDD <- ggplot(ordered_site_temp_summer, aes(x = summer_temp, y = (summer_GDD0 - summer_BDD), color = summer_temp)) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
   geom_point(size = 3) +
   geom_smooth(method = "lm", se = TRUE, colour = "grey40") +
   scale_color_viridis_c(name = "Mean Summer\nTemp (°C)") +
   theme_classic() +
   labs(
-    x = "Cumulative Growing Degree Days per Site (T = 0°C)",
-    y = "Difference in BDD per Site Rel. To GDD (T = 4°C)"
+    x = "Mean Summer Temperature (°C)",
+    y = "Δ GDD - BDD per site (T = 4°C)"
   )
 

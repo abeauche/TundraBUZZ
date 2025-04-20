@@ -744,6 +744,29 @@ ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, y = first_fl
   ) +
   theme_classic() 
 
+# Plot last flowering date
+ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, y = last_flowering, color = species)) +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_date(date_labels = "%b %d") +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "First Flowering Date",
+    colour = "Species"
+  ) +
+  theme_classic() 
+
+# Plot peak flowering date
+ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, y = peak_flowering, color = species)) +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_date(date_labels = "%b %d") +
+  labs(
+    x = "Mean Summer Temperature (°C)",
+    y = "First Flowering Date",
+    colour = "Species"
+  ) +
+  theme_classic() 
 
 
 # Mutate date objects to numeric
