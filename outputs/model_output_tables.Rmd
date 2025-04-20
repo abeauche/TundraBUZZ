@@ -84,4 +84,208 @@ knitr::opts_chunk$set(echo = TRUE)
 |:----------------------------------|-------------:|--------------:|:---------------:|---------:|-------------:|-------------:|
 | **shape**                         |     1.02     |      0.32     | [0.72, 1.60]    |     1.00 |       776     |       550     |
 
+### TEMP ACTIVITY
+
+```{r aic-comparison, echo=FALSE, message=FALSE, results='asis'}
+library(knitr)
+
+# AIC comparison table
+df_comparison <- data.frame(
+  df = 2:10,
+  AIC = c(5771.070, 5771.100, 5753.791, 5757.449, 5755.492, 5753.873, 5754.502, 5755.753, 5757.876)
+)
+
+# Highlight the lowest AIC
+df_comparison$Note <- ifelse(df_comparison$AIC == min(df_comparison$AIC), "Lowest AIC", "")
+
+# Render table
+kable(df_comparison,
+      caption = "AIC Comparison Across Model Degrees of Freedom",
+      digits = 3,
+      align = c("r", "r", "l"))
+```
+
+## Model outputs
+
+```{r lmer-spline-summary-full, echo=FALSE, message=FALSE}
+library(knitr)
+
+# REML criterion
+reml_criterion <- 5698.5
+
+# Scaled residuals
+scaled_resid <- data.frame(
+  Statistic = c("Min", "1Q", "Median", "3Q", "Max"),
+  Value = c(-1.6580, -0.5513, -0.2105, 0.2277, 6.6206)
+)
+
+# Random effects
+random_effects <- data.frame(
+  Group = c("location_id (Intercept)", "Residual"),
+  Variance = c(1761, 11695),
+  Std_Dev = c(41.96, 108.14)
+)
+
+# Fixed effects
+fixed_effects <- data.frame(
+  Term = c("(Intercept)", "Spline 1", "Spline 2", "Spline 3", "Spline 4"),
+  Estimate = c(-36.46, 59.90, 185.64, 302.97, 14.91),
+  Std_Error = c(30.21, 26.83, 26.58, 67.67, 30.23),
+  DF = c(145.85, 456.48, 456.58, 457.61, 456.86),
+  `t value` = c(-1.207, 2.233, 6.984, 4.477, 0.493),
+  `Pr(>|t|)` = c(0.229, 0.026, 1.02e-11, 9.56e-06, 0.622)
+)
+
+# Correlation of fixed effects
+corr_fixed <- data.frame(
+  Term1 = c("Spline 1", "Spline 2", "Spline 3", "Spline 4", "Spline 2", "Spline 3", "Spline 4", "Spline 3", "Spline 4", "Spline 4"),
+  Term2 = c("(Intercept)", "(Intercept)", "(Intercept)", "(Intercept)", "Spline 1", "Spline 1", "Spline 1", "Spline 2", "Spline 2", "Spline 3"),
+  Correlation = c(-0.731, -0.521, -0.857, -0.109, 0.236, 0.709, 0.325, 0.552, -0.321, 0.179)
+)
+
+# Output all tables
+cat("### REML Criterion\n")
+cat("REML criterion at convergence: **", reml_criterion, "**\n\n")
+
+cat("### Scaled Residuals\n")
+kable(scaled_resid, digits = 3)
+
+cat("\n### Random Effects\n")
+kable(random_effects, digits = 2)
+
+cat("\n### Fixed Effects\n")
+kable(fixed_effects, caption = "Fixed Effects Summary for Linear Mixed-Effects Model", digits = 3)
+
+cat("\n### Correlation of Fixed Effects\n")
+kable(corr_fixed, caption = "Pairwise Correlation of Fixed Effects", digits = 3)
+```
+
+
+
+### MICROCLIMATE CLUSTERING - PERMANOVA
+
+```{r permanova-microclimate, echo=FALSE, message=FALSE, results='asis'}
+library(knitr)
+
+# Create the PERMANOVA results table
+permanova_results <- data.frame(
+  Term = c("Model", "Residual", "Total"),
+  Df = c(2, 7, 9),
+  SumOfSqs = c(0.60287, 0.86004, 1.46291),
+  R2 = c(0.4121, 0.5879, 1.0000),
+  F = c(2.4534, NA, NA),
+  `Pr(>F)` = c(0.005, NA, NA),
+  Signif = c("**", "", "")
+)
+
+# Render the table
+kable(permanova_results,
+      caption = "PERMANOVA Results Testing Microclimate Effects on Community Composition (999 Permutations)",
+      digits = c(0, 0, 5, 4, 4, 3),
+      align = c("l", "r", "r", "r", "r", "r"))
+```
+
+# Betadisper ANOVA
+
+```{r dispersion-anova, echo=FALSE, message=FALSE, results='asis'}
+library(knitr)
+
+# Create the ANOVA table
+dispersion_anova <- data.frame(
+  Term = c("Groups", "Residuals"),
+  Df = c(2, 7),
+  SumSq = c(0.013992, 0.152834),
+  MeanSq = c(0.0069961, 0.0218334),
+  F = c(0.3204, NA),
+  `Pr(>F)` = c(0.7359, NA)
+)
+
+# Render the table
+kable(dispersion_anova,
+      caption = "Test for Homogeneity of Multivariate Dispersions (ANOVA on betadisper distances)",
+      digits = c(0, 0, 6, 7, 4, 4),
+      align = c("l", "r", "r", "r", "r", "r"))
+```
+
+# Pairwise results
+
+```{r pairwise-permanova, echo=FALSE, message=FALSE, results='asis'}
+library(knitr)
+
+# Pairwise PERMANOVA results
+pairwise_results <- data.frame(
+  Group1 = c("Cool", "Cool", "Moderate"),
+  Group2 = c("Moderate", "Warm", "Warm"),
+  F_value = c(2.35, 3.27, 1.75),
+  R2 = c(0.320, 0.396, 0.305),
+  p_value = c(0.026, 0.019, 0.1)
+)
+
+# Add significance stars
+pairwise_results$Signif <- cut(pairwise_results$p_value,
+  breaks = c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+  labels = c("***", "**", "*", ".", "")
+)
+
+# Print the table
+kable(pairwise_results,
+      caption = "Pairwise PERMANOVA Results Between Microclimate Groups",
+      digits = c(0, 0, 2, 3, 3),
+      align = c("l", "l", "r", "r", "r", "c"))
+```
+
+
+
+
+### SCALING ANALYSIS - PERMANOVA TABLES
+
+```{r PERMANOVA}
+# Create the table data
+adonis_results <- data.frame(
+  Term = c("Model", "Residual", "Total"),
+  Df = c(1, 18, 19),
+  SumOfSqs = c(0.1921, 3.6292, 3.8214),
+  R2 = c(0.05028, 0.94972, 1.00000),
+  F = c(0.9529, NA, NA),
+  `Pr(>F)` = c(0.46, NA, NA)
+)
+
+# Print the table with formatting
+kable(adonis_results, caption = "PERMANOVA Results (adonis2) with 999 Permutations",
+      digits = c(0, 0, 4, 5, 4, 2),
+      align = c("l", "r", "r", "r", "r", "r"))
+```
+
+### Homogeneity test
+
+```{r dispersion-test, echo=FALSE, message=FALSE, results='asis'}
+library(knitr)
+
+# Create the table data
+dispersion_results <- data.frame(
+  Term = c("Groups", "Residuals"),
+  Df = c(1, 18),
+  SumSq = c(0.02057, 0.36470),
+  MeanSq = c(0.020575, 0.020261),
+  F = c(1.0155, NA),
+  NPerm = c(999, NA),
+  `Pr(>F)` = c(0.327, NA)
+)
+
+# Print the table with formatting
+kable(dispersion_results,
+      caption = "Test for Homogeneity of Multivariate Dispersions (999 Permutations)",
+      digits = c(0, 0, 5, 6, 4, 0, 3),
+      align = c("l", "r", "r", "r", "r", "r", "r"))
+```
+
+
+
+
+
+
+
+
+
+
 

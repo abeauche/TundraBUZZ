@@ -26,6 +26,7 @@ set.seed(123)
 # Load data
 vegetation_raw <- read.csv("./data/raw/QHI_vegetation_2024_raw.csv", stringsAsFactors = TRUE)
 location_mapping <- read.csv("./data/raw/location_mapping_TundraBUZZ.csv", stringsAsFactors = TRUE)
+mean_summer_temp <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
 # Merge to replace aru_id with location_id
 vegetation_raw <- vegetation_raw %>%
