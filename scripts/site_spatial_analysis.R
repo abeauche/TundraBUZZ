@@ -1,5 +1,18 @@
+# ====================================================
+# Script Name: site_spatial_analysis.R
+# Project: TundraBUZZ 2024-25
+# Author: Alex Beauchemin
+# Date Created: 2025-04-15
+# Last Modified: 2025-04-22
+# Description: This script does an exploratory analysis of distances between site locations as well as carrying out a hierarchical clustering.
+# Dependencies: R package: geosphere
+# ====================================================
+
+# Load packages
 library(geosphere)
 
+
+#### Define site coordinates ----
 # Define site coordinates
 coords_cool <- data.frame(
   site = c("COOL1", "COOL2", "COOL3", "COOL4"),
@@ -30,7 +43,7 @@ coords_all <- rbind(coords_cool, coords_mod, coords_warm)
 # Compute all pairwise distances (in meters)
 dist_matrix <- distm(coords_all[, c("lon", "lat")], fun = distHaversine)
 
-# Extract upper triangle of matrix (no duplicates)
+# Extract upper triangle of matrix
 dists <- dist_matrix[upper.tri(dist_matrix)]
 
 # Average distance in meters
@@ -43,6 +56,7 @@ mean_distance_km
 
 
 
+#### Calculate pairwise distances ----
 
 # Create a function to calculate average pairwise distance between two groups
 average_group_distance <- function(group1, group2, data) {
@@ -62,7 +76,6 @@ average_group_distance <- function(group1, group2, data) {
   mean(dists)
 }
 
-
 # Calculate average pairwise distances between each group pair
 avg_cool_mod  <- average_group_distance("COOL", "MOD", coords_all)
 avg_cool_warm <- average_group_distance("COOL", "WARM", coords_all)
@@ -73,15 +86,10 @@ cat("Average distance COOL to MOD:", round(avg_cool_mod / 1000, 2), "km\n")
 cat("Average distance COOL to WARM:", round(avg_cool_warm / 1000, 2), "km\n")
 cat("Average distance MOD to WARM:", round(avg_mod_warm / 1000, 2), "km\n")
 
-
-
-
 # Get distance matrix (in meters)
 dist_matrix <- distm(coords_all[, c("lon", "lat")], fun = distHaversine)
 rownames(dist_matrix) <- coords_all$site
 colnames(dist_matrix) <- coords_all$site
-
-
 
 # Convert to dist object (required for hclust)
 geo_dist <- as.dist(dist_matrix)
@@ -91,7 +99,6 @@ hc_geo <- hclust(geo_dist, method = "average")  # or "complete", "ward.D", etc.
 
 plot(hc_geo, main = "Hierarchical Clustering of Sites by Geographic Distance",
      xlab = "Site", sub = "", ylab = "Distance (meters)")
-
 
 clusters <- cutree(hc_geo, k = 3)
 coords_all$cluster <- clusters
