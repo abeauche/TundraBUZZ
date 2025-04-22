@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-04-08
-# Last Modified: 2025-04-11
-# Description: This script TBD.
-# Dependencies: TBD
+# Last Modified: 2025-04-22
+# Description: This script wrangles flowering data and prepares it for plotting and modelling as per RQ3. 
+# Dependencies: POLCAM_data.csv, location_mapping_TundraBUZZ.csv, mean_summer_temp_TundraBUZZ.csv, 5_FloRes_raw.csv, 3_Aggregate_species.csv, flower_list_POLCAM.csv, QHI_location_temperature_daily.csv; R packages: tidyverse, lubridate, hms, ggridges, cowplot, ggnewscale, viridis, patchwork, brms, tidybayes, ggeffects, broom.mixed
 # ====================================================
 
 #### SETUP ----
@@ -29,6 +29,8 @@ setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Set seed for repeatability
 set.seed(123)
+
+
 
 # Load data
 polcam_data <- read_csv("/Volumes/TundraBUZZ/data/raw/POLCAM_data.csv", skip = 1)
@@ -230,9 +232,6 @@ ggplot(flowering_long_GDD0, aes(x = summer_GDD0, y = GDD0, fill = phase)) +
   scale_fill_brewer(palette = "Set2") +
   scale_color_brewer(palette = "Set2")
 
-
-
-
 # Pivot longer for plotting
 flowering_long_GDD5 <- flowering_summary %>%
   select(location_id, microclimate, 
@@ -286,8 +285,6 @@ ggplot(flowering_long_GDD5, aes(x = summer_GDD5, y = GDD5, fill = phase)) +
   scale_fill_brewer(palette = "Set2") +
   scale_color_brewer(palette = "Set2")
 
-
-
 # Plot last flowering date
 ggplot(flowering_summary, aes(x = summer_GDD0, y = last_flowering)) +
   geom_point(aes(colour = microclimate), size = 3) +
@@ -302,12 +299,10 @@ ggplot(flowering_summary, aes(x = summer_GDD0, y = last_flowering)) +
   scale_colour_manual(values = c("#440154", "forestgreen","gold"))
 
 
-
-
 # Define common theme and color scale
 microclimate_colors <- c("#440154", "forestgreen", "gold")
 
-# Define origin date (e.g., first date in your dataset)
+# Define origin date
 origin_date <- as.Date("2024-06-23")
 
 # Mutate date objects to numeric
@@ -318,12 +313,11 @@ flowering_bayes <- flowering_summary %>%
     peak_flowering_num = as.numeric(peak_flowering - origin_date)
   )
 
-
 # Censoring dates with first flowering date before/= to installation date
 flowering_bayes <- flowering_bayes %>%
   mutate(
     first_flowering_num = as.numeric(first_flowering - origin_date),
-    censored = if_else(first_flowering == origin_date, "left", "none")  # assuming you have `first_obs_date`
+    censored = if_else(first_flowering == origin_date, "left", "none")
   )
 
 flowering_bayes$censored <- factor(flowering_bayes$censored, levels = c("none", "left"))
@@ -340,7 +334,9 @@ table(flowering_bayes$cens_duration)
 anyNA(flowering_bayes$duration_days)
 head(flowering_bayes)
 
-#### FIT MODELS
+
+
+#### FIT MODELS ----
 hist(flowering_bayes$first_flowering_num)
 
 # First flowering model --> censored left given that there is uncertainty regarding start date prior to installation of camera
@@ -403,7 +399,7 @@ summary(mod_peak)
 plot(mod_peak)
 pp_check(mod_peak)
 
-# Duration (numeric so no conversion needed)
+# Duration (numeric)
 mod_duration <- brm(
   duration_days ~ summer_GDD0, 
                 data = flowering_bayes, family = gaussian(),
@@ -435,6 +431,10 @@ mod_first <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_
 mod_last <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_last.rds")
 mod_peak <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_peak.rds")
 mod_duration <- readRDS("/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/bayesian_mod_duration.rds")
+
+
+
+#### Extract model summaries ----
 
 mod_first_summary_scaled <- summary(mod_first)$fixed %>%
   as_tibble(rownames = "term") %>%
@@ -522,9 +522,10 @@ mod_duration_summary_scaled <- summary(mod_duration)$fixed %>%
 #   theme_classic()
 
 
-### First flowering date
+
+#### First flowering date
 # Get predicted values from Bayesian model
-preds_first <- ggpredict(mod_first, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
+preds_first <- ggpredict(mod_first, terms = "summer_GDD0 [all]") 
 
 # Convert predictions to Date format if the response was numeric date
 preds_first$predicted_date <- as.Date(preds_first$predicted, origin = "2024-06-23")
@@ -535,7 +536,7 @@ preds_first$conf.high_date <- as.Date(preds_first$conf.high, origin = "2024-06-2
 mod_first_plot <- ggplot(preds_first, aes(x = x, y = predicted_date)) +
   geom_ribbon(aes(ymin = conf.low_date, ymax = conf.high_date), alpha = 0.3, fill = "grey60") +
   geom_line(linewidth = 1.2, color = "black") +
-  geom_hline(yintercept = as.Date("2024-06-23")-0.5, linetype = "dashed", color = "grey44") +  # Horizontal line
+  geom_hline(yintercept = as.Date("2024-06-23")-0.5, linetype = "dashed", color = "grey44") +  
   annotate("text", x = Inf, y = as.Date("2024-06-23") - 1.5, label = "Camera Deployment", 
            hjust = 1, vjust = 0, color = "grey44", size = 4, fontface = "italic") +
   geom_point(data = flowering_bayes, aes(x = summer_GDD0, y = as.Date(first_flowering_num, origin = "2024-06-23"), colour = microclimate), size = 3) +
@@ -550,9 +551,9 @@ mod_first_plot <- ggplot(preds_first, aes(x = x, y = predicted_date)) +
 
 
 
-### Last flowering date
+#### Last flowering date
 # Get predicted values from Bayesian model
-preds_last <- ggpredict(mod_last, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
+preds_last <- ggpredict(mod_last, terms = "summer_GDD0 [all]") 
 
 # Convert predictions to Date format if the response was numeric date
 preds_last$predicted_date <- as.Date(preds_last$predicted, origin = "2024-06-23")
@@ -574,9 +575,9 @@ mod_last_plot <- ggplot(preds_last, aes(x = x, y = predicted_date)) +
   theme_classic() 
 
 
-### Peak flowering date
+#### Peak flowering date
 # Get predicted values from Bayesian model
-preds_peak <- ggpredict(mod_peak, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
+preds_peak <- ggpredict(mod_peak, terms = "summer_GDD0 [all]")  
 
 # Convert predictions to Date format if the response was numeric date
 preds_peak$predicted_date <- as.Date(preds_peak$predicted, origin = "2024-06-23")
@@ -598,9 +599,9 @@ mod_peak_plot <- ggplot(preds_peak, aes(x = x, y = predicted_date)) +
   theme_classic() 
 
 
-### Duration
+#### Duration
 # Get predicted values from Bayesian model
-preds_duration <- ggpredict(mod_duration, terms = "summer_GDD0 [all]")  # or use pretty() to control breaks
+preds_duration <- ggpredict(mod_duration, terms = "summer_GDD0 [all]")  
 
 # Plot
 mod_duration_plot <- ggplot(preds_duration, aes(x = x, y = predicted)) +
@@ -615,7 +616,6 @@ mod_duration_plot <- ggplot(preds_duration, aes(x = x, y = predicted)) +
   ) +
   theme_classic()
 
-
 # Combine patchwork layout
 flowering_season_traits_plot <- (mod_first_plot + mod_last_plot) / 
   (mod_peak_plot + mod_duration_plot) + 
@@ -629,8 +629,7 @@ ggsave(
   height = 8
 )
 
-
-
+#### Effect size plot 
 # Extract and label slopes
 slopes <- bind_rows(
   tidy(mod_first, effects = "fixed", parameters = "summer_GDD0") %>% mutate(trait = "Onset of flowering"),
@@ -649,7 +648,6 @@ slopes <- slopes %>%
     "Flowering duration"
   ))))
 
-
 # Plot
 flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate*100, y = (trait))) +
   geom_point(size = 3) +
@@ -661,7 +659,6 @@ flowering_slope_effect_size <- ggplot(slopes, aes(x = estimate*100, y = (trait))
   ) +
   theme_classic()
 
-
 # Save plot
 ggsave(
   filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flowering_slope_effect_size.pdf",
@@ -669,7 +666,6 @@ ggsave(
   width = 8,
   height = 3.5
 )
-
 
 
 
@@ -731,7 +727,6 @@ ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, color = spec
   ) +
   theme_classic() 
 
-
 # Plot first flowering date
 ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, y = first_flowering, color = species)) +
   geom_point(size = 3, alpha = 0.8) +
@@ -768,7 +763,6 @@ ggplot(flowering_summary_per_species_filtered, aes(x = summer_temp, y = peak_flo
   ) +
   theme_classic() 
 
-
 # Mutate date objects to numeric
 flowering_bayes_species <- flowering_summary_per_species_filtered %>%
   mutate(
@@ -779,7 +773,7 @@ flowering_bayes_species <- flowering_summary_per_species_filtered %>%
 
 # Model first flowering date per species
 mod_first_species <- brm(first_flowering_num ~ summer_temp + (1|species), 
-                 data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95)  # default is 0.8
+                 data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95)
 )
 
 summary(mod_first_species)
@@ -788,16 +782,15 @@ pp_check(mod_first_species)
 
 # Model last flowering date per species
 mod_last_species <- brm(last_flowering_num ~ summer_temp + (1|species), 
-                         data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95)  # default is 0.8
+                         data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95) 
 )
-
 summary(mod_last_species)
 plot(mod_last_species)
 pp_check(mod_last_species)
 
 # Model peak flowering date per species
 mod_peak_species <- brm(peak_flowering_num ~ summer_temp + (1|species), 
-                         data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95)  # default is 0.8
+                         data = flowering_bayes_species, family = gaussian(), cores = 4,  control = list(adapt_delta = 0.95)
 )
 summary(mod_peak_species)
 plot(mod_peak_species)
@@ -819,9 +812,9 @@ saveRDS(mod_peak_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/
 saveRDS(mod_duration_species, "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/brms_models/mod_duration_species.rds")
 
 
-### First flowering date per species
+#### First flowering date per species
 # Get predicted values from Bayesian model
-preds_first_species <- ggpredict(mod_first_species, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_first_species <- ggpredict(mod_first_species, terms = "summer_temp [all]")  
 
 # Convert predictions to Date format if the response was numeric date
 preds_first_species$predicted_date <- as.Date(preds_first_species$predicted, origin = "2024-06-23")
@@ -842,9 +835,9 @@ mod_first_species_plot <- ggplot(preds_first_species, aes(x = x, y = predicted_d
   theme_classic() 
 
 
-### Last flowering date per species
+#### Last flowering date per species
 # Get predicted values from Bayesian model
-preds_last_species <- ggpredict(mod_last_species, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_last_species <- ggpredict(mod_last_species, terms = "summer_temp [all]") 
 
 # Convert predictions to Date format if the response was numeric date
 preds_last_species$predicted_date <- as.Date(preds_last_species$predicted, origin = "2024-06-23")
@@ -865,9 +858,9 @@ mod_last_species_plot <- ggplot(preds_last_species, aes(x = x, y = predicted_dat
   theme_classic() 
 
 
-### Peak flowering date per species
+#### Peak flowering date per species
 # Get predicted values from Bayesian model
-preds_peak_species <- ggpredict(mod_peak_species, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_peak_species <- ggpredict(mod_peak_species, terms = "summer_temp [all]")  
 
 # Convert predictions to Date format if the response was numeric date
 preds_peak_species$predicted_date <- as.Date(preds_peak_species$predicted, origin = "2024-06-23")
@@ -888,9 +881,9 @@ mod_peak_species_plot <- ggplot(preds_peak_species, aes(x = x, y = predicted_dat
   theme_classic() 
 
 
-### Duration per species
+#### Duration per species
 # Get predicted values from Bayesian model
-preds_duration_species <- ggpredict(mod_duration_species, terms = "summer_temp [all]")  # or use pretty() to control breaks
+preds_duration_species <- ggpredict(mod_duration_species, terms = "summer_temp [all]")
 
 # Plot
 mod_duration_species_plot <- ggplot(preds_duration_species, aes(x = x, y = predicted)) +
@@ -917,8 +910,7 @@ ggsave(
 )
 
 
-#### Test
-
+#### Effect size per species
 
 # Extract and label slopes
 slopes_species <- bind_rows(
@@ -937,7 +929,6 @@ slopes_species <- slopes_species %>%
     "Peak flowering date",
     "Flowering duration"
   )))
-
 
 # Plot
 slope_species_effect_size <- ggplot(slopes_species, aes(x = estimate, y = trait)) +
@@ -967,29 +958,14 @@ polcam_data_grouped <- polcam_data_species %>%
   group_by(location_id, date) %>%
   summarise(total_flower_count = sum(count, na.rm = TRUE), .groups = "drop")
 
-# Join with a lookup table that has microclimate or temperature info per location
+# Join with a table that has microclimate/temperature info per location
 polcam_data_grouped <- polcam_data_grouped %>%
   left_join(mean_summer_temperature, by = "location_id")
-
 
 # Reverse order by mean_summer_temp
 polcam_data_grouped$location_id <- factor(polcam_data_grouped$location_id,
                                           levels = rev(unique(polcam_data_grouped$location_id[order(polcam_data_grouped$summer_temp)])))
 
-
-# Ridge plot
-flowering_temperature_ridgeplot <- ggplot(polcam_data_grouped, aes(x = date, y = location_id, height = total_flower_count, fill = summer_temp)) +
-  geom_density_ridges(stat = "identity", scale = 2.5, alpha = 0.7) +
-  scale_fill_viridis_c(name = "Mean Summer\nTemp (°C)") +
-  labs(
-    x = "2024 Growing Season",
-    y = "Total Flower Count per Site"
-  ) +
-  theme_classic() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right"
-  )
 
 # Ridge plot
 flowering_temperature_ridgeplot_GDD0 <- ggplot(polcam_data_grouped, aes(x = date, y = location_id, height = total_flower_count, fill = summer_GDD0)) +
@@ -1005,12 +981,6 @@ flowering_temperature_ridgeplot_GDD0 <- ggplot(polcam_data_grouped, aes(x = date
     legend.position = "right"
   )
 
-ggsave(
-  filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flowering_temperature_ridgeplot.pdf",
-  plot = flowering_temperature_ridgeplot,
-  width = 8,
-  height = 6
-)
 
 ggsave(
   filename = "/Users/alexandrebeauchemin/TundraBUZZ_github/outputs/figures/flowering_temperature_ridgeplot_GDD0.pdf",
