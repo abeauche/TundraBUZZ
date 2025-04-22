@@ -4,7 +4,7 @@
 # Author: Alex Beauchemin
 # Date Created: 2025-04-15
 # Last Modified: 2025-04-22
-# Description: This script does an exploratory analysis of distances between site locations as well as carrying out a hierarchical clustering.
+# Description: This script does an exploratory analysis of distances between site locations as well as carrying out a hierarchical clustering analysis.
 # Dependencies: R package: geosphere
 # ====================================================
 
