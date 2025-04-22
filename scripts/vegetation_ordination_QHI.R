@@ -5,12 +5,11 @@
 # Date Created: 2025-03-20
 # Last Modified: 2025-03-26
 # Description: This script creates an ordination for vegetation plots based on vegetation composition data for 10 POLCAM sites on Qikiqtaruk-Herschel Island measured in the summer of 2024 by A. Beauchemin and E. Bowman.
-# Dependencies: XQuartz, QHI_vegetation_2024_raw.csv, location_mapping_TundraBUZZ.csv
+# Dependencies: XQuartz, QHI_vegetation_2024_raw.csv, location_mapping_TundraBUZZ.csv, mean_summer_temp_TundraBUZZ.csv; R packages: tiyverse, vegan, RColorBrewer, rgl
 # ====================================================
 
 #### SETUP ----
 # Load required libraries 
-# install.packages("rgl")
 library(tidyverse)
 library(vegan)
 library(RColorBrewer)
@@ -375,7 +374,7 @@ write.csv(adonis_df, "./outputs/permanova_results_corevssite.csv", row.names = T
 
 
 
-#### PERMANOVA? ----
+#### PERMANOVA ----
 # Running PERMANOVA to test if microclimate gradient significantly explains NMDS axes
 library(vegan)
 
@@ -431,6 +430,7 @@ legend("topleft", legend = names(colors),
        col = colors, pch = 19, title = "Microclimate")
 
 
+# Test for pariwise differences between core and averaged okits
 microclimates <- unique(nmds_data_k2$microclimate)
 pairwise_results <- combn(microclimates, 2, simplify = FALSE) %>%
   purrr::map_df(function(pair) {
@@ -456,6 +456,6 @@ dispersion <- betadisper(vegdist(community_matrix), nmds_data_k2$microclimate)
 # Test statistically
 anova(dispersion)
 
-# Optional: visualize
+# Visualize
 plot(dispersion)
 boxplot(dispersion, main = "Multivariate Dispersion by Microclimate")
