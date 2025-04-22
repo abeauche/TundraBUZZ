@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Dr. Jeremy Borderieux, Alex Beauchemin
 # Date Created: 2025-03-27
-# Last Modified: 2025-03-27
-# Description: Reading TOMST data with myclim
-# Dependencies: TBD, location_mapping_TundraBUZZ.csv
+# Last Modified: 2025-04-22
+# Description: This script reads and prepares TOMST data with the myclim package
+# Dependencies: data/raw/QHI_TOMST_2024_fixed, location_mapping_TundraBUZZ.csv; R packages: tidyverse, lubridate, hms, myClim, foreach, data.table, stringr, broom.
 # ====================================================
 
 #### SETUP ----
@@ -34,7 +34,6 @@ tomst_file_path <- "/Volumes/TundraBUZZ/data/raw/QHI_TOMST_2024_fixed"
 
 # Set seed for repeatability
 set.seed(123)
-
 
 
 
@@ -354,8 +353,8 @@ ordered_site_temp_summer <- daily_temp_mapped %>%
   arrange(desc(summer_temp))
 
 # write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
-
 ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+
 
 ordered_site_GDD0 <- daily_temp_mapped %>%
   group_by(location_id, microclimate) %>%
@@ -368,6 +367,8 @@ ordered_site_GDD5 <- daily_temp_mapped %>%
   arrange(desc(summer_GDD5))
 
 
+
+### Plot cumulative GDD overtime
 
 cumulative_GDD <- ggplot(daily_temp_mapped, aes(x = datetime, colour = microclimate, fill = microclimate)) +
   # Points for GDD0 and GDD5 with different shapes
@@ -403,6 +404,7 @@ ggsave(
   width = 11,       # adjust based on layout
   height = 8
 )
+
 
 #### PLOTTING ----
 #ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
