@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-04-12
-# Last Modified: 2025-04-12
-# Description: This script TBD.
-# Dependencies: summary_flightbuzzes_ARUQ_2024.csv, daily_summary_flightbuzzes_ARUQ_2024.csv, environmental_variables_hourly.csv, environmental_variables_daily.csv, QHI_location_temperature_hourly.csv, QHI_location_temperature_daily.csv, mean_summer_temp_TundraBUZZ.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg, patchwork, cowplot, viridis.
+# Last Modified: 2025-04-22
+# Description: This script extracts all recording dates and creates a completed dataframe with temperature readings.
+# Dependencies: flight_buzz_daily.csv, flight_buzz_hourly.csv, summary_flightbuzzes_ARUQ_2024.csv, mean_summer_temp_TundraBUZZ.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg, patchwork, cowplot, viridis.
 # ====================================================
 
 #### SETUP ----
@@ -170,8 +170,6 @@ flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
 
 # Save the dataset to a CSV file
 write_csv(flightbuzzes_ARUQ_2024_complete, "./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
-
-
 
 
 
