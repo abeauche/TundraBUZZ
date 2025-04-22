@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-28
-# Last Modified: 2025-04-07
+# Last Modified: 2025-04-22
 # Description: This script uses the suncalc library to obtain sunrise, sunset, and sun altitude data for Qikiqtaruk - Herschel Island for the period from June 21, 2024, at 21:00:00, to August 12, 2024, at 23:59:59.
-# Dependencies: summary_flightbuzzes_ARUQ_2024.csv
+# Dependencies: summary_flightbuzzes_ARUQ_2024.csv; R packages: tidyverse, lubridate, suncalc, hms
 # ====================================================
 
 #### SETUP ----
@@ -26,6 +26,7 @@ lat <- 69.57
 lon <- -138.91
 
 
+
 #### Using tidy datasets ----
 # Load data
 summary_flightbuzzes_ARUQ_2024 <- read_csv("/Volumes/TundraBUZZ/outputs/recognizer_outputs/clean/summary_flightbuzzes_ARUQ_2024.csv")
@@ -37,9 +38,7 @@ summary_flightbuzzes_ARUQ_2024 <- summary_flightbuzzes_ARUQ_2024 %>%
 
 
 #### SUN DATA ----
-
 ### Sun altitude data
-
 # Generate POSIXct list of times for 2024 summer
 TundraBUZZ_times_2024 <- seq(from = as.POSIXct("2024-06-21 21:00:00", tz = "America/Whitehorse"), 
                              to = as.POSIXct("2024-08-12 23:59:59", tz = "America/Whitehorse"), by = "hour")
@@ -53,12 +52,10 @@ sun_data_2024$datetime <- with_tz(sun_data_2024$date, tzone = "America/Whitehors
 # Remove the original 'date' column
 sun_data_2024 <- sun_data_2024 %>% select(-date)
 
-
 write_csv(sun_data_2024, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
 
 
 ### Sunrise and sunset data
-
 # Extract unique dates
 unique_dates <- unique(summary_flightbuzzes_ARUQ_2024$date_utc)
 
