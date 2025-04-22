@@ -89,7 +89,7 @@ expected_times <- recording_windows %>%
 
 # Generate tibble with problem dates per location
 bad_dates <- tibble(
-  location_id = c("COOL2", "MOD1", "WARM2"),  # Example location IDs
+  location_id = c("COOL2", "MOD1", "WARM2"), 
   error_date = as.POSIXct(c("2024-08-02 06:10:00", "2024-07-26 13:53:00", "2024-08-01 16:28:00"), tz = "America/Whitehorse"),
   re_start = as.POSIXct(c("2024-08-04 13:30:00", "2024-08-05 13:00:00", "2024-08-06 16:00:00"), tz = "America/Whitehorse")
 )
@@ -97,9 +97,8 @@ bad_dates <- tibble(
 # Merge bad dates with the expected_times dataset
 recording_windows_clean <- expected_times %>%
   left_join(bad_dates, by = "location_id") %>%
-  # Apply filtering condition only to sites with error_date and re_start (i.e., bad dates)
   filter(is.na(error_date) | !(datetime >= error_date & datetime < re_start)) %>%
-  select(-error_date, -re_start)  # Optionally drop the extra columns
+  select(-error_date, -re_start) 
 
 
 # Order locations per mean_summer_temp
@@ -137,8 +136,8 @@ active_aru_dates_plot <- ggplot(recording_windows_clean, aes(
 
 # Save the plot as a PDF
 ggsave("./outputs/figures/active_aru_dates_plot.pdf", 
-       plot = active_aru_dates_plot,   # Save the most recent plot
-       width = 10, height = 6)  # Customize the size as needed
+       plot = active_aru_dates_plot,   
+       width = 10, height = 6) 
 
 
 # Join recording_windows_clean with summary_flightbuzzes_ARUQ_2024, filter dates within recording windows
@@ -172,13 +171,13 @@ flightbuzzes_ARUQ_2024_complete <- flightbuzzes_ARUQ_2024_complete %>%
 write_csv(flightbuzzes_ARUQ_2024_complete, "./data/clean/flight_buzzes_complete_TundraBUZZ.csv")
 
 
-
+# Convert to local date
 flightbuzzes_ARUQ_2024_date <- flightbuzzes_ARUQ_2024_complete %>%
   mutate(
-    date = as.Date(datetime, tz = "America/Whitehorse")  # Convert to local date
+    date = as.Date(datetime, tz = "America/Whitehorse") 
   )
 
-# Step 1: Count how many hours of data are available for each day and location (based on local time)
+# Obtain total number of recording hours per date and location
 complete_days <- flightbuzzes_ARUQ_2024_date %>%
   group_by(location_id, date) %>%
   summarise(
@@ -187,11 +186,11 @@ complete_days <- flightbuzzes_ARUQ_2024_date %>%
   ) %>%
   filter(num_hours == 24)  # Keep only days with 24 hours of data (complete days)
 
-# Step 2: Aggregate data by day (for complete days) and keep date_local
+# Aggregate data by day (for complete days)
 daily_aggregated_data <- flightbuzzes_ARUQ_2024_date %>%  # Only keep complete days
   group_by(location_id, date) %>%
   summarise(
-    daily_duration_above_threshold = sum(total_duration_above_threshold, na.rm = TRUE),  # Example of an aggregation, can be changed based on your needs
+    daily_duration_above_threshold = sum(total_duration_above_threshold, na.rm = TRUE), 
     .groups = "drop"
   )
 # Filter for complete days (by both location_id and date)
