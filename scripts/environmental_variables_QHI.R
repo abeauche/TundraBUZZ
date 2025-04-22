@@ -3,9 +3,9 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-04-07
-# Last Modified: 2025-04-08
-# Description: This script TBD.
-# Dependencies: 
+# Last Modified: 2025-04-22
+# Description: This script compiles and tidies all environmental data into a single dataset per date and location.
+# Dependencies: copernicus_browser_qhi_2024.csv, met_station_pauline_cove_22010631.csv, en_climate_hourly_YT_2100636_06-2024_P1H.csv, en_climate_hourly_YT_2100636_07-2024_P1H.csv, en_climate_hourly_YT_2100636_08-2024_P1H.csv, QHI_sun_data_2024.csv, QHI_sunrise_daily.csv, QHI_location_temperature_daily.csv, R packages: tidyverse, lubridate, hms, janitor
 # ====================================================
 
 #### SETUP ----
@@ -29,6 +29,7 @@ eccc_july <- read_csv("/Volumes/TundraBUZZ/data/raw/ECCC_climate_hourly_herschel
 eccc_aug <- read_csv("/Volumes/TundraBUZZ/data/raw/ECCC_climate_hourly_herschel/en_climate_hourly_YT_2100636_08-2024_P1H.csv")
 sun_data <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sun_data_2024.csv")
 sunrise_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/raw/QHI_sunrise_daily.csv")
+QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
 
 
 #### Merge and tidy ECCC dataset ----
@@ -56,7 +57,7 @@ eccc_summer_2024_hourly <- eccc_summer_2024_hourly %>%
 
 # Aggregate into daily dataset
 eccc_summer_2024_daily <- eccc_summer_2024_hourly %>%
-  mutate(date = as_date(datetime)) %>%  # Create date-only column
+  mutate(date = as_date(datetime)) %>%  #
   group_by(date) %>%
   summarise(
     mean_wind_speed = mean(wind_spd_km_h, na.rm = TRUE),
@@ -76,7 +77,7 @@ met_station_pauline_cove <- met_station_pauline_cove %>%
     air_rh_1m = `RH, % (LGR S/N: 22010631, SEN S/N: 21741589, LBL: air_rh_1m)`,
   ) %>%
   mutate(
-    datetime = mdy_hms(datetime)  # This assumes the format is MM/DD/YYYY HH:MM:SS
+    datetime = mdy_hms(datetime)  
   )
 
 # Summarize hourly
@@ -135,8 +136,7 @@ environmental_variables_daily <- eccc_summer_2024_daily %>%
 # write_csv(environmental_variables_daily, "/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
 
 environmental_variables_daily <- read_csv("/Users/alexandrebeauchemin/TundraBUZZ_github/data/clean/environmental_variables_daily.csv")
-QHI_temp_daily <- read.csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
-str(environmental_variables_daily)
+
 
 QHI_temp_daily_micro <- QHI_temp_daily %>%
   select(datetime, location_id, microclimate, value, cumulative_GDD0) %>%
@@ -145,7 +145,7 @@ QHI_temp_daily_micro <- QHI_temp_daily %>%
             cumulative_GDD0 = mean(cumulative_GDD0)) %>%
   mutate(date = as.Date(datetime))
 
-# Join by date (adjust if your date columns have different names)
+# Join by date
 env_combined <- environmental_variables_daily %>%
   left_join(QHI_temp_daily_micro, by = "date")
 
@@ -158,6 +158,8 @@ env_long <- environmental_daily_filtered %>%
     names_to = "variable",
     values_to = "value"
   )
+
+#### Plot all environmental variables ----
 
 big_env_plot <- ggplot(env_long, aes(x = date, y = value, colour = microclimate)) +
   geom_line(linewidth = 1) +
