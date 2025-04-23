@@ -128,12 +128,12 @@ random_effects <- data.frame(
 
 # Fixed effects
 fixed_effects <- data.frame(
-  Term = c("(Intercept)", "Spline 1", "Spline 2", "Spline 3", "Spline 4"),
+  Term = c("(Intercept)", "**Spline 1**", "**Spline 2**", "**Spline 3**", "Spline 4"),
   Estimate = c(-36.46, 59.90, 185.64, 302.97, 14.91),
   Std_Error = c(30.21, 26.83, 26.58, 67.67, 30.23),
-  DF = c(145.85, 456.48, 456.58, 457.61, 456.86),
+  df = c(145.85, 456.48, 456.58, 457.61, 456.86),
   `t value` = c(-1.207, 2.233, 6.984, 4.477, 0.493),
-  `Pr(>|t|)` = c(0.229, 0.026, 1.02e-11, 9.56e-06, 0.622)
+  `p` = c(0.229, 0.026, 1.02e-11, 9.56e-06, 0.622)
 )
 
 # Correlation of fixed effects
