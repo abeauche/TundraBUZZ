@@ -3,7 +3,7 @@
 # Project: TundraBUZZ 2024-25
 # Author: Alex Beauchemin
 # Date Created: 2025-03-21
-# Last Modified: 2025-04-10
+# Last Modified: 2025-04-22
 # Description: This script prepares data, analyzes it in relation to research questions, and outputs figures and tables.
 # Dependencies: summary_flightbuzzes_ARUQ_2024.csv, daily_summary_flightbuzzes_ARUQ_2024.csv, environmental_variables_hourly.csv, environmental_variables_daily.csv, QHI_location_temperature_hourly.csv, QHI_location_temperature_daily.csv, mean_summer_temp_TundraBUZZ.csv, location_mapping_TundraBUZZ.csv, R packages: tidyverse, lubridate, suncalc, hms, lme4, lmerTest, mgcv, visreg, patchwork, cowplot, viridis, brms, tidybayes, slider, ggeffects, corrplot, ggppubr, car, lme4, broom, splines.
 # ====================================================
