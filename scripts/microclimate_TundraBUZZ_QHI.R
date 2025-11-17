@@ -30,7 +30,7 @@ location_mapping <- location_mapping %>%
   mutate(localities = paste0("TOMST", tomst_id, "_QHI"))
 
 # Set file path
-tomst_file_path <- "/Volumes/TundraBUZZ/data/raw/QHI_TOMST_2024_fixed"
+tomst_file_path <- "/Volumes/TundraBUZZ/QHI_TOMST_Data_2025"
 
 # Set seed for repeatability
 set.seed(123)
@@ -43,7 +43,12 @@ list_path <- list.files(tomst_file_path, full.names = TRUE)
 list_files <- list.files(tomst_file_path, full.names = FALSE)
 
 # Extract locality names from filenames (e.g., "TOMST123_QHI")
-locality_name <- str_extract(list_files, "TOMST\\d+_QHI")
+# Extract and reformat as TOMST17_QHI --> Edited for 2025
+locality_name <- str_replace(
+  str_extract(list_files, "QHI_TOMST_\\d+"),
+  "QHI_TOMST_(\\d+)",
+  "TOMST\\1_QHI"
+)
 
 # Create a table of TOMST data file paths and associated metadata
 files_table <- data.table(
@@ -163,10 +168,10 @@ hourly_dt_GDD0[, month := month(datetime_local)]
 hourly_dt_GDD0[, day := day(datetime_local)]
 hourly_dt_GDD0[, week := week(datetime_local)]
 
-# Filter for only 2024
-hourly_dt_T3 <- hourly_dt_T3[year == 2024,]
-hourly_dt_GDD5 <- hourly_dt_GDD5[year == 2024,]
-hourly_dt_GDD0 <- hourly_dt_GDD0[year == 2024,]
+# Filter for only 2025
+hourly_dt_T3 <- hourly_dt_T3[year == 2025,]
+hourly_dt_GDD5 <- hourly_dt_GDD5[year == 2025,]
+hourly_dt_GDD0 <- hourly_dt_GDD0[year == 2025,]
 
 # Filter for summer months
 hourly_dt_T3_filtered <- hourly_dt_T3 %>%
@@ -216,12 +221,14 @@ hourly_temp_mapped <- hourly_temp_mapped %>%
     by = c("location_id", "datetime")
   )
 
-# write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
-# write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly.csv")
-# write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly.csv")
+# write_csv(hourly_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly_2025.csv")
+# write_csv(hourly_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_hourly_2025.csv")
+# write_csv(hourly_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_hourly_2025.csv")
 
 #### ----
-# hourly_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly.csv")
+hourly_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_hourly_2025.csv")
+beebox_hourly_temp_2025 <- hourly_temp_mapped %>% filter(location_id == "BEEBOX")
+write_csv(beebox_hourly_temp_2025, "/Volumes/TundraBUZZ/data/raw/beebox_hourly_temp_2025.csv")
 
 #### Aggregate into daily data ----
 daily.tms <- mc_agg(
@@ -269,11 +276,11 @@ daily_dt_BDD <- daily_dt_BDD %>%
 daily_dt_T3 <- daily_dt_T3 %>%
   select(locality_id, datetime, value, year, month, day, week)
 
-# Filter for only 2024
-daily_dt_T3 <- daily_dt_T3[year == 2024,]
-daily_dt_GDD5 <- daily_dt_GDD5[year == 2024,]
-daily_dt_GDD0 <- daily_dt_GDD0[year == 2024,]
-daily_dt_BDD <- daily_dt_BDD[year == 2024,]
+# Filter for only 2025
+daily_dt_T3 <- daily_dt_T3[year == 2025,]
+daily_dt_GDD5 <- daily_dt_GDD5[year == 2025,]
+daily_dt_GDD0 <- daily_dt_GDD0[year == 2025,]
+daily_dt_BDD <- daily_dt_BDD[year == 2025,]
 
 # Filter for summer months
 daily_dt_T3_filtered <- daily_dt_T3 %>%
@@ -333,15 +340,15 @@ daily_temp_mapped <- daily_temp_mapped %>%
     by = c("location_id", "datetime")
   )
 
-# write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
-# write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
-# write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
+# write_csv(daily_temp_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily_2025.csv")
+# write_csv(daily_GDD5_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily_2025.csv")
+# write_csv(daily_GDD0_mapped, "/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily_2025.csv")
 
 # daily_GDD5_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_GDD5_daily.csv")
 # daily_GDD0_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_GDD0_daily.csv")
 
 #### ----
-# daily_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily.csv")
+daily_temp_mapped <- read_csv("/Volumes/TundraBUZZ/data/clean/QHI_location_temperature_daily_2025.csv")
 
 #### Order sites by mean summer temperature based on daily temperatures ----
 ordered_site_temp_summer <- daily_temp_mapped %>%
@@ -352,7 +359,7 @@ ordered_site_temp_summer <- daily_temp_mapped %>%
             summer_BDD = max(cumulative_BDD, na.rm = TRUE)) %>%
   arrange(desc(summer_temp))
 
-# write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+# write_csv(ordered_site_temp_summer, "/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ_2025.csv")
 ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
 
 
@@ -407,7 +414,7 @@ ggsave(
 
 
 #### PLOTTING ----
-#ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ.csv")
+# ordered_site_temp_summer <- read_csv("/Volumes/TundraBUZZ/data/clean/mean_summer_temp_TundraBUZZ_2025.csv")
 ordered_site_temp_summer <- ordered_site_temp_summer %>%
   left_join(location_mapping, by = "location_id")
 
@@ -432,7 +439,8 @@ clean_summer_temp_per_microclimate <- ggplot(ordered_site_temp_summer, aes(x = m
        y = "Mean Summer Temperature (°C)",
        fill = "Microclimate") +
   theme_classic() +
-  scale_fill_manual(values = c("grey44","gold", "forestgreen", "#440154"))
+  scale_fill_manual(values = c("grey44","gold", "forestgreen", "#440154")) +
+  coord_cartesian(ylim = c(7.5, 10))
 
 
 # Convert to long format
@@ -485,3 +493,28 @@ BDD_to_GDD <- ggplot(ordered_site_temp_summer, aes(x = summer_temp, y = (summer_
     y = "Δ GDD - BDD per site (T = 4°C)"
   )
 
+
+
+
+
+
+### Plot summer temp over time
+
+summer_temp_mapped_beebox <- ggplot(daily_temp_mapped %>% filter(location_id == "BEEBOX"), aes(x = datetime, colour = microclimate, fill = microclimate)) +
+  geom_point(aes(y = value)) +
+  geom_line(aes(y = value, group = location_id), linewidth = 1, alpha = 0.2) +
+ # geom_smooth(aes(y = value), method = "loess", se = F) +
+  
+  # Labels and themes
+  labs(x = "Date", 
+       y = "Air temperature (°C)",
+       colour = "Microclimate",
+       fill = "Microclimate") +
+  
+  scale_colour_manual(values = c("#440154", "forestgreen", "gold")) +
+  scale_fill_manual(values = c("#440154", "forestgreen", "gold")) +
+  theme_classic()
+
+
+beebox_temp_2025 <- daily_temp_mapped %>% filter(location_id == "BEEBOX")
+write_csv(beebox_temp_2025, "/Volumes/TundraBUZZ/data/raw/beebox_temp_2025.csv")
