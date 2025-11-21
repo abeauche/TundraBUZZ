@@ -311,22 +311,48 @@ library(brms)
 QHI_bumblebee_nest_2025 <- QHI_bumblebee_nest_2025 %>%
   mutate(bumblebee_buzz_hourly = as.integer(bumblebee_buzz_hourly))
 
+
+
+# Explore variables
+
+ggplot()
+
+cor(QHI_bumblebee_nest_2025$temperature_C, QHI_bumblebee_nest_2025$solar_radiation, method = "spearman")
+
+hist(QHI_bumblebee_nest_2025$temperature_C)
+hist(QHI_bumblebee_nest_2025$solar_radiation) # scale + center  
+hist(QHI_bumblebee_nest_2025$wind_speed_kmh)     
+hist(QHI_bumblebee_nest_2025$gust_speed_kmh)     
+hist(QHI_bumblebee_nest_2025$wind_dir_deg)     # cosinus et sinus, verifier, drop
+hist(QHI_bumblebee_nest_2025$atm_pressure_kpa) # scale + center
+
+
+hist(QHI_bumblebee_nest_2025$bumblebee_buzz_hourly[
+  QHI_bumblebee_nest_2025$bumblebee_buzz_hourly < 20
+], breaks = 100)
+
+hist(QHI_bumblebee_nest_2025$bumblebee_buzz_hourly[
+  QHI_bumblebee_nest_2025$bumblebee_buzz_hourly > 0
+], breaks = 100)
+
+
 # Fit a zero-inflated NB with AR(1) autocorrelation #### did not converge, 13 divergent transitions, not the fuzziest caterpillars --> simplify model?
+br( bumblebee_buzz_hourly ~ 
+      poly(temperature_C, 2) +
+      solar_radiation + # possiblement enlever, acp?
+      wind_speed_kmh +
+      atm_pressure_kpa +
+      ar(time_index, p = 1), # verifier comment inclure une structure cyclique
+    zi ~ )
+
 brms_model <- brm(
-  bumblebee_buzz_hourly ~ 
-    s(temperature_C) +
-    s(time_of_day_hour, bs = "cc") +
-    solar_radiation +
-    wind_speed_kmh +
-    atm_pressure_kpa +
-    s(doy) +
-    ar(time_index, p = 1),
+ ,
   family = zero_inflated_negbinomial(),
   data = QHI_bumblebee_nest_2025,
-  chains = 4, cores = 4
+  chains = 4, cores = 4,iter = 1200,warmup = 300
 )
 
-
+pp_check()
 #write.csv(QHI_bumblebee_nest_2025, "/Volumes/IGUTCHAQ/outputs/clean/QHI_bumblebee_nest_2025.csv", row.names = FALSE)
-QHI_bumblebee_nest_test <- read_csv("/Volumes/IGUTCHAQ/outputs/clean/QHI_bumblebee_nest_2025.csv")
+QHI_bumblebee_nest_2025 <- read_csv("/Volumes/IGUTCHAQ/outputs/clean/QHI_bumblebee_nest_2025.csv")
 
