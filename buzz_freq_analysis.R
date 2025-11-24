@@ -14,7 +14,9 @@ library(gganimate)
 setwd("/Users/alexandrebeauchemin/TundraBUZZ_github")
 
 # Load data
-buzz_freq <- read_csv("/Volumes/IGUTCHAQ/data/QHI_ARU_Data_2025_Aug2025/buzz_freq_QHI_2025.csv")
+# buzz_freq <- read_csv("/Volumes/IGUTCHAQ/data/QHI_ARU_Data_2025_Aug2025/buzz_freq_QHI_2025.csv")
+buzz_freq <- read_csv("/Volumes/TundraBUZZ/data/clean/buzz_freq_QHI_2024.csv")
+
 
 # plot
 ggplot(buzz_freq, aes(x = date, y = buzz_freq, group = date)) +
